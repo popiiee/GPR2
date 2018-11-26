@@ -1,0 +1,297 @@
+<!-- Panel HTML -->
+<div id="pnlAbout" class="adminPanel">
+	<div class="progressPanel ui-widget-content ui-helper-hidden" id="updateProgressPanel">
+		<div id="updateProgressbar" style="margin:20px 0px;"></div>
+		<div id="updateProgressText" style="line-height:24px;">Getting file size information..</div>
+		<a href="#" class="button noSpacing" id="cancelUpdate" style="float:right; margin-right:10px;">
+			<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-cancel"></span>
+			Cancel
+		</a>
+	</div>
+	<div class="ui-widget-content ui-helper-hidden" id="serverRestartingDialog">
+		<div class="notes" style="padding:5px;display:block;margin:0px 3px 15px 3px;">
+			Server is restarting now..
+		</div>
+		<div class="notes windowsOnly" style="padding:5px;display:block;font-size: 14px;line-height: 18px;background: #f7f2cd;margin: 0px -5px;border-radius: 5px;box-shadow: 0px 0px 4px 1px #8a8585;">
+			<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span> <strong>Information :</strong>
+			<hr class="ui-widget-content" />
+			If CrushFTP has <strong>not been installed as a service</strong>, you will need to run the <strong>update.bat</strong> file that has just been created to continue.
+		</div>
+	</div>
+	<div style="text-align:center;" id="aboutPanelContent">
+		<p>
+			<span class="liveData ui-priority-primary" id="about_info_str"></span>
+		</p>
+		<p>
+			Last Server Restart : <span class="liveData" id="server_start_time"></span>
+		</p>
+		<div id="noNewVersion" class="ui-helper-hidden">
+			CrushFTP is up to date (<span class="ui-priority-primary" id="server_current_version"></span>)
+		</div>
+		<div style="margin:10px 0px;">
+			<a href="#" class="button noSpacing" id="checkForUpdateCrushFTPAction">
+				<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-refresh"></span>
+				Check for updates
+			</a>
+			<a href="#" class="button noSpacing updateCrushFTP">
+				<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-circle-arrow-s"></span>
+				Update Now
+			</a>
+		</div>
+		<div id="newUpdateAvailable" class="ui-helper-hidden">
+			New update is available (New version : <span class="liveData" id="update_available_version"></span>)
+			<div style="margin:10px 0px;">
+				<input id="update_available_html" type="text" class="ui-helper-hidden" />
+				<a href="#" class="button noSpacing updateCrushFTP">
+					<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-circle-arrow-s"></span>
+					Update Now
+				</a>
+				<a href="#" class="button noSpacing" id="showNewVersionDetails">
+					<span style="display:inline-block;margin:-1px 2px 0px -9px;float:left;" class="pointer ui-icon ui-icon-clipboard"></span>
+					Show Details
+				</a>
+			</div>
+			<div id="updateDialog">
+				<table width="100%">
+					<tr>
+						<td>
+							New version : <span id="new_version_no"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div id="new_version_html" class="LargeListBox sideScroll"></div>
+						</td>
+					</tr>
+					<tr>
+						<td class="right">
+							<a href="#" class="button noSpacing updateCrushFTP">
+								<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-circle-arrow-s"></span>
+								Update
+							</a>
+							<a href="#" class="button noSpacing" id="closeUpdateWindow" style="margin-right:15px;">
+								<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-close"></span>
+								Cancel
+							</a>
+						</td>
+					</tr>
+				</table>
+		   </div>
+		</div>
+		<br/>
+		<hr class="ui-widget-content" />
+		<p>
+			<a href="#" class="button noSpacing" id="registerCrushFTP">
+				<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-key"></span>
+				Register Now
+			</a>
+		</p>
+		<p>
+			Registration Name : <span class="liveData" id="registration_name"></span>
+		</p>
+		<p>
+			Registration Email : <span class="liveData" id="registration_email"></span>
+		</p>
+		<p>
+			Maximum Concurrent Users : <span class="liveData" id="max_max_users"></span>
+		</p>
+		<p>
+			<span class="liveData" id="enterprise_level"></span>
+		</p>
+		<p style="margin-top:30px;">
+			<span class="ui-priority-primary">CrushFTP Support</span>
+			<br/>
+			<a href="mailto:support@crushftp.com">support@crushftp.com</a><br/>
+			<a href="http://www.crushftp.com/">http://www.crushftp.com/</a><br/>
+		</p>
+		<p>
+			<a id="debugThreadList" class="button noSpacing" href="javascript:void(0);">
+				<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-clipboard"></span>
+				Debug : Dump Thread List
+			</a>
+		</p>
+		<p id="javaInfo">
+			Java : <span id="java_info"></span>
+		</p>
+		<p id="memcacheItems">
+			MemCache Items : <span class="liveData" id="memcache_objects"></span>
+		</p>
+		<p id="keywordCacheSize">
+			Keyword Cache Size : <span class="liveData" id="keywords_cache_size_f"></span>
+		</p>
+		<p id="exifCachedCount">
+			EXIF Items Cached : <span class="liveData" id="exif_item_count"></span>
+		</p>
+		<hr class="ui-widget-content" />
+		<p style="margin-top:10px;">
+		</p>
+		<table style="text-align: left;padding: 10px;line-height: 25px;">
+			<tr>
+				<td colspan="2" style="text-align: left;">
+					<span class="ui-priority-primary">Replication Status</span>
+					<hr class="ui-widget-content" />
+					<p style="margin-top:10px;">
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;width: 170px;">Status 1 : </td>
+				<td>
+					<span class="liveData" id="repliction_status1"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">Status 2 : </td>
+				<td>
+					<span class="liveData" id="repliction_status2"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">Status 3 : </td>
+				<td>
+					<span class="liveData" id="repliction_status3"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">Error : </td>
+				<td>
+					<span class="liveData" id="repliction_error"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Client ID :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_client_id"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Item ID :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_id"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Path :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_path"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Date :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_date"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Action :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_action"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Path 1 :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_path1"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Path 2 :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_path2"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align: right;font-weight: bold;">
+					Path 3 :
+				</td>
+				<td>
+					<span class="liveData" id="last_item_path3"></span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<hr class="ui-widget-content" />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td style="text-align: left;">
+					<p style="margin-top:10px;">
+						<a href="#" id="killReplication" class="button noSpacing">
+							<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-cancel"></span>
+							Kill Last Item
+						</a>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</div>
+	 <div id="registrationDialog">
+		<table width="100%">
+			<tr>
+				<td colspan="2">
+					<div class="ui-state-highlight ui-corner-all warning" style="padding:5px;display:block;margin:0px 3px 15px 3px;">
+						<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+						Please visit <a href="http://www.crushftp.com/pricing.html">http://www.CrushFTP.com/pricing.html</a> to register.
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 50px;" class="right">
+					<label>
+						Name :
+					</label>
+				</td>
+				<td>
+					<input _name="registration_name" class="bigInputBox" type="text" id="registrationDialog_registration_name" />
+				</td>
+			</tr>
+			<tr>
+				<td class="right">
+					<label>
+						Email :
+					</label>
+				</td>
+				<td>
+					<input _name="registration_email" class="bigInputBox" type="text" id="registrationDialog_registration_email" />
+				</td>
+			</tr>
+			<tr>
+				<td class="right">
+					<label>
+						Code :
+					</label>
+				</td>
+				<td>
+					<input _name="registration_code" class="bigInputBox" type="text" id="registrationDialog_registration_code" />
+				</td>
+			</tr>
+			<tr>
+				<td class="right" colspan="2">
+					<a href="#" class="button noSpacing" id="registerCrushFTPAction">
+						<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-key"></span>
+						Register
+					</a>
+					<a href="#" class="button noSpacing" id="cancelRegistration" style="margin-right:15px;">
+						<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-close"></span>
+						Cancel
+					</a>
+				</td>
+			</tr>
+		</table>
+   </div>
+</div>

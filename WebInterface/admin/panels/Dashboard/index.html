@@ -1,0 +1,213 @@
+<!-- Panel HTML -->
+<div id="pnlDashboard" class="adminPanel">
+    <span style="position: absolute;left: 15px;top: 0px;">
+        <div class="label" style="position: relative;top: 5px;font-size: 11px;text-align: left;min-width:300px;">
+            <label class="ui-priority-primary">Last Restart : </label> <label class="liveData" _id="server_start_time"></label>
+            <span class="spacer"></span>
+            <label class="ui-priority-primary">Host Name : </label> <label class="liveData" _id="hostname"></label>
+        </div>
+    </span>
+    <span style="position: absolute;right: 15px;top: 0px;" class="ui-priority-secondary">Last updated : <span id="lastDashboardTimestamp" class="ui-priority-primary"></span></span>
+    <div style="margin:7px 0px;"></div>
+    <div class="dashboardGraphPanelGroup">
+        <fieldset id="liveServers" class="ui-widget-content allignedForm dashboardGraphPanel smallLabels">
+            <legend>Server Status</legend>
+            <a href="#" class="dashboardPanelLink serverStatus"><span style="display:inline-block;float:right;" class="pointer ui-icon ui-icon-circle-zoomin"></span> More</a>
+            <span class="clear"></span>
+            <div class="graph sparkline">
+                Loading...
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #429B42;"></span>Live </span><span class="value up"></span></div>
+                <div class="label"><span class="block" style="background-color: #C80D22;"></span>Down </span><span class="value down"></span></div>
+            </div>
+        </fieldset>
+        <fieldset class="ui-widget-content allignedForm dashboardGraphPanel smallLabels user-info">
+            <legend>Session Information</legend>
+            <a href="#" class="dashboardPanelLink sessionInformation"><span style="display:inline-block;float:right;" class="pointer ui-icon ui-icon-circle-zoomin"></span> More</a>
+            <span class="clear"></span>
+            <div id="speedInformation" class="graph sparkline">
+                <div class="liveData concurrent-user-info" _id="concurrent_users" style="border:1px solid #eee; background-color:#A3A3C2;padding:15px;text-align: center;margin:0px 10px 10px 10px;color:white;font-size:1.2em;"></div>
+                <div class="liveData" _id="connected_users" style="border:1px solid #eee; background-color:#666699;padding:15px;text-align: center;margin:20px 10px 0px 10px;color:white;font-size:1.2em;"></div>
+            </div>
+            <div class="dashboardLegends">
+                <div class="label concurrent-user-info"><span class="block" style="background-color: #A3A3C2;"></span>Concurrent</span></div>
+                <div class="label"><span class="block" style="background-color: #666699;"></span>Connected</span></div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="dashboardGraphPanelGroup">
+        <fieldset id="loginInfo" class="ui-widget-content allignedForm dashboardGraphPanel smallLabels resetStat">
+            <legend>Login Information</legend>
+            <div class="graph sparkline">
+                Loading...
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #FFAD5C;"></span>Successful</span><span class="value liveData hideZero" _id="successful_logins"></span></div>
+                <div class="label"><span class="block" style="background-color: #B27940;"></span>Failed</span><span class="value liveData hideZero" _id="failed_logins"></span></div>
+            </div>
+        </fieldset>
+        <fieldset id="downloadUploadInfo" class="ui-widget-content allignedForm dashboardGraphPanel smallLabels resetStat">
+            <legend>Download / Upload</legend>
+            <div class="graph sparkline">
+                Loading...
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #DBB84D;"></span>Download</span><span class="value liveData hideZero" _id="downloaded_files"></span></div>
+                <div class="label"><span class="block" style="background-color: #CC9900;"></span>Upload</span><span class="value liveData hideZero" _id="uploaded_files"></span></div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="dashboardGraphPanelGroup">
+        <fieldset id="transferInfo" class="ui-widget-content allignedForm dashboardGraphPanel smallLabels resetStat">
+            <legend>Bytes transferred</legend>
+            <div class="graph sparkline">
+                Loading...
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #B5AABA;"></span>Sent</span><span class="value liveData formatData hideZero" _id="total_server_bytes_sent"></span></div>
+                <div class="label"><span class="block" style="background-color: #95869D;"></span>Received</span><span class="value liveData formatData hideZero" _id="total_server_bytes_received"></span></div>
+            </div>
+        </fieldset>
+        <fieldset id="speedInformation" class="ui-widget-content allignedForm dashboardGraphPanel smallLabels">
+            <legend>Speed Information</legend>
+            <div class="graph sparkline">
+                <div class="downSpeed liveData formatData inKBs speedInSecond " _id="current_download_speed" style="border:1px solid #eee; background-color:#ADAD85;padding:15px;text-align: center;margin:0px 10px 10px 10px;color:white;font-size:1.2em;">-</div>
+                <div class="upSpeed liveData formatData inKBs speedInSecond " _id="current_upload_speed" style="border:1px solid #eee; background-color:#999966;padding:15px;text-align: center;margin:20px 10px 0px 10px;color:white;font-size:1.2em;">-</div>
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #ADAD85;"></span>Outgoing</span></div>
+                <div class="label"><span class="block" style="background-color: #999966;"></span>Incoming</span></div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="dashboardGraphPanelGroup">
+        <fieldset class="ui-widget-content allignedForm dashboardGraphPanel smallLabels">
+            <legend>Job Schedules</legend>
+            <a href="/WebInterface/Jobs/index.html" target="_blank" class="dashboardPanelLink jobsInformation"><span style="display:inline-block;float:right;" class="pointer ui-icon ui-icon-circle-zoomin"></span> More</a>
+            <span class="clear"></span>
+            <div id="jobsInformation" class="graph sparkline">
+                <div id="totalJobs" style="border:1px solid #eee; background-color:#C1AFC1;padding:15px;text-align: center;margin:0px 10px 10px 10px;color:white;font-size:1.2em;"></div>
+                <div id="runningJobs" style="border:1px solid #eee; background-color:#A68DA6;padding:15px;text-align: center;margin:20px 10px 0px 10px;color:white;font-size:1.2em;"></div>
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #C1AFC1;"></span>Total</span></div>
+                <div class="label"><span class="block" style="background-color: #A68DA6;"></span>Running</span></div>
+            </div>
+        </fieldset>
+        <fieldset id="processThreads" class="ui-widget-content allignedForm dashboardGraphPanel smallLabels">
+            <legend>Process Threads</legend>
+            <div class="graph sparkline">
+                Loading...
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #B4C4CB;"></span>Free </span><span class="value liveData free" _id="thread_pool_available"></span></div>
+                <div class="label"><span class="block" style="background-color: #688A97;"></span>Busy </span><span class="value liveData busy" _id="thread_pool_busy"></span></div>
+            </div>
+            <div class="label" style="position: relative;top: -172px;font-size: 10px;text-align: right;display: inline-block;width: 100%;"><span class="block"></span>Max : </span><span class="value liveData hideZero" _id="max_threads"></span></div>
+        </fieldset>
+    </div>
+    <div class="dashboardGraphPanelGroup">
+        <fieldset id="memoryInfo" class="ui-widget-content allignedForm dashboardGraphPanel smallLabels">
+            <legend>Memory</legend>
+            <div class="graph sparkline">
+                Loading...
+            </div>
+            <div class="dashboardLegends">
+                <div class="label"><span class="block" style="background-color: #83B8D8;"></span>Free</span><span class="value liveData hideZero" _id="ram_free_f"></span></div>
+                <div class="label"><span class="block" style="background-color: #549FCC;"></span>Used</span><span class="value liveData hideZero" _id="ram_used_f"></span></div>
+            </div>
+            <div class="label" style="position: relative;top: -172px;font-size: 10px;text-align: right;display: inline-block;width: 100%;"><span class="block"></span>Max : </span><span class="value liveData hideZero" _id="ram_max_f"></span></div>
+        </fieldset>
+        <fieldset class="ui-widget-content allignedForm dashboardGraphPanel smallLabels">
+            <legend>Alerts</legend>
+            <span class="clear"></span>
+            <div style="overflow-x:auto;height:155px;">
+                <span class="clear"></span>
+                <div class="ui-priority-primary ui-widget-content ui-state-highlight" style="margin-bottom:2px;padding:1px;text-align:center;">Drive Space</div>
+                <ul class="dashboardAlerts" id="drivespaceAlerts" style="margin-bottom:5px;">
+                    <li style="text-align:center;">Nothing to show</li>
+                </ul>
+                <div class="ui-priority-primary ui-widget-content ui-state-highlight" style="margin-bottom:2px;padding:1px;text-align:center;">Too many logins</div>
+                <ul class="dashboardAlerts" id="hammeringAlerts">
+                    <li style="text-align:center;">Nothing to show</li>
+                </ul>
+            </div>
+        </fieldset>
+    </div>
+    <div class="dashboardGraphPanelGroup">
+        <fieldset class="ui-widget-content allignedForm dashboardGraphPanel double smallLabels">
+            <legend>Recent Logins</legend>
+            <a href="#" class="dashboardPanelLink userInformation"><span style="display:inline-block;float:right;" class="pointer ui-icon ui-icon-circle-zoomin"></span> More</a>
+            <span class="clear"></span>
+            <div id="lastLogins" class="lastLogins">
+                Nothing to show
+            </div>
+        </fieldset>
+        <fieldset style="display: none;" class="replication-info ui-widget-content enterpriseFeature allignedForm dashboardGraphPanel double smallLabels">
+            <legend>Replication Info</legend>
+            <span class="clear"></span>
+            <div style="overflow-x:auto;height:155px;font-size: 13px;margin-top: 10px;">
+                <span class="clear"></span>
+                <div style="width:170px;text-align:right;display:inline-block;margin-bottom:2px;padding:1px;float:left;">Number of message passed :</div>
+                <div class="ui-priority-primary" style="display:inline-block;width:90px;font-size: 17px;height:15px;float:right;">
+                    <span class="liveData" _id="replicated_received_message_count"></span>
+                </div>
+                <hr class="ui-widget-content clear" style="margin: 15px 0px !important;" />
+                <div style="width:170px;text-align:right;display:inline-block;margin-bottom:2px;padding:1px;float:left;">Number of pref changes :</div>
+                <div class="ui-priority-primary" style="display:inline-block;width:90px;font-size: 17px;height:15px;float:right;">
+                    <span class="liveData" _id="replicated_write_prefs_count"></span>
+                </div>
+                <hr class="ui-widget-content clear" style="margin: 15px 0px !important;" />
+                <div style="width:170px;text-align:right;display:inline-block;margin-bottom:2px;padding:1px;float:left;">Number of user changes :</div>
+                <div class="ui-priority-primary" style="display:inline-block;width:90px;font-size: 17px;height:15px;float:right;">
+                    <span class="liveData" _id="replicated_user_changes_count"></span>
+                </div>
+                <hr class="ui-widget-content clear" style="margin: 15px 0px !important;" />
+                <div style="width:170px;text-align:right;display:inline-block;margin-bottom:2px;padding:1px;float:left;">Number of job changes :</div>
+                <div class="ui-priority-primary" style="display:inline-block;width:90px;font-size: 17px;height:15px;float:right;">
+                    <span class="liveData" _id="replicated_job_changes_count"></span>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset style="display:none;" class="ui-widget-content allignedForm dashboardGraphPanel double smallLabels">
+            <legend>Server Information</legend>
+            <a href="#" class="dashboardPanelLink serverInformation"><span style="display:inline-block;float:right;" class="pointer ui-icon ui-icon-circle-zoomin"></span> More</a>
+            <span class="clear"></span>
+            <div style="margin:10px 0px 20px 0px;">
+                <label class="ui-priority-primary">Last Restart : </label>
+                <label class="liveData" _id="server_start_time"></label>
+            </div>
+            <div style="margin:0px 0px 20px 0px;">
+                <label class="ui-priority-primary">Registration Name :</label>
+                <label class="liveData" _id="registration_name"></label>
+            </div>
+            <div style="margin:0px 0px 20px 0px;">
+                <label class="ui-priority-primary">Enterprise Level :</label>
+                <label class="liveData" _id="enterprise_level"></label>
+            </div>
+            <div style="margin:0px 0px 20px 0px;">
+                <label class="liveData ui-priority-primary" _id="about_info_str"></label>
+            </div>
+        </fieldset>
+    </div>
+    <div class="clear"></div>
+    <div style="margin:5px;">
+        <div id="serverGraphsTabDashboard">
+        </div>
+    </div>
+    <ul id="serverResetStatsContextMenu" class="contextMenu">
+        <li class="allStats">
+            <a href="#allStats" msg="Reset All Stats">Reset All Below Listed Stats</a>
+        </li>
+        <li class="loginStats separator">
+            <a href="#loginStats">Reset Login Counts (total, successful, failed)</a>
+        </li>
+        <li class="transferStats separator">
+            <a href="#transferStats">Reset Server Bytes (in, out)</a>
+        </li>
+        <li class="uploadDownloadStats separator">
+            <a href="#uploadDownloadStats">Reset Upload/Download Counter</a>
+        </li>
+    </ul>
+</div>

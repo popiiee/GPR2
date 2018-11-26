@@ -1,0 +1,324 @@
+<div id="autocompleteFix" style="position:absolute;top:-200px;">
+    <input type="text" name="email" value="" style="display: none" />
+    <input type="text" name="email" value="Alice"/>
+    <input type="text" name="not-an-email" value="" style="display: none" />
+    <input type="password" name="password" value="" style="display: none" />
+    <input type="password" name="password" value=""/>
+</div>
+<!-- Plugin HTML -->
+<div id="pnlPluginHomeDirectory">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td>
+                <div id="pluginSection" class="customForm">
+                    <p>
+                        <input type="checkbox" name="enabled" id="enabled" />
+                        <label for="enabled" class="ui-priority-primary HomeDirectory lblEnabledText">Enabled</label>
+
+                        <span class="spacer"></span>
+                        <span class="spacer"></span>
+
+                        <input type="checkbox" name="debug" id="debug" />
+                        <label for="debug" class="ui-priority-primary HomeDirectory lblDebugText" class="nonEmbed">Debug</label>
+
+                        <span style="float:right;" class="nonEmbed">
+                            <span class="HomeDirectory lblVersionText">Version :</span>
+                            <span class="liveData" id="version"></span>
+                        </span>
+                    </p>
+                    <div class="tabs nobg">
+                        <ul>
+                            <li><a href="#Help" class="HomeDirectory lblHelpTabText">Help</a>
+                            </li>
+                            <li><a href="#Setup" id="setupTabLink" class="HomeDirectory lblSetupTabText">Setup</a>
+                            </li>
+                        </ul>
+                        <div class="pluginDetails HomeDirectory pnlHelpInstructionsText" id="Help" style="line-height:20px;">
+                            <div style="width:600px;">
+                                <strong>HomeDirectory Plugin Help</strong>
+                                <p>
+                                    Simple plugin that just generates the users home directory when they first login.
+                                    This way you could use say the SQL plugin and setup a user. When they actually
+                                    login, a new folder could be created for them to upload into.
+                                </p>
+                                <strong>How to use:</strong>
+                                <p>
+                                    Set a location where users home folders will be created at. Use the browse button to pick
+                                    the location.
+                                </p>
+                                <p>
+                                    Specify the permission they will have in that folder. In general you will give them full
+                                    permissions here as this folder is probably empty. This way they can then login, and upload
+                                    files to it. If the folder doesn't exist, it will be created for them.
+                                </p>
+                                <p>
+                                    To test, create a new user via the user manager. Don't setup any directory
+                                    items in the "user's stuff (VFS)" pane. Then login with that user and look for
+                                    the new folder that just got created.
+                                    For the time/date format on a unique folder, search google for 'SimpleDateFormat'.
+                                </p>
+                                <p>
+                                    Questions? Email me : <a target="_blank" href="mailto:support@crushftp.com">support@crushftp.com</a>
+                                </p>
+                                <p>
+                                    --Ben Spink
+                                </p>
+                            </div>
+                        </div>
+                        <div id="Setup" class="ui-corner-all ui-widget-content nobg" style="padding:5px 10px;">
+                            <p>
+                                <label for="path" class="HomeDirectory lblPathText">Path :</label>
+                                <input type="text" id="path" name="path" class="bigInputBox maskPasswordOnURL" />
+                                <a FileMode="user" href="#" class="button serverFilePickButton" rel="path" file_mode="server">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                    <span class="HomeDirectory btnBrowseText">Browse</span>
+                                </a>
+                            </p>
+                            <p>
+                                <fieldset class="nobg" style="display:inline-block;">
+                                    <legend class="donotProcess">Directory Permissions :</legend>
+                                    <input type="text" id="permissions" name="permissions" class="bigInputBox" style="display:none;" />
+                                    <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_read" rel="(read)" />
+                                        <label for="privs_read">Download</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_write" rel="(write)" />
+                                        <label for="privs_write">Upload</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_view" rel="(view)" />
+                                        <label for="privs_view">View</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_delete" rel="(delete)" />
+                                        <label for="privs_delete">Delete</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_deletedir" rel="(deletedir)" />
+                                        <label for="privs_deletedir">Delete Folder</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_makedir" rel="(makedir)" />
+                                        <label for="privs_makedir">Create Folder</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_rename" rel="(rename)" />
+                                        <label for="privs_rename">Rename</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_resume" rel="(resume)" />
+                                        <label for="privs_resume">Resume Transfers</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_share" rel="(share)" />
+                                        <label for="privs_share">Share/Publish</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_slideshow" rel="(slideshow)" />
+                                        <label for="privs_slideshow">Slideshow</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_invisible" rel="(invisible)" />
+                                        <label for="privs_invisible">Make Invisible</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_ratio" rel="(ratio)" />
+                                        <label for="privs_ratio">Free Ratio</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_replicate" rel="(replicate)" /><label for="privs_replicate">Replicate</label>
+                                    </span>
+                                    <span style="float:left;margin-right:10px;" title="Blocks changes to this folder, while allowing changes in sub folders." class="vtip">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_locked" rel="(locked)" />
+                                        <label for="privs_ratio">Locked</label>
+                                    </span>
+                                    <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <label for="privs_quota">Quota:(MB)</label>
+                                        <input type="text" id="privs_quota" valtype="float" class="ignoreBind validate excludeXML permissionItem" />
+                                    </span>
+                                    <span style="float:left;margin-right:10px;">
+                                        <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_real_quota" rel="(real_quota)" />
+                                        <label for="privs_real_quota">RealFile Quota</label>
+                                    </span>
+                                    <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                    <span style="clear: both;">
+                                        <label for="privs_comment">
+                                            Comment: (HTML OK)</label>
+                                        <br/>
+                                        <textarea class="ignoreBind excludeXML permissionItem" id="privs_comment" cols="80" rows="3"></textarea>
+                                    </span>
+                                    <span style="clear: both;margin-top:10px;display:block;"></span>
+                                    <span style="">
+                                        <a href="#" class="button" id="advancedPrivsOptions" style="top:0px !important;">
+                                            <span style='display: inline-block; margin: 0px 3px 0px -7px; float: left;' class='pointer ui-icon ui-icon-key'></span>
+                                            <span class="">Advanced</span>
+                                        </a>
+                                    </span>
+                                    <div style="clear: both;margin-top:0px;"></div>
+                                    <div style="clear:both;"></div>
+                                </fieldset>
+                            </p>
+                            <p>
+                                <label title="Allows you to specify the individual server that can use this plugin instance." for="server_item" class="HomeDirectory lblAllowedServerPortText">Allowed Server Port :</label>
+                                <div id="server_item_list"></div>
+                                <input style="display:none;" type="text" id="server_item" name="server_item" />
+                                <div class="clear"></div>
+                            </p>
+                            <p title="Java SimpleDateFormat - search google for the format.">
+                                <input type="checkbox" name="uniqueFolder" id="uniqueFolder" />
+                                <label for="uniqueFolder" class="HomeDirectory lblUseUniqueTimeStampText">Use Unique Time Stamped Folder? (ex. johndoe_01.01.2007)</label>
+
+                                <span class="spacer"></span>
+
+                                <input type="text" id="uniqueFolderFormat" name="uniqueFolderFormat" />
+                            </p>
+                            <p>
+                                <label for="username_filter" class="HomeDirectory lblUsernameMatchingText">Username matching :</label>
+                                <input type="text" id="username_filter" name="username_filter" />
+
+                                <span class="spacer"></span>
+
+                                <input type="checkbox" name="prependUsername" id="prependUsername" />
+                                <label for="prependUsername" class="HomeDirectory lblPrependUserNameText">Prepend username?</label>
+                            </p>
+                            <p>
+                                <input type="checkbox" name="always_generate" id="always_generate" />
+                                <label for="always_generate" class="HomeDirectory lblAlwaysGenerateHomeFolderText">Replace Existing VFS With New Home Folder</label>
+
+                                <!-- <span class="spacer"></span>
+                                <span class="spacer"></span>
+                                <span title="Allows you to specify the individual server that can use this plugin instance.">
+                                    <label for="server_item" class="HomeDirectory lblServerText">Server :</label>
+                                    <select id="server_item" name="server_item"></select>
+                                </span> -->
+                            </p>
+                            <!-- <p class="subPanel ui-widget-content leftborder nobg">
+                                <input type="checkbox" class="reverse" name="erase_home" id="erase_home" />
+                                <label for="erase_home" class="HomeDirectory lblAllowAccessToOldHomeFoldersText">Allow access to old home folders</label>
+                            </p> -->
+                            <p>
+                                <input type="checkbox" name="event_only" id="event_only" />
+                                <label for="event_only" class="HomeDirectory lblRunOnlyForLoginEventText">Only run if configured for a login event?</label>
+                            </p>
+                            <p title="Enter each additional path on each line.  Example: dropoff/">
+                                <label for="additional_paths" class="HomeDirectory lblCreateAdditionalSubfoldersText">
+                                    <strong>Create additional subfolders in home directory :</strong></label>
+                                <!--textarea class="formTextarea nobg" id="additional_paths" name="additional_paths" /-->
+                                <div class="buttonBar buttonBarNoBottom">
+                                    <a id="addNewSubFolder" href="#" class="button">
+                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-plus'></span>Add
+                                    </a>
+                                    <span class="spacer"></span>
+                                    <a id="editSubFolder" href="#" class="button">
+                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-document'></span>Edit
+                                    </a>
+                                    <span class="spacer"></span>
+                                    <a id="removeSubFolder" href="#" class="button">
+                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-trash'></span>Remove
+                                    </a>
+                                </div>
+                                <div>
+                                    <div class="LargeListBox ui-corner-all ui-widget-content nobg sideScroll" style="width:500px;height:200px;float:left;">
+                                        <ol class="nobg selectable multiple sideScroll" id="homeDirSubFolders" name="homeDirSubFolders">
+                                        </ol>
+                                    </div>
+                                    <div id="subfolderPrivs" style="width:800px;height:300px;float:left;margin: -10px 0px 0px 10px;line-height: 30px;display:none;">
+                                        <fieldset class="nobg" style="display:inline-block;">
+                                            <legend class="donotProcess">Directory Permissions :</legend>
+                                            <input type="text" id="subfolder_permissions" name="permissions" class="bigInputBox" style="display:none;" />
+                                            <span style="clear: both;display:block;height:1px;"></span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_read" rel="(read)" />
+                                                <label for="subfolder_privs_read">Download</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_write" rel="(write)" />
+                                                <label for="subfolder_privs_write">Upload</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_view" rel="(view)" />
+                                                <label for="subfolder_privs_view">View</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_delete" rel="(delete)" />
+                                                <label for="subfolder_privs_delete">Delete</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_deletedir" rel="(deletedir)" />
+                                                <label for="subfolder_privs_deletedir">Delete Folder</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_makedir" rel="(makedir)" />
+                                                <label for="subfolder_privs_makedir">Create Folder</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_rename" rel="(rename)" />
+                                                <label for="subfolder_privs_rename">Rename</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_resume" rel="(resume)" />
+                                                <label for="subfolder_privs_resume">Resume Transfers</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_share" rel="(share)" />
+                                                <label for="subfolder_privs_share">Share/Publish</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_slideshow" rel="(slideshow)" />
+                                                <label for="subfolder_privs_slideshow">Slideshow</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_invisible" rel="(invisible)" />
+                                                <label for="subfolder_privs_invisible">Make Invisible</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_ratio" rel="(ratio)" />
+                                                <label for="subfolder_privs_ratio">Free Ratio</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_replicate" rel="(replicate)" /><label for="subfolder_privs_replicate">Replicate</label>
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_locked" rel="(locked)" />
+                                                <label for="subfolder_privs_locked">Locked</label>
+                                            </span>
+                                            <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <label for="subfolder_privs_quota">Quota:(MB)</label>
+                                                <input type="text" id="subfolder_privs_quota" valtype="float" class="ignoreBind validate excludeXML permissionItemSubFolder" />
+                                            </span>
+                                            <span style="float:left;margin-right:10px;">
+                                                <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_real_quota" rel="(real_quota)" />
+                                                <label for="subfolder_privs_real_quota">RealFile Quota</label>
+                                            </span>
+                                            <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                            <span style="clear: both;">
+                                                <label for="subfolder_privs_comment">
+                                                    Comment: (HTML OK)</label>
+                                                <br/>
+                                                <textarea class="ignoreBind excludeXML permissionItemSubFolder" id="subfolder_privs_comment" cols="80" rows="3"></textarea>
+                                            </span>
+                                            <span style="clear: both;margin-top:10px;display:block;"></span>
+                                            <span style="">
+                                                <a href="#" class="button" id="advancedPrivsOptionsSubFolder" style="top:0px !important;">
+                                                    <span style='display: inline-block; margin: 0px 3px 0px -7px; float: left;' class='pointer ui-icon ui-icon-key'></span>
+                                                    <span class="">Advanced</span>
+                                                </a>
+                                            </span>
+                                            <div style="clear: both;margin-top:0px;"></div>
+                                            <div style="clear:both;"></div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                                <div class="clear"></div>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

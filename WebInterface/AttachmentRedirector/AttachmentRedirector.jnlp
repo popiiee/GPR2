@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.5+" codebase="%base_url%WebInterface/AttachmentRedirector/">
+	<information>
+		<title>%appname%</title>
+		<vendor>%base_url%</vendor>
+	    <icon href="logo.png"/>
+	</information>
+	<security><all-permissions/></security>
+	<resources>
+		<j2se version="1.4+" max-heap-size="512m"/>
+		<jar href="AttachmentRedirector.jar"/>
+		<property name="apple.awt.UIElement" value="true"/>
+	</resources>
+	<application-desc main-class="com.attachmentredirector.Daemon" name="AdvancedFileTransferDesktop">
+		<argument>appname=%appname%:::user_name=%user_name%:::base_url=%base_url%</argument>
+	</application-desc>
+</jnlp>

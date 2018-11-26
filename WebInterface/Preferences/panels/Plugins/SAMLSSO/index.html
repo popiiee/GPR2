@@ -1,0 +1,572 @@
+<div id="autocompleteFix" style="position:absolute;top:-200px;">
+    <input type="text" name="email" value="" style="display: none" />
+    <input type="text" name="email" value="Alice"/>
+    <input type="text" name="not-an-email" value="" style="display: none" />
+    <input type="password" name="password" value="" style="display: none" />
+    <input type="password" name="password" value=""/>
+</div>
+<!-- Plugin HTML -->
+<div id="pnlPluginSAMLSSO">
+	<table width="100%" cellpadding="0" cellspacing="0" border="0">
+	<tr>
+		<td>
+            <p>
+                <div style="padding:5px;font-size:13px;font-weight:bolder;" class="ui-corner-all ui-state-error">
+                    <span style="float:left;cursor:pointer;margin-top:-2px;margin-right:2px;" class="ui-icon ui-icon-flag"></span>
+                Enterprise only feature
+                </div>
+            </p>
+			<div id="pluginSection" class="customForm" style="padding: 4px;">
+				<p>
+					<input type="checkbox" name="enabled" id="enabled" />
+					<label for="enabled" class="ui-priority-primary SAMLSSO lblEnabledText">Enabled</label>
+
+					<span class="spacer"></span>
+					<span class="spacer"></span>
+
+					<input type="checkbox" name="debug" id="debug" />
+					<label for="debug" class="ui-priority-primary SAMLSSO lblDebugText">Debug</label>
+
+					<span class="spacer"></span>
+					<span class="spacer"></span>
+					<span class="spacer"></span>
+
+					<span style="display:inline-block;padding:3px;float:right;" class="nonEmbed"><span class="SAMLSSO lblVersionText">Version :</span> <span class="liveData" id="version"></span></span>
+				</p>
+                <div class="ui-state-highlight ui-corner-all warning" style="padding:5px;display:inline-block;margin:0px 3px 5px 3px;">
+                    <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+                    <span class="SAMLSSO">
+                        The <strong>HTTP Redirect Base ("http_redirect_base")</strong> parameter in your prefs.XML file must be cleared out, or set to be your domain name you will be using or the plugin will be unable to redirect your properly to the URL you need to use. You can modify the <strong>HTTP Redirect Base</strong> in the <strong>"Misc"</strong> panel as well.
+                    </span>
+                </div>
+				<div class="ui-corner-all ui-widget-content nobg" style="padding:5px 10px;">
+					<p>
+						<label for="server_item" class="SAMLSSO lblServerItemText">Server Item : </label>
+						<select id="server_item" name="server_item"></select>
+						<div class="ui-state-highlight ui-corner-all warning" style="padding:3px;display:inline-block;margin:0px 3px;">
+							<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+							<span class="SAMLSSO lblServerItemNoteText">
+								You can specify which server item will use this plugin. Example 	lookup_21, or lookup_8080
+							</span>
+						</div>
+					</p>
+					<p>
+						<label for="saml_provider_url" class="SAMLSSO lblsaml_provider_urlText">SAML Provider URL : </label>
+						<input type="text" id="saml_provider_url" class="bigInputBox" name="saml_provider_url"  />
+					</p>
+					<p>
+						<label for="saml_audience" class="SAMLSSO lblsaml_audienceText">SAML Audience : </label>
+						<input type="text" id="saml_audience" class="" name="saml_audience"  />
+					</p>
+                    <span style="clear: both;">
+                        <label for="saml_signing_cert">
+                            Base64 encoded PEM Signing certificate: (copy from config xml from saml provider)</label>
+                        <br/>
+                        <textarea style="font-family:Courier;" id="saml_signing_cert" cols="76" rows="18"></textarea>
+                    </span>
+                    <p>
+                        <input type="checkbox" name="saml_validate_signature" id="saml_validate_signature" />
+                        <label for="saml_validate_signature" class="ui-priority-primary">Validate XML Signature</label>
+                    </p>
+                    <p>
+                        <input type="checkbox" name="saml_send_post" id="saml_send_post" />
+                        <label for="saml_send_post" class="ui-priority-primary">Send HTTP-POST SAML AuthNRequest</label>
+                    </p>
+                    <div class="saml-special ui-corner-all ui-widget-content nobg" style="padding:5px 10px;">
+                        <p>
+                            <label for="idp_redirect_url" class="SAMLSSO bigLabel">IDP Redirect URL :</label>
+                            <input type="text" id="idp_redirect_url" name="idp_redirect_url" class="bigInputBox" />
+                        </p>
+                        <p>
+                            <label for="return_url" class="SAMLSSO bigLabel">CrushFTP Service Provider URL :</label>
+                            <input type="text" id="return_url" name="return_url" class="bigInputBox" />
+                        </p>
+                        <p>
+                            <label for="saml_issuer" class="SAMLSSO bigLabel">SAML Issuer :</label>
+                            <input type="text" id="saml_issuer" name="saml_issuer" class="bigInputBox" />
+                        </p>
+                        <p>
+                            <label for="name_id_format" class="SAMLSSO bigLabel">Name Id Format :</label>
+                            <input type="text" id="name_id_format" name="name_id_format" class="bigInputBox" />
+                        </p>
+                        <p>
+                            <label for="name_qualifier" class="SAMLSSO bigLabel">Name Qualifier :</label>
+                            <input type="text" id="name_qualifier" name="name_qualifier" class="bigInputBox" />
+                        </p>
+                        <p>
+                            <label for="compress_auth" class="SAMLSSO bigLabel">Compress AuthNRequest :</label>
+                            <input type="checkbox" name="compress_auth" id="compress_auth" />
+                        </p>
+                    </div>
+                    <hr class="ui-widget-content" />
+                    <div class="saml-special" style="padding:0px 10px;">
+                        <p>
+                            <strong>Encrypted SAML Response (This only needs to be filled out if the SAML assertion is encrypted.)</strong>
+                        </p>
+                        <p>
+                            <label for="saml_decryption_keystore" class="SAMLSSO bigLabel">Decryption Keystore Path :</label>
+                            <input type="text" id="saml_decryption_keystore" name="saml_decryption_keystore" autocomplete="off" class="bigInputBox" />
+                            <a PickType="any" href="#" class="button serverFilePickButton" rel="saml_decryption_keystore" style="top:4px;">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                <span class="FolderMonitor btnFolderLocationBrowseText">Browse
+                                </span>
+                            </a>
+                        </p>
+                        <p>
+                            <label for="saml_decryption_keystore_password" class="SAMLSSO bigLabel">Decryption Keystore Password :</label>
+                            <input type="password" id="saml_decryption_keystore_password" class="encryptPass" autocomplete="off" name="saml_decryption_keystore_password" />
+                        </p>
+                        <p>
+                            <label for="saml_decryption_key_password" class="SAMLSSO bigLabel">Decryption Key Password :</label>
+                            <input type="password" id="saml_decryption_key_password" class="encryptPass" name="saml_decryption_key_password" />
+                        </p>
+                        <p>
+                            <label for="saml_decryption_cipher" class="SAMLSSO bigLabel">Decryption Cipher :</label>
+                            <input type="text" id="saml_decryption_cipher" name="saml_decryption_cipher" />
+                        </p>
+                        <p>
+                            <label for="saml_stream_cipher" class="SAMLSSO bigLabel">Stream Cipher :</label>
+                            <input type="text" id="saml_stream_cipher" name="saml_stream_cipher" class="bigInputBox" />
+                        </p>
+	                    <p>
+	                        <input type="checkbox" name="saml_sign_auth" id="saml_sign_auth" />
+	                        <label for="saml_sign_auth" class="ui-priority-primary">Sign SAML AuthNRequest</label>
+	                    </p>
+                    </div>
+                    <hr class="ui-widget-content" />
+                    <p class="vtip" title="If this is enabled, SAMLSSO is only used for authentication.  The CrushFTP UserManager will have all the settings and directory access.">
+                        <input type="checkbox" name="authenticationOnly" id="authenticationOnly" />
+                        <label for="authenticationOnly" class="ui-priority-primary">SAMLSSO only used for Authentication (User manager then defines user's access.)</label>
+                    </p>
+                    <div class="authenticationOnlyItemsReverse">
+                        <input type="checkbox" name="create_local_user" id="create_local_user" />
+                        <label for="create_local_user" class="ui-priority-primary">Create user from template username :</label>
+                        <input type="text" id="create_local_user_template" disabled name="create_local_user_template" class="bigInputBox ui-state-disabled" />
+                    </div>
+                    <div  class="authenticationOnlyItems ui-corner-all ui-widget-content nobg" style="padding:5px 10px;">
+                        <p>
+                            <!-- <label title="Allows you to specify the individual server that can use this plugin instance." for="server_item" class="SAMLSSO lblAllowedServerPortText bigLabel">Allowed Server Port :</label>
+                            <select title="Allows you to specify the individual server that can use this plugin instance." id="server_item" name="server_item"></select>
+
+                            <span class="spacer"></span> -->
+
+                            <label for="cache_minutes" class="SAMLSSO lblLDAPCacheTimeText bigLabel">SAMLSSO Cache Time :</label>
+                            <input type="text" id="cache_minutes" name="cache_minutes" class="smallInputBox" />
+                        </p>
+                        <p title="Just enter the username.">
+                            <label for="adminUsername" class="SAMLSSO lblUsernameForQueriesText bigLabel">Username For Queries :</label>
+                            <input type="text" id="adminUsername" name="adminUsername" class="bigInputBox" />
+                        </p>
+                        <p>
+                            <label for="adminPassword" class="SAMLSSO lblPasswordText bigLabel">Password :</label>
+                            <input type="password" id="adminPassword" class="encryptPass" name="adminPassword" />
+
+                            <span class="spacer"></span>
+
+                            <select title="Usually this should be simple, but adjust if your server requires another method." id="auth_method" name="auth_method">
+                                <option>Simple</option>
+                                <option>CRAM-MD5</option>
+                                <option>DIGEST-MD5</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label for="ldapURL" class="SAMLSSO lblLDAPServerURLText bigLabel">LDAP Server URL :</label>
+                            <input type="text" id="ldapURL" name="ldapURL" class="bigInputBox" />
+
+                            <a href="#" class="button" id="testLogin">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-transferthick-e-w'></span>
+                                <span class="SAMLSSO btnTestLoginSettingsText">Test Connection Settings</span>
+                            </a>
+                        </p>
+                        <p>
+                            <label for="follow_referral" class="UniSSO bigLabel">&nbsp;</label>
+                            <input type="checkbox" name="follow_referral" id="follow_referral" />
+                            <label for="follow_referral">Follow LDAP Referrals?</label>
+                        </p>
+                        <p>
+                            <label for="ldapURL" class="CrushLDAPGroup bigLabel"></label>
+                            <input id="acceptAnyCert" type="checkbox" id="acceptAnyCert" />
+                            <label class="right" for="acceptAnyCert">Accept any SSL certificate</label>
+                        </p>
+                        <hr class="ui-widget-content" />
+                        <p>
+                            <label for="searchBase" class="SAMLSSO lblSearchBaseLocationText bigLabel">Search Base Location :</label>
+                            <input type="text" id="searchBase" name="searchBase" class="bigInputBox" />
+
+                            <a href="#" class="button rolePickButton" rel="searchBase" style="top:4px;">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                Pick Location
+                            </a>
+                        </p>
+                        <p>
+                            <label for="searchFilter" class="SAMLSSO lblSearchFilterText bigLabel">Search Filter :</label>
+                            <input type="text" id="searchFilter" name="searchFilter" />
+
+                            <a href="#" class="button" id="testSearch">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-transferthick-e-w'></span>
+                                <span class="SAMLSSO btnTestSearchText">Test Search</span>
+                            </a>
+                        </p>
+                        <p>
+                            <div class="ui-state-highlight ui-corner-all warning" style="padding:3px;display:inline-block;margin:0px 3px;width:650px;">
+                                <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+                                <span class="SAMLSSO lblSearchNoteText">
+                                    Tree will be searched for a field that matches the username. In general this will be 'uid' or 'sAMAccountName'.
+                                </span>
+                            </div>
+                        </p>
+                        <hr class="ui-widget-content" />
+                        <p>
+                            <label title="Not the attribute on the user, but the attribute on the role that has this user." class="SAMLSSO lblLDAPRolesTheUserMustBeMemberOfText" style="float:left;margin:10px 0px;" for="ldap_roles">LDAP roles user must be member of :</label>
+                            <div class="ui-state-highlight ui-corner-all warning" style="padding:3px;display:inline-block;margin:0px 3px;width:300px;">
+                                <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+                                <span class="SAMLSSO lblLeaveBlankForAllUsersNoteText">
+                                    Roles cannot be empty or no logins are allowed.
+                                </span>
+                            </div>
+
+                            <div class="clear"></div>
+
+                            <a href="#" class="button" id="addNewRole" style="margin-left: 10px;">
+                                <span style='display:inline-block;margin:0px 0px -3px -8px;float:left;' class='pointer ui-icon ui-icon-plus'></span>
+                                <span class="SAMLSSO">Add Role</span>
+                            </a>
+
+                            <a href="#" class="button" id="editRole">
+                                <span style='display:inline-block;margin:0px 0px -3px -8px;float:left;' class='pointer ui-icon ui-icon-document'></span>
+                                <span class="AutoUnzip btnEditPathText">Edit Selected</span>
+                            </a>
+
+
+                            <a href="#" class="button" id="moveRoleUp">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-triangle-1-n'></span>
+                                <span class="">
+                                    Move Up
+                                </span>
+                            </a>
+
+                            <a href="#" class="button" id="moveRoleDown">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-triangle-1-s'></span>
+                                <span class="">
+                                    Move Down
+                                </span>
+                            </a>
+
+                            <a href="#" class="button" id="removeRole">
+                                <span style='display:inline-block;margin:0px 0px -3px -8px;float:left;' class='pointer ui-icon ui-icon-trash'></span>
+                                <span class="AutoUnzip btnRemovePathText">Remove Selected</span>
+                            </a>
+
+                            <div style="height:10px;" class="clear"></div>
+                            <div style="float:left;margin:10px;margin-top:5px;width:600px;">
+                                <div class="LargeListBox ui-corner-all ui-widget-content nobg sideScroll" style="height:200px;">
+                                    <ol class="nobg selectable single sideScroll" id="ldap_roles" name="ldap_roles">
+                                    </ol>
+                                </div>
+                            </div>
+                        </p>
+                        <p>
+                            <a href="#" class="button" id="testSearchRole">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-transferthick-e-w'></span>
+                                <span class="SAMLSSO btnTestSearchRoleText">Test Search Role</span>
+                            </a>
+                        </p>
+                        <p class="clear"></p>
+                        <p>
+                            <label for="memberOf" class="SAMLSSO lblRoleMemberFieldText">Role Member Field :</label>
+                            <input type="text" id="memberOf" name="memberOf" />
+
+                            <span class="SAMLSSO lblRoleMemberFieldNoteText">
+                                (memberOf, memberof, member, groupMembership, memberUid, memberuid, etc.)
+                            </span>
+                        </p>
+                        <hr class="ui-widget-content" />
+                         <p>
+                            <strong>Key Mappings : <i>(SAMLSSO -&gt; CrushFTP)</i></strong>
+                            <div class="clear"></div>
+                            <a href="#" class="button" id="addNewMapping" style="margin-left: 10px;">
+                                <span style='display:inline-block;margin:0px 0px -3px -8px;float:left;' class='pointer ui-icon ui-icon-plus'></span>
+                                <span class="SAMLSSO">Add Key Mapping</span>
+                            </a>
+
+                            <a href="#" class="button" id="editMapping">
+                                <span style='display:inline-block;margin:0px 0px -3px -8px;float:left;' class='pointer ui-icon ui-icon-document'></span>
+                                <span class="AutoUnzip btnEditPathText">Edit Selected</span>
+                            </a>
+                            <a href="#" class="button" id="removeMapping">
+                                <span style='display:inline-block;margin:0px 0px -3px -8px;float:left;' class='pointer ui-icon ui-icon-trash'></span>
+                                <span class="AutoUnzip btnRemovePathText">Remove Selected</span>
+                            </a>
+                        </p>
+                        <div class="LargeListBox ui-corner-all ui-widget-content nobg sideScroll" style="width:500px;height:200px;float:left;margin-left:10px;">
+                            <ol class="nobg selectable multiple sideScroll" id="keysMapping" name="keysMapping">
+                            </ol>
+                        </div>
+                        <div style="margin-bottom:10px;" class="clear"></div>
+                        <hr class="ui-widget-content" />
+                        <!-- <p class="vtip" title="If this is enabled, LDAP is only used for authentication.  The CrushFTP UserManager will have all the settings and directory access.">
+                            <input type="checkbox" name="authenticationOnly" id="authenticationOnly" />
+                            <label for="authenticationOnly" class="ui-priority-primary SAMLSSO lblLDAPOnlyUsedForAuthenticationText">LDAP only used for Authentication (User manager then defines user's access.)</label>
+                        </p> -->
+                        <p>
+                            <label for="homeDirectory" class="SAMLSSO lblHomeDirectoryFieldText">HomeDirectory field :</label>
+                            <input type="text" id="homeDirectory" name="homeDirectory" />
+                            <span class="spacer"></span>
+                            <span class="vtip" title="This makes a folder based on the path specified in your SAMLSSO tree for the user's home folder.  Typically leave this off.">
+                                <input type="checkbox" name="createHomeDirectory" id="createHomeDirectory" />
+                                <label for="createHomeDirectory" class="ui-priority-primary SAMLSSO lblCreateHomedirectoryIfNotExistText">Create HomeDirectory folder if it doesn't exists</label>
+                            </span>
+                            <span class="spacer"></span>
+                            <input type="checkbox" name="randomize_home_name" id="randomize_home_name" />
+                            <label for="randomize_home_name" class="ui-priority-primary SAMLSSO">Randomize home folder name.</label>
+
+                            <br>
+                        </p>
+                        <p>
+                            <span class="CrushLDAPGroup lblHomeFolderNoteText">
+                                (This field will be used for the users 'home' folder. If not found... see below.)
+                            </span>
+                        </p>
+                        <p class="subPanel ui-widget-content leftborder nobg lineHeight">
+                            <input type="checkbox" name="useLocalDirectory" id="useLocalDirectory" />
+                            <label for="useLocalDirectory" class="ui-priority-primary CrushLDAPGroup lblUseLocalFolderText">Use local folder if LDAP's HomeDirectory not found?</label>
+                            <span class="forLocalDirectory">
+                                <br />
+
+                                <span class="spacer"></span>
+                                <input type="checkbox" name="appendUserNme" id="appendUsername" />
+                                <label for="appendUsername" class="ui-priority-primary CrushLDAPGroup lblAppendUsernameToPathText">Append username to path?</label>
+
+                                <br />
+
+                                <span class="spacer"></span>
+                                <input type="checkbox" name="createFolder" id="createFolder" />
+                                <label for="createFolder" class="ui-priority-primary CrushLDAPGroup lblCreateFolderWithUsernameText">Create folder with username</label>
+
+                                <br />
+
+                                <span class="spacer"></span>
+                                <label for="UserHome" class="ui-priority-primary CrushLDAPGroup lblPathText">Path:</label>
+                                <input type="text" name="UserHome" id="UserHome" class="bigInputBox" />
+
+                                <a FileMode="user" PickType="dir" href="#" class="button serverFilePickButton" rel="UserHome" style="top:4px;">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                    <span class="FolderMonitor btnFolderLocationBrowseText">Browse
+                                    </span>
+                                </a>
+                            </span>
+                        </p>
+                        <p>
+                            <div class="ui-state-highlight ui-corner-all warning" style="padding:3px;display:inline-block;margin:0px 3px;">
+                                <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+                                <span class="SAMLSSO lblHomeFolderNoteText">
+                                    Username folder will be made in this location
+                                </span>
+                            </div>
+                        </p>
+                        <p>
+                            <fieldset class="nobg" style="display:inline-block;">
+                                <legend class="donotProcess">Privs : </legend>
+                                <input type="text" id="permissions" name="permissions"  class="bigInputBox" style="display:none;" />
+                                <!-- <span style="clear: both;margin-top:10px;display:block;height:10px;"></span> -->
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_read" rel="(read)" />
+                                    <label for="privs_read">Download</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_write" rel="(write)" />
+                                    <label for="privs_write">Upload</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_view" rel="(view)" />
+                                    <label for="privs_view">View</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_delete" rel="(delete)" />
+                                    <label for="privs_delete">Delete</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_deletedir" rel="(deletedir)" />
+                                    <label for="privs_deletedir">Delete Folder</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_makedir" rel="(makedir)" />
+                                    <label for="privs_makedir">Create Folder</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_rename" rel="(rename)" />
+                                    <label for="privs_rename">Rename</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_resume" rel="(resume)" />
+                                    <label for="privs_resume">Resume Transfers</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_share" rel="(share)" />
+                                    <label for="privs_share">Share/Publish</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_slideshow" rel="(slideshow)" />
+                                    <label for="privs_slideshow">Slideshow</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_invisible" rel="(invisible)" />
+                                    <label for="privs_invisible">Make Invisible</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_ratio" rel="(ratio)" />
+                                    <label for="privs_ratio">Free Ratio</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_replicate" rel="(replicate)" /><label for="privs_replicate">Replicate</label>
+                                </span>
+                                <span style="float:left;margin-right:10px;" title="Blocks changes to this folder, while allowing changes in sub folders." class="vtip">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_locked" rel="(locked)" />
+                                    <label for="privs_locked">Locked</label>
+                                </span>
+                                <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                <span style="float:left;margin-right:10px;">
+                                    <label for="privs_quota">Quota:(MB)</label>
+                                    <input type="text" id="privs_quota" valtype="float" class="ignoreBind validate excludeXML permissionItem"/>
+                                </span>
+                                <span style="float:left;margin-right:10px;">
+                                    <input type="checkbox" class="ignoreBind excludeXML permissionCB" id="privs_real_quota"  rel="(real_quota)" /><label for="privs_real_quota">RealFile Quota</label>
+                                </span>
+                                <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                <span style="clear: both;">
+                                    <label for="privs_comment">
+                                    Comment: (HTML OK)</label>
+                                    <br/>
+                                    <textarea class="ignoreBind excludeXML permissionItem" id="privs_comment" cols="80" rows="3"></textarea>
+                                </span>
+                                <span style="clear: both;margin-top:10px;display:block;"></span>
+                                <span style="">
+                                    <a href="#" class="button" id="advancedPrivsOptions" style="top:0px !important;"><span style='display: inline-block; margin: 0px 3px 0px -7px; float: left;' class='pointer ui-icon ui-icon-key'></span><span class="">Advanced</span></a>
+                                </span>
+                                <div style="clear: both;margin-top:0px;"></div>
+                                <div style="clear:both;"></div>
+                            </fieldset>
+                        </p>
+                        <p title="Enter each additional path on each line.  Example: dropoff/">
+                            <label for="additional_paths" class="lblCreateAdditionalSubfoldersText">
+                                <strong>Create additional subfolders in home directory :</strong></label>
+                            <span style="clear: both;margin-top:10px;display:block;height:1px;"></span>
+                            <div class="buttonBar buttonBarNoBottom" style="margin-top:-5px;">
+                                <a id="addNewSubFolder" href="#" class="button">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-plus'></span>Add
+                                </a>
+                                <span class="spacer"></span>
+                                <a id="editSubFolder" href="#" class="button">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-document'></span>Edit
+                                </a>
+                                <span class="spacer"></span>
+                                <a id="removeSubFolder" href="#" class="button">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-trash'></span>Remove
+                                </a>
+                            </div>
+                            <div>
+                                <div class="LargeListBox ui-corner-all ui-widget-content nobg sideScroll" style="width:500px;height:200px;float:left;">
+                                    <ol class="nobg selectable multiple sideScroll" id="homeDirSubFolders" name="homeDirSubFolders">
+                                    </ol>
+                                </div>
+                                <div id="subfolderPrivs" style="width:800px;height:300px;float:left;margin: -10px 0px 0px 10px;line-height: 30px;display:none;">
+                                    <fieldset class="nobg" style="display:inline-block;">
+                                        <legend class="donotProcess">Directory Permissions :</legend>
+                                        <input type="text" id="subfolder_permissions" name="permissions" class="bigInputBox" style="display:none;" />
+                                        <span style="clear: both;display:block;height:1px;"></span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_read" rel="(read)" />
+                                            <label for="subfolder_privs_read">Download</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_write" rel="(write)" />
+                                            <label for="subfolder_privs_write">Upload</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_view" rel="(view)" />
+                                            <label for="subfolder_privs_view">View</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_delete" rel="(delete)" />
+                                            <label for="subfolder_privs_delete">Delete</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_deletedir" rel="(deletedir)" />
+                                            <label for="subfolder_privs_deletedir">Delete Folder</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_makedir" rel="(makedir)" />
+                                            <label for="subfolder_privs_makedir">Create Folder</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_rename" rel="(rename)" />
+                                            <label for="subfolder_privs_rename">Rename</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_resume" rel="(resume)" />
+                                            <label for="subfolder_privs_resume">Resume Transfers</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_share" rel="(share)" />
+                                            <label for="subfolder_privs_share">Share/Publish</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_slideshow" rel="(slideshow)" />
+                                            <label for="subfolder_privs_slideshow">Slideshow</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_invisible" rel="(invisible)" />
+                                            <label for="subfolder_privs_invisible">Make Invisible</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_ratio" rel="(ratio)" />
+                                            <label for="subfolder_privs_ratio">Free Ratio</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_replicate" rel="(replicate)" /><label for="subfolder_privs_replicate">Replicate</label>
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_locked" rel="(locked)" />
+                                            <label for="subfolder_privs_locked">Locked</label>
+                                        </span>
+                                        <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <label for="subfolder_privs_quota">Quota:(MB)</label>
+                                            <input type="text" id="subfolder_privs_quota" valtype="float" class="ignoreBind validate excludeXML permissionItemSubFolder" />
+                                        </span>
+                                        <span style="float:left;margin-right:10px;">
+                                            <input type="checkbox" class="ignoreBind excludeXML permissionCBSubFolder" id="subfolder_privs_real_quota" rel="(real_quota)" />
+                                            <label for="subfolder_privs_real_quota">RealFile Quota</label>
+                                        </span>
+                                        <span style="clear: both;margin-top:10px;display:block;height:10px;"></span>
+                                        <span style="clear: both;">
+                                            <label for="subfolder_privs_comment">
+                                                Comment: (HTML OK)</label>
+                                            <br/>
+                                            <textarea class="ignoreBind excludeXML permissionItemSubFolder" id="subfolder_privs_comment" cols="80" rows="3"></textarea>
+                                        </span>
+                                        <span style="clear: both;margin-top:10px;display:block;"></span>
+                                        <span style="">
+                                            <a href="#" class="button" id="advancedPrivsOptionsSubFolder" style="top:0px !important;">
+                                                <span style='display: inline-block; margin: 0px 3px 0px -7px; float: left;' class='pointer ui-icon ui-icon-key'></span>
+                                                <span class="">Advanced</span>
+                                            </a>
+                                        </span>
+                                        <div style="clear: both;margin-top:0px;"></div>
+                                        <div style="clear:both;"></div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </p>
+                        <p>
+                            <label for="usernameTemplate" class="SAMLSSO lblUsernameTemplateText">Username to use as template (except directory access) : </label>
+                            <input type="text" id="usernameTemplate" name="usernameTemplate"  class="bigInputBox" />
+                        </p>
+                    </div>
+				</div>
+			</div>
+		</td>
+	</tr>
+	</table>
+</div>

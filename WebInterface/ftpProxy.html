@@ -1,0 +1,148 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>CrushFTP</title>
+		<SCRIPT>
+			function updateProxyPort()
+			{
+				var protocol = document.loginForm.protocol.options[document.loginForm.protocol.selectedIndex].text;
+				if (protocol == "FTP") document.loginForm.port.value="21";
+				else if (protocol == "FTPS") document.loginForm.port.value="21";
+				else if (protocol == "FTPS Implicit") document.loginForm.port.value="990";
+				else if (protocol == "SFTP") document.loginForm.port.value="22";
+			}
+			function doProxyFormSubmit()
+			{
+				if (document.loginForm.ip.value == "")
+				{
+					alert("You must specify a host.");
+					return false;
+				}
+				var u = document.loginForm.user.value;
+				var p = document.loginForm.pass.value;
+				document.loginForm.user.value = proxy_url_encode(u);
+				document.loginForm.pass.value = proxy_url_encode(p);
+				document.loginForm.submit();
+				return false;
+			}
+			function proxy_url_encode(uu)
+			{
+				uu = replace_str(uu,"%","---PERCENT---");
+				uu = replace_str(uu,"#","%23");
+				uu = replace_str(uu,"@","%40");
+				uu = replace_str(uu,":","%3A");
+				uu = replace_str(uu,"/","%2F");
+				uu = replace_str(uu,"\\","%5C");
+				uu = replace_str(uu,"+","---PLUS---");
+				uu = replace_str(uu," ","%20");
+				return uu;
+			}
+			function checkAdhocProxy()
+			{
+				if (!siteprivs) return false;
+				if (siteprivs.indexOf("(SITE_ADHOCWEBFTPPROXY)") >= 0)
+				{
+					var item1 = document.getElementById("adhoc1");
+					var item2 = document.getElementById("adhoc2");
+					item1.style.visibility="visible";
+					item1.style.position="relative";
+					item2.style.visibility="visible";
+					item2.style.position="relative";
+				}
+			}
+	
+			function setupWhitelistProxy()
+			{
+				if (!whitelist) return false;
+				if (siteprivs.indexOf("(SITE_WEBFTPPROXY)") < 0) return false;
+				var whitelist_sel = document.getElementById("whitelist");
+				for (var x=0; x<whitelist.length; x++)
+				{
+					var add_str = whitelist[x].protocol+"://"+whitelist[x].host;
+					if (whitelist[x].protocol == "FTP" && whitelist[x].port != "21") add_str += ":"+whitelist[x].port;
+					if (whitelist[x].protocol == "FTPS" && whitelist[x].port != "21") add_str += ":"+whitelist[x].port;
+					if (whitelist[x].protocol == "SFTP" && whitelist[x].port != "22") add_str += ":"+whitelist[x].port;
+					add_str += "/";
+					whitelist_sel.options[whitelist_sel.options.length] = new Option(whitelist[x].proxyName+"   "+add_str,add_str);
+				}
+			}
+			function whitelistUpdateProxy()
+			{
+				if (document.getElementById("whitelist").selectedIndex > 0)
+				{
+					var item = whitelist[document.getElementById("whitelist").selectedIndex-1];
+					if (item.protocol == "FTP") document.loginForm.protocol.selectedIndex = 0;
+					else if (item.protocol == "FTPS") document.loginForm.protocol.selectedIndex = 1;
+					else if (item.protocol == "SFTP") document.loginForm.protocol.selectedIndex = 2;
+					document.loginForm.ip.value = item.host;
+					document.loginForm.port.value = item.port;
+				}
+			}
+			function replace_str(master_str,find_str,replace_str)
+			{
+				var i = 0;
+				var result = "";
+				while (master_str.indexOf(find_str,i) != -1)  
+				{
+					result += master_str.substring(i,master_str.indexOf(find_str,i)) + replace_str;
+					i = (master_str.indexOf(find_str,i) + find_str.length);
+				}
+				result += master_str.substring(i,master_str.length);
+				return result;
+			}
+
+		</SCRIPT>
+
+		<!-- PROXY_INFO --!>
+		<script defer="true">
+			setTimeout("checkAdhocProxy()",200);
+			setTimeout("setupWhitelistProxy()",200);
+		</script>
+	</head>
+	<body bgcolor="cccccc">
+		<form method="post" name="diagnosticForm" action="http://www.crushftp.com/diagnostics.jsp" target="_blank">
+			<input type="hidden" name="action" value="TEST"/>
+			<input type="hidden" name="details" value="ON"/>
+			<input type="hidden" name="protocol" value="FTP"/>
+			<input type="hidden" name="ip" value=""/>
+			<input type="hidden" name="user" value=""/>
+			<input type="hidden" name="pass" value=""/>
+			<input type="hidden" name="path" value=""/>
+			<input type="hidden" name="port" value="21"/>
+		</form>		
+		<form method="post" name="loginForm" enctype="multipart/form-data" onsubmit="doProxyFormSubmit();">
+			<input type="hidden" name="the_action" value="FTPPROXY"/>
+			<center>
+				<table>
+					<tr>
+						<td>
+							<table>
+								</tr><tr name="whitelist">
+									<td>Preset:</td><td><select name="whitelist" id="whitelist" onChange="whitelistUpdateProxy();"><option value=""></option></td>
+								</tr><tr id="adhoc1" style="visibility:hidden;position:absolute;">
+									<td>Protocol:</td><td><select name="protocol" onChange="updateProxyPort();"><option value="FTP">FTP</option><option value="FTPS">FTPS</option><option value="FTPS">FTPS Implicit</option><option value="SFTP">SFTP</option></td>
+								<tr id="adhoc2" style="visibility:hidden;position:absolute;">
+									<td>Hostname:</td><td><input type="text" name="ip" style="width:150;" value=""/></td>
+								</tr><tr name="adhoc" style="visibility:hidden;position:absolute;">
+									<td>Port:</td><td><input type="text" name="port" style="width:150;" value="21"/></td>
+								</tr><tr>
+									<td>User:</td><td><input type="text" name="user" style="width:150;" value=""/></td>
+								</tr><tr>
+									<td>Pass:</td><td><input type="password" name="pass" style="width:150;" value=""/></td>
+								</tr><tr>
+									<td>Path:</td><td><input type="text" name="path" style="width:150;" value="/"/></td>
+								</tr>
+							</table>
+						</td>
+						<td valign="center" id="buttondiv" align="center">
+							<input type="button" value=" Connect! " onclick="doProxyFormSubmit();"/><br/>
+							<br/>
+							<font size="-2"><a href="javascript:if(document.loginForm.ip.value==''){alert('You must specify a host!');} else {document.diagnosticForm.ip.value=document.loginForm.ip.value;document.diagnosticForm.user.value=document.loginForm.user.value;document.diagnosticForm.pass.value=document.loginForm.pass.value;document.diagnosticForm.path.value=document.loginForm.path.value;document.diagnosticForm.submit();}">Run Diagnostics...</a></font>
+						</td>
+					</tr>
+				</table>
+				<a href="/WebInterface/login.html">Logout</a>
+			</center>
+		</form>
+	</body>
+</html>

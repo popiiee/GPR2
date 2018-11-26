@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="cache-control" content="no-cache">
+    <title>CrushFTP - Let's Encrypt</title>
+    <link type="text/css" href="/WebInterface/Resources/css/themes/ui-lightness.zip/jquery-ui.css" rel="stylesheet" />
+    <link type="text/css" href="/WebInterface/Resources/css/style.css" rel="stylesheet" />
+    <link type="text/css" href="/WebInterface/Resources/css/vtip.css" rel="stylesheet" />
+    <link type="text/css" href="css/adminStyle.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.json-2.2.js"></script>
+    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-ui-1.8.23.min.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.blockUI.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jqueryUI.forms.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.xml2json.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.json2xml.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.alerts.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.textChange.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.notify.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/date.format.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/vtip.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/browserSelector.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jQuery.cookie.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.contextMenu.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.UI.ComboBox.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/crushftp.browseVFSPopup.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/crushftp.commonMethods.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/crushftp.sessionChecker.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/crushftp.validator.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jQuery.passwordValidator.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/crushftp.encryptPassword.js"></script>
+
+    <script type="text/javascript" src = "/WebInterface/admin/js/lets-encrypt/crushftp.letsencrypt.js"></script>
+    <script type="text/javascript" src = "/WebInterface/admin/js/lets-encrypt/init.js"></script>
+
+    <!-- File Browser stuff -->
+    <link rel="stylesheet" href="/WebInterface/Resources/css/localFileBrowser.css" />
+    <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.WI.FileBrowser.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#switcher').themeswitcher({onSelect:function(item){}});
+        });
+    </script>
+    <script type="text/javascript" src="/WebInterface/Resources/js/themeswitcher.js">
+    </script>
+    <style>
+
+.unfix-labels label{
+    width: auto;
+}
+    </style>
+</head>
+<body id="GUIAdmin">
+    <div id="autocompleteFix" style="position:absolute;top:-200px;">
+        <input type="text" name="email" value="" style="display: none" />
+        <input type="text" name="email" value="Alice"/>
+        <input type="text" name="not-an-email" value="" style="display: none" />
+        <input type="password" name="password" value="" style="display: none" />
+        <input type="password" name="password" value=""/>
+    </div>
+    <div class="navigation ui-widget-content" id="header" style="height:55px;">
+        <div id="topSwitchButtons" style="margin:5px;float:left;background:none;border-top:0px;border-right:0px;border-left:0px;display:none;">
+           <ul style="background:none;border:none;">
+              <li class="ui-state-default ui-corner-top"><a href="/WebInterface/../"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-folder-open">
+                </span>Files</a></li>
+              <li privs="connect,server_edit,server_view,update_run,report_edit,report_view" class="ui-state-default ui-corner-top ui-state-active"><a href="/WebInterface/admin/index.html"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-gear">
+                </span>Server Admin</a></li>
+              <li privs="connect,job_edit,job_view,job_list,job_list_history" class="ui-state-default ui-corner-top"><a href="/WebInterface/Jobs/index.html"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-copy">
+                </span>Jobs</a></li>
+              <li privs="connect,user_admin,user_edit,user_view" class="ui-state-default ui-corner-top"><a href="/WebInterface/UserManager/index.html"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-person">
+                </span>User Manager</a></li>
+              <li privs="connect,pref_edit,pref_view" class="ui-state-default ui-corner-top"><a href="/WebInterface/Preferences/index.html"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-copy">
+                </span>Preferences</a></li>
+              <li privs="connect,share_edit,share_view" class="ui-state-default ui-corner-top"><a href="/WebInterface/TempAccounts/index.html"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-bookmark">
+                </span>Shares</a></li>
+            <li class="ui-state-default ui-corner-top vtip" title="Telnet">
+                    <a href="/WebInterface/admin/log.html" id="telnetButton">
+                        <span style="display: inline-block;margin: -1px -4px 0px -10px;float: left;width: 16px;height: 16px;" class="pointer terminal-icon">
+                        </span></a>
+              </li>
+              <li class="ui-state-default ui-corner-top vtip" title="Logout"><a href="#tabs-5" onclick="return doLogout();"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-unlocked">
+                </span></a></li>
+              <li class="clear"></li>
+           </ul>
+        </div>
+        <div class="logoContainer">
+            <a id="logo" style="border:0px;padding:0px;" href="javascript:void(0);">
+                <img src="/WebInterface/Resources/images/crushftp_gray_logo_resized.png" alt="" border="0" width="200" />
+            </a>
+            <div  class="clear"></div>
+        </div>
+        <div style="position:absolute; top:38px; left:5px;">
+            <span class="note" id="loggedInAs"></span>
+            <span style="margin-left:5px;" class="note" id="SessionSeconds"></span>
+            <span style="margin-left:6px;" class="liveData ui-priority-primary note" id="crushVersionInfo"></span>
+        </div>
+        <div>
+            <span id="switcher"></span>
+        </div>
+    </div>
+    <div class="clear content" style="margin-left:0px;">
+        <div class="mainContentPanel" id="adminPanel">
+            <div id="loadingIndicator"></div>
+            <div class="ui-widget">
+                <div class="ui-widget-content">
+                    <div id="notification" style="display:none;" class="ui-corner-all ui-state-error"></div>
+                    <div id="placeHolder" class="customForm">
+                        <div id="pnlPluginLetsEncrypt">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td>
+                                    <div id="pluginSection" class="customForm">
+                                        <div class="ui-corner-all ui-widget-content nobg" style="padding:5px 10px;">
+                                            <div>
+                                                <p class="fixedWidthLabels">
+                                                    <label for="domains" class="right LetsEncrypt">Domains : </label>
+                                                    <textarea id="domains" name="domains" cols="50" rows="2"></textarea>
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="keystore_path">Keystore :</label>
+                                                    <span class="unfix-labels">
+                                                        <input _name="keystore_path" type="text" class="excludeXML bigInputBox" id="keystore_path" style="width:280px;" />
+                                                    </span>
+                                                    <a href="#" PickType="dir" class="button slim serverFilePickButton" rel="keystore_path" style="padding:3px 12px;margin-top: -5px;">
+                                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                                        Browse
+                                                    </a>
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="keystore_pass">Keystore Password :</label>
+                                                    <input _name="keystore_pass" type="password" class="encryptPass excludeXML" id="keystore_pass" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label for="key_pass" class="right">
+                                                        Key Password :
+                                                    </label>
+                                                    <input _name="key_pass" type="password" class="encryptPass excludeXML" id="key_pass" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="challenge_path">Challenge Path :</label>
+                                                    <span class="unfix-labels">
+                                                        <input _name="challenge_path" type="text" class="excludeXML bigInputBox" id="challenge_path" style="width:280px;" />
+                                                    </span>
+                                                    <a href="#" PickType="dir" class="button slim serverFilePickButton" rel="challenge_path" style="padding:3px 12px;margin-top: -5px;">
+                                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                                        Browse
+                                                    </a>
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="cacert_key">Cacert Key :</label>
+                                                    <input _name="cacert_key" type="password" class="encryptPass excludeXML" id="cacert_key" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="commonName">Common Name :</label>
+                                                    <input _name="commonName" type="text" class="inputBox excludeXML" id="commonName" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="organisationUnit">Organisation Unit :</label>
+                                                    <input _name="organisationUnit" type="text" class="inputBox excludeXML" id="organisationUnit" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="locality">Locality :</label>
+                                                    <input _name="locality" type="text" class="inputBox excludeXML" id="locality" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="state">State :</label>
+                                                    <input _name="state" type="text" class="inputBox excludeXML" id="state" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="countryCode">Country Code :</label>
+                                                    <input _name="countryCode" type="text" class="smallInputBox excludeXML" id="countryCode" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="email">Email :</label>
+                                                    <input _name="email" type="text" class="bigInputBox excludeXML" id="email" />
+                                                </p>
+                                                <p class="fixedWidthLabels">
+                                                    <label class="right" for="validity">Validity :</label>
+                                                    <input _name="validity" value="365" type="text" class="smallInputBox excludeXML" id="validity" />
+                                                </p>
+                                                <!-- <p>
+                                                    <span class="fixedWidthLabels">
+                                                        <label class="right" for="validity">&nbsp;</label>
+                                                    </span>
+                                                    <input type="checkbox" name="enabled" id="enabled" />
+                                                    <label for="enabled" class="ui-priority-primary LetsEncrypt">Enabled</label>
+
+                                                    <span class="spacer"></span>
+                                                    <span class="spacer"></span>
+                                                    <input type="checkbox" name="debug" id="debug" />
+                                                    <label for="debug" class="ui-priority-primary LetsEncrypt">Debug</label>
+
+                                                    <span class="spacer"></span>
+                                                    <span class="spacer"></span>
+
+                                                    <input type="checkbox" name="staging" id="staging" />
+                                                    <label for="staging" class="ui-priority-primary LetsEncrypt">Staging</label>
+                                                </p> -->
+                                                <br><br>
+                                                <p>
+                                                    <span class="fixedWidthLabels">
+                                                        <label class="right" for="validity">&nbsp;</label>
+                                                    </span>
+                                                    <a id="submit-btn" href="#" class="button slim" style="padding:3px 12px;margin-top: -5px;">
+                                                        <span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-disk"></span>
+                                                        Submit
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="growlContainer" style="display: none;">
+                <div id="growl">
+                    <a class="ui-notify-close" href="#"><span class="ui-icon ui-icon-close" style="float: right">
+                    </span></a><span style="float: left; margin: 2px 5px 0 0;" class="ui-icon ui-icon-alert">
+                    </span>
+                    <h2>
+                        #{title}</h2>
+                    <p>
+                        #{text}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="footer" class="ui-widget-content">
+        <div style="margin: 5px 0px; padding: 5px; height: 25px">
+            <div style="float:left;margin-top:10px;">
+                <span id="PoweredByText" class="poweredby">Powered by
+                    <a href="http://www.crushftp.com/" target="_blank">CrushFTP</a>
+                </span>
+                <span id="CopyrightText" class="copyright">&copy; 2018
+                    <a href="http://www.CrushFTP.com/" target="_blank">CrushFTP</a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div id="dialog-message"></div>
+</div>
+</body>
+</html>

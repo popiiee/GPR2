@@ -1,0 +1,166 @@
+.separator {
+    margin-top: 5px;
+    padding: 2px;
+    border-top: 1px solid #eee;
+    font-weight: normal !important;
+    font-size: 11px;
+}
+.contextMenu li.start a, .contextMenu li.startAllServers a {
+    background-image: url(/WebInterface/Resources/images/server_connect.png);
+}
+.contextMenu li.restart a {
+    background-image: url(/WebInterface/Resources/images/server_go.png);
+}
+.contextMenu li.stop a, .contextMenu li.stopAllServers a {
+    background-image: url(/WebInterface/Resources/images/server_database.png);
+}
+.contextMenu li.diag a {
+    background-image: url(/WebInterface/Resources/images/table_relationship.png);
+}
+.running .icon, .stopped .icon {
+    display: inline-block;
+    float: right;
+    width: 16px;
+    height: 16px;
+    background-image: url("/WebInterface/Resources/images/bullet_red.png") !important;
+    background-repeat: no-repeat !important;
+    background-position: right top !important;
+}
+.running .icon {
+    background-image: url("/WebInterface/Resources/images/bullet_green.png") !important;
+}
+#server_item_list .item {
+    display: inline-block;
+    width: 150px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+.ban-info {
+    padding: 1px 5px;
+    border-left: 2px solid #ccc;
+    margin: 5px;
+    font-size: 11px;
+    min-height: 15px;
+    max-height: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.saml-special .bigLabel
+{
+    width: 180px;
+}
+.sortableWebInterfaceForm{
+    list-style-type: none;
+    padding: 0;
+}
+#formPreview span.ui-state-default.ui-corner-all
+{
+    position: relative;
+    margin-bottom: -3px;
+}
+
+#formPreview , #formPreview label, #formPreview input, #formPreview select, #formPreview textarea
+{
+    font-weight: normal;
+}
+
+.custom-list
+{
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    border: 0px !important;
+}
+
+.custom-list li
+{
+    list-style: none;
+    margin: 3px;
+    padding: 7px;
+    border-radius: 4px;
+    cursor: pointer;
+    border-right-width: 0px;
+    border-left-width: 0px;
+    border-top-width: 0px;
+    position: relative;
+    border-radius: 0px;
+}
+
+.custom-list li span.drag
+{
+    cursor: move;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.custom-list li span.delete-control
+{
+    position: absolute;
+    right: 25px;
+}
+
+.addControlTrigger
+{
+    cursor: move;
+    animation: all 3s ease-in;
+}
+.addControlTriggerDragging
+{
+    background: #fff;
+    opacity: 0.8;
+    box-shadow: #BDB6B6 0px 0px 5px 4px;
+    list-style: none;
+    border-radius: 4px !important;
+    border:1px solid #eee;
+    min-width: 450px;
+    padding: 5px 5px 0px 5px;
+}
+.addControlTriggerDragging .drag, .addControlTriggerDragging span.pointer
+{
+    display: none !important;
+}
+
+.addControlTriggerDragging input, .addControlTriggerDragging textarea, .addControlTriggerDragging select
+{
+    width: 98%;
+}
+.delete-control
+{
+    color: red;
+    float: right;
+    font-size: 13px;
+    line-height: 14px;
+    display: inline-block;
+    width: 16px;
+    text-align: center;
+    border-radius: 16px;
+    height: 16px;
+}
+div#footer {
+    z-index: 800;
+}
+
+.sortby.asc::before{
+    content : '\25B2'
+}
+
+.sortby.desc::before{
+    content : '\25BC'
+}
+.unfix-labels label{
+    width: auto;
+}
+.hidden{
+    display: none !important;
+}
+.error-text{
+    color: red;
+    font-weight: normal;
+    font-size: 12px;
+    padding-top: 4px;
+}
+
+.v9-only{
+    display: none;
+}

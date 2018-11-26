@@ -1,0 +1,686 @@
+<div id="autocompleteFix" style="position:absolute;top:-200px;">
+    <input type="text" name="email" value="" style="display: none" />
+    <input type="text" name="email" value="Alice"/>
+    <input type="text" name="not-an-email" value="" style="display: none" />
+    <input type="password" name="password" value="" style="display: none" />
+    <input type="password" name="password" value=""/>
+</div>
+<!-- Panel HTML -->
+<div id="pnlIPServers">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td colspan="2">
+                <div class="ui-priority-primary IPServers headerText">
+                    Server items: (FTP/FTPS/SFTP/HTTP &amp; WebDAV/HTTPS &amp; WebDAV)
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="35%" class="ui-widget-content rightborder" style="padding-right:10px;">
+                <div class="buttonBar buttonBarNoBottom">
+                    <a href="#" class="button" id="removeServerItem">
+                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-trash' ></span>
+                    <span class="IPServers btnRemoveText">Remove</span>
+                    </a>
+                    <a href="#" class="button" id="addServerItem">
+                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-plus' ></span>
+                    <span class="IPServers btnAddText">Add</span>
+                    </a>
+                </div>
+                <div class="ui-corner-all ui-widget-content nobg">
+                    <ol class="ServerListBox nobg selectable single sideScroll" id="serverlist" name="serverlist" style="height:500px;">
+                    </ol>
+                </div>
+                <div style="margin-top:10px;">
+                    <fieldset class="ui-corner-all ui-widget-content nobg">
+                        <legend class="ui-priority-secondary IPServers lblUserConnectionGroupsText">User Connection Group :
+                        </legend>
+                        <div style="margin-top:5px;">
+                            <select class="ConnectionListBox" id="drpConnectionGroupsOption">
+                            </select>
+                            <div class="buttonBar buttonBarNoBottom">
+                                <a href="#" class="button" id="removeUserConnection">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-trash' ></span>
+                                <span class="IPServers btnRemoveText">Remove</span>
+                                </a>
+                                <a href="#" class="button" id="addUserConnection">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-plus' ></span>
+                                <span class="IPServers btnAddText">Add</span>
+                                </a>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </td>
+            <td style="padding-left:10px;">
+                <div id="settingsPanel" class="panelFormFields">
+                    <div class="tabs nobg">
+                        <ul>
+                            <li><a href="#IPSGeneral" class="IPServers lblGeneralTabText">General</a></li>
+                            <li class="advanceTab"><a href="#IPSAdvanced" class="IPServers lblAdvancedTabText">Advanced</a></li>
+                            <li class="sshTab"><a href="#IPSSSH" class="IPServers lblSSHTabText">SSH</a></li>
+                            <li class="captchaTab"><a href="#ReCaptcha" class="IPServers lblReCaptchaTabText">Re-Captcha</a></li>
+                            <li class="restrictionTab"><a href="#IPRestrictions" class="IPServers">IP Restrictions</a></li>
+                            <li class="tourTab" style="float: right;"><a href="javascript:void(0);" id="dmzTourLink"><span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-help'></span><span>Tour</span></a></li>
+                        </ul>
+                        <div id="IPSGeneral" class="customForm">
+                            <p>
+                            <label for="txtIP" class="IPServers lblIPText">IP :</label>
+                            <input type="text" id="ip" name="ip" />
+                            </p>
+                            <p>
+                            <label for="txtPort" class="IPServers lblPortText">Port :</label>
+                            <input type="text" id="port" name="port" />
+                            </p>
+                            <p>
+                            <label for="linkedServer" class="IPServers lblUserConnectionGroupsText">User Connection Group :
+                            </label>
+                            <select id="linkedServer">
+                            </select>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbFTP" />
+                            <label for="rdbFTP" class="IPServers lblServerTypeFTPText">FTP Access (FTP://)</label>
+                            </p>
+                            <div class="subPanel ui-widget-content leftborder nobg onlyFTP">
+                                <p>
+                                <label for="pasv_ports" class="IPServers lblFormPassivePortRangeText">
+                                Passive port range:</label>
+                                <input type="text" id="pasv_ports" name="pasv_ports" />
+                                </p>
+                                <p>
+                                <input type="checkbox" id="ftp_aware_router" name="ftp_aware_router" />
+                                <label for="ftp_aware_router" class="IPServers lblFTPAwareRouterText">
+                                FTP Aware Router / Firewall</label>
+                                </p>
+                                <p>
+                                <label for="server_ip" class="IPServers lblIPUsedForPassiveText">
+                                IP used for Passive:</label>
+                                <input type="text" id="server_ip" name="server_ip" />
+                                </p>
+                                <p>
+                                <label for="ftp_welcome_message" id="welcomeMsgLabelText" class="IPServers lblFTPWelcomeMessageText">
+                                FTP Welcome Message:</label>
+                                <textarea id="ftp_welcome_message" class="formTextarea nobg" name="ftp_welcome_message"></textarea>
+                                </p>
+                            </div>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbHTTP" />
+                            <label for="rdbHTTP" class="IPServers lblServerTypeHTTPText">
+                                Web Access (HTTP://) (This is also WebDAV.)
+                            </label>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbHTTPS" />
+                            <label for="rdbHTTPS" class="IPServers lblServerTypeHTTPSText">
+                                Web Access SSL (HTTPS://) (This is also WebDAV.)
+                            </label>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbFTPS" />
+                            <label for="rdbFTPS" class="IPServers lblServerTypeSSLFTPText">
+                                Implicit SSL FTP (FTP://)
+                            </label>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbSFTP" />
+                            <label for="rdbSSHFTP" class="IPServers lblServerTypeSSHFTPText">
+                                SFTP/SCP (SFTP://)
+                            </label>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbServerBeat" />
+                            <label for="rdbServerBeat" class="IPServers lblServerTypeServerBeatText">
+                                ServerBeat Virtual IP (ServerBeat://)
+                            </label>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbDMZ" />
+                            <label for="rdbDMZ" class="IPServers lblServerTypeDMZText">
+                                DMZ (DMZ://)
+                            </label>
+                            </p>
+                            <p class="enterpriseFeature crush7Feature">
+                            <input type="radio" name="serverType" id="rdbSOCKS5" />
+                            <label for="rdbSOCKS5" class="IPServers lblServerTypeSOCKS5Text">
+                                SOCKS (SOCKS://)
+                            </label>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbPortForward" />
+                            <label for="rdbPortForward" class="IPServers lblServerTypePortForwardText">
+                                PortForward IP (PortForward://)
+                            </label>
+                            </p>
+                            <p>
+                            <input type="radio" name="serverType" id="rdbPortForwardS" />
+                            <label for="rdbPortForward" class="IPServers lblServerTypePortForwardSText">
+                                PortForward IP SSL (PortForwardS://)
+                            </label>
+                            </p>
+                            <p>
+                            <label for="server_item_name" class="IPServers lblNameText">Name (Optional):</label>
+                            <input type="text" id="server_item_name" name="server_item_name" />
+                            </p>
+                        </div>
+                        <div id="IPSAdvanced" class="customForm">
+                            <p class="ftpOpts">
+                            <label class="IPServers lblFTPOptionsText">FTP Options:</label>
+                            </p>
+                            <div class="subPanel ui-widget-content leftborder nobg ftpOpts">
+                                <p>
+                                <input type="checkbox" name="require_encryption" id="require_encryption" />
+                                <label for="require_encryption" class="IPServers lblFTPOptionRequireEncryptionText">
+                                    Require Encryption
+                                </label>
+                                &nbsp;&nbsp;
+                                <input type="checkbox" name="explicit_ssl" id="explicit_ssl" />
+                                <label for="explicit_ssl" class="IPServers lblFTPOptionExplicitSSLText">
+                                    Explicit SSLv3 (FTPS)
+                                </label>
+                                </p>
+                                <p>
+                                <input type="checkbox" name="explicit_tls" id="explicit_tls" />
+                                <label for="explicit_tls" class="IPServers lblFTPOptionExplicitTLSText">
+                                    Explicit TLSv1 (FTPS)
+                                </label>
+                                &nbsp;&nbsp;
+                                <input type="checkbox" name="require_secure" id="require_secure" />
+                                <label for="require_secure" class="IPServers lblFTPOptionRequireSecureDataChannelText">
+                                    Require data channel to be secure
+                                </label>
+                                </p>
+                            </div>
+                            <p class="httpsOpts">
+                            <label class="IPServers lblHTTPOptionsText">HTTP/HTTPS Options:</label>
+                            </p>
+                            <div class="subPanel ui-widget-content leftborder nobg httpsOpts">
+                                <p>
+                                <input type="checkbox" name="allow_webdav" id="allow_webdav" />
+                                <label for="allow_webdav" class="IPServers lblHTTPOptionAllowUsersToUseWebDAVText">
+                                    Allow Users To Use WebDAV.
+                                </label>
+                                &nbsp;&nbsp;
+                                <span class="httpsRedirect">
+                                    <input type="checkbox" name="https_redirect" id="https_redirect" />
+                                    <label for="https_redirect" class="IPServers lblHTTPOptionRedirectToHTTPSText">
+                                        Redirected to HTTPS://
+                                    </label>
+                                </span>
+                                <span class="crush7Feature">
+                                &nbsp;&nbsp;
+                                <input type="checkbox" name="allow_proxy" id="allow_proxy" />
+                                <label for="allow_proxy" class="IPServers lblHTTPOptionAllowProxyText">
+                                    Allow Forward Proxy.
+                                </label>
+                                </span>
+                                </p>
+                                <p>
+                                <label for="httpTrustHeaderVariables" class="IPServers lblTrustHeadersText">Trust Headers:</label>
+                                <input type="text" class="bigInputBox" id="httpTrustHeaderVariables" name="httpTrustHeaderVariables" />
+                                </p>
+                                <p>
+                                <label for="httpReverseProxy" class="IPServers lblHTTPOptionHttpReverseProxyText">ReverseProxy Path (CrushFTP is behind a proxy):</label>
+                                <input type="text" class="bigInputBox" id="httpReverseProxy" name="httpReverseProxy" />
+                                </p>
+                                <p>
+                                <label class="IPServers lblHTTPOptionsReverseProxyText">ReverseProxy Server Configuration:</label>
+                                </p>
+                                <div>
+                                    <div style="display: none;">
+                                        <p>
+                                        <label for="reverseProxyDomain" class="IPServers lblHTTPOptionReverseProxyDomainText">ReverseProxy Domain:</label>
+                                            <textarea class="bigInputBox" id="reverseProxyDomain" name="reverseProxyDomain"></textarea>
+                                        </p>
+                                        <p>
+                                        <label for="reverseProxyUrl" class="IPServers lblHTTPOptionReverseProxyUrlText">ReverseProxy URL:</label>
+                                            <textarea class="bigInputBox" id="reverseProxyUrl" name="reverseProxyUrl"></textarea>
+                                        </p>
+                                        <p>
+                                        <label for="reverseProxyPath" class="IPServers lblHTTPOptionReverseProxyPathText">ReverseProxy Path:</label>
+                                            <textarea id="reverseProxyPath" name="reverseProxyPath"></textarea>
+                                        </p>
+                                    </div>
+                                    <a href="#" class="addItemProxy addMoreProxy" style="width:65px;padding-left: 18px;margin-top: 5px;float:none;">Add</a>
+                                    <div>
+                                        <div class="clear"></div>
+                                        <div class="multipleProxiesOption ui-widget-content nobg" style="width:430px;float:left;padding:5px;height:130px;margin:5px;">
+                                            <div>
+                                                <p>
+                                                <label for="mo_reverseProxyDomain" style="text-align: right;width:50px;display: inline-block;">Domain : </label>
+                                                <input id="mo_reverseProxyDomain" type="text" recName="domain" class="ignoreBind bigInputBox domain notFormElem" />
+                                                </p>
+                                                <p>
+                                                <label for="mo_reverseProxyUrl" style="text-align: right;width:50px;display: inline-block;">URL : </label>
+                                                <input id="mo_reverseProxyUrl" type="text" recName="url" class="ignoreBind bigInputBox url notFormElem" />
+                                                </p>
+                                                <p>
+                                                <label for="mo_reverseProxyPath" style="text-align: right;width:50px;display: inline-block;">Path : </label>
+                                                <input id="mo_reverseProxyPath" type="text" recName="path" class="ignoreBind bigInputBox path notFormElem" />
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="sslOpts">
+                            <label class="IPServers lblSSLOptionsText">SSL Options: (Overrides Global Encryption SSL Settings)</label>
+                            </p>
+                            <div class="subPanel ui-widget-content leftborder nobg sslOpts">
+                                <p>
+                                    SSL Certificates are used for HTTPS and FTP(S)(ES) connections.  See a tutorial here : <a target="_blank" href="http://www.crushftp.com/crush8wiki/Wiki.jsp?page=SSL">http://www.crushftp.com/crush8wiki/Wiki.jsp?page=SSL</a>
+                                </p>
+                                <fieldset class="nobg" style="margin-bottom: 10px;width:820px;">
+                                    <div style="width: 240px;float: left;padding-right: 10px;border-right: 1px solid #ccc;margin-right: 10px;">
+                                        <div class="ui-priority-primary" style="line-height: 18px;margin-bottom: 0px;border-bottom: 1px solid #ccc;
+                                            padding-bottom: 5px;margin-left: 3px;">Step 1: Generate Key
+                                        </div>
+                                        <p style="text-align: center;">
+                                        <span style='display:inline-block;margin:0px 3px 0px 3px;float:left;' class='pointer ui-icon ui-icon-gear' ></span>
+                                        <!--span>&nbsp;</span-->
+                                        </a>
+                                        <a href="#" class="button" id="btnGenerateKeyStore" style="top:4px;">
+                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-key'></span>
+                                        <span class="IPServers">Generate Key</span>
+                                        </a>
+                                        </p>
+                                    </div>
+                                    <div style="width:265px;float:left;margin-right: 10px;border-right: 1px solid #ccc;margin-right: 10px;padding-right:10px;">
+                                        <div class="ui-priority-primary" style="line-height: 18px;margin-bottom: 0px;border-bottom: 1px solid #ccc;
+                                            padding-bottom: 5px;margin-left: 3px;">Step 2: Generate Certificate Signing Request
+                                        </div>
+                                        <p style="text-align: center;">
+                                        <a href="#" class="button" id="btnGenerateCSR" style="top:4px;">
+                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-document'></span>
+                                        <span class="IPServers">Generate CSR</span>
+                                        </a>
+                                        </p>
+                                    </div>
+                                    <div style="width:250px;float:left;margin-right: 10px;">
+                                        <div class="ui-priority-primary" style="line-height: 18px;margin-bottom: 0px;border-bottom: 1px solid #ccc;
+                                            padding-bottom: 5px;margin-left: 3px;">Step 3: Import Certificate Authority Reply
+                                        </div>
+                                        <p style="text-align: center;">
+                                        <a href="#" class="button" id="btnImportSSL" style="top:4px;">
+                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-arrowthickstop-1-n'></span>
+                                        <span class="IPServers">Import Reply</span>
+                                        </a>
+                                        </p>
+                                    </div>
+                                </fieldset>
+                                <p>
+                                    <label for="customKeystore" class="IPServers lblSSLOptionKeyStoreLocationText">Keystore Location:</label>
+                                    <input type="text" class="bigInputBox" id="customKeystore" name="customKeystore" />
+                                    <a href="#" PickType="file" class="button serverFilePickButton" rel="customKeystore" id="browseKeystoreLocation" style="top:4px;">
+                                        <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                        <span class="IPServers btnKeyStoreLocationBrowseText">Browse
+                                        </span>
+                                    </a>
+                                </p>
+                                <div class="ui-state-highlight ui-corner-all warning" style="padding:3px;display:inline-block;margin:0px 3px;white-space: nowrap;">
+                                    <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+                                    <span class="msgText">
+                                        Keystores are either Java JKS files or PFX files. A stand alone private key and cert must be properly imported into a keystore first.
+                                    </span>
+                                </div>
+                                <p>
+                                <label for="customKeystorePass" class="IPServers lblSSLOptionKeyStorePasswordText">Keystore Password:</label>
+                                <input type="password" id="customKeystorePass" class="encryptPass" name="customKeystorePass" />
+                                </p>
+                                <p>
+                                <label for="customKeystoreCertPass" class="IPServers lblSSLOptionKeyPasswordText">Key Password:</label>
+                                <input type="password" id="customKeystoreCertPass" class="encryptPass" name="customKeystoreCertPass" />
+                                <a href="#" class="button" id="testCertificate" style="top:4px;">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon  ui-icon-transferthick-e-w'></span>
+                                <span class="Encryption btnKeyStorePasswordTestCertificateText">Test Certificate
+                                </span>
+                                </a>
+                                </p>
+                                <p>
+                                <input type="checkbox" name="needClientAuth" id="needClientAuth" />
+                                <label for="needClientAuth" class="IPServers lblSSLRequireValidClientCertiText">
+                                    Require valid client certificate.
+                                </label>
+                                </p>
+                            </div>
+                            <p class="sslOpts">
+                                <input type="checkbox" name="sni_enabled" id="sni_enabled" />
+                                <label class="IPServers" for="sni_enabled">SSL/TLS ServerNameInclusion (SNI)</label> <label>- How it works <a target="_blank" href="http://www.crushftp.com/crush8wiki/Wiki.jsp?page=SNI">http://www.crushftp.com/crush8wiki/Wiki.jsp?page=SNI</a></label>
+                            </p>
+                            <p class="upnpOpts">
+                                <input type="checkbox" name="configure_external" id="configure_external" />
+                                <label class="IPServers" for="configure_external">Configure Router Port Forwarding Automatically</label>
+                            </p>
+                            <p>
+                                <input type="checkbox" name="proxy_header" id="proxy_header" />
+                                <label class="IPServers" for="proxy_header">Read proxy protocol header info from connecting socket (v1)</label>
+                            </p>
+                            <fieldset id="serverBeatOptions" class="nobg" style="width:700px;">
+                                <legend>ServerBeat Options:</legend>
+                                <p>
+                                <label for="vip" class="IPServers lblServerBeatVirtualIP1Text">Virtual IP :</label>
+                                <input type="text" id="vip" name="vip" />
+                                <input type="text" id="index1" class="smallInputBox" name="index1" />
+                                </p>
+                                <p>
+                                <label for="vip2" class="IPServers lblServerBeatVirtualIP2Text">List of participating server IPs, comma separated :</label>
+                                <input type="text" id="vip2" name="vip2" style="width:400px;" />
+                                </p>
+                                <p>
+                                <label for="netmask" class="IPServers">Netmask :</label>
+                                <input type="text" id="netmask" name="netmask" />
+                                </p>
+                                <p>
+                                <label for="adapter" class="IPServers lblServerBeatEthernetText">Ethernet Adapter OS Name :</label>
+                                <input type="text" id="adapter" name="adapter" style="width:500px;" />
+                                </p>
+                                <p>
+                                <label for="priority" class="IPServers">Priority :</label>
+                                <input type="text" class="smallInputBox" id="priority" name="priority" /> <label for="">(Higher number has priority)</label>
+                                </p>
+                            </fieldset>
+                            <fieldset id="portForwardOptions" class="nobg" style="width:700px;">
+                                <legend>PortForward Options:</legend>
+                                <p>
+                                <label for="dest_ip" class="IPServers lblPortForwardIPText">Destination IP :</label>
+                                <input type="text" id="dest_ip" name="dest_ip" /> <label>:</label> <input type="text" id="dest_port" class="smallInputBox" name="dest_port" />
+                                </p>
+                            </fieldset>
+                            <p class="commonOpts">
+                                <label for="commandDelayInterval">Delay between protocol commands :</label>
+                                <input type="text" id="commandDelayInterval" name="commandDelayInterval" class="smallInputBox"  />
+                                <label for="commandDelayInterval">(ms)</label>
+                            </p>
+                        </div>
+                        <div id="IPSSSH" class="customForm">
+                            <p>
+                            <label class="IPServers lblServerHostKeyRSAText">Server Host Key (RSA):</label>
+                            <span class="spacer"></span>
+                            <input type="checkbox" class="ssh-change-warn" name="ssh_rsa_enabled" id="ssh_rsa_enabled" />
+                            <label for="ssh_rsa_enabled" class="IPServers lblSSHRSAEnabledText">
+                                Enabled
+                            </label>
+                            </p>
+                            <div class="subPanel ui-widget-content leftborder nobg">
+                                <p>
+                                <input type="text" class="bigInputBox ssh-change-warn" name="ssh_rsa_key" id="ssh_rsa_key" />
+                                <a href="#" class="button serverFilePickButton" rel="ssh_rsa_key" id="browseSSHRSAKeyLocation" style="top:4px;">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                <span class="IPServers btnBrowseText">Browse
+                                </span>
+                                </a>
+                                </p>
+                            </div>
+                            <p>
+                            <label class="IPServers lblServerHostKeyDSAText">Server Host Key (DSA):</label>
+                            <span class="spacer"></span>
+                            <input type="checkbox" class="ssh-change-warn" name="ssh_dsa_enabled" id="ssh_dsa_enabled" />
+                            <label for="ssh_dsa_enabled" class="IPServers lblSSHDSAEnabledText">
+                                Enabled
+                            </label>
+                            </p>
+                            <div class="subPanel ui-widget-content leftborder nobg">
+                                <p>
+                                <input type="text" class="bigInputBox ssh-change-warn" name="ssh_dsa_key" id="ssh_dsa_key" />
+                                <a href="#" class="button serverFilePickButton" rel="ssh_dsa_key" id="browseSSHDSAKeyLocation" style="top:4px;">
+                                <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-open'></span>
+                                <span class="IPServers btnBrowseText">Browse
+                                </span>
+                                </a>
+                                </p>
+                            </div>
+                            <p>
+                                <label for="ssh_cipher_list" class="IPServers lblSSHSupportedCiphersText">Supported Ciphers &amp; Preferred Order :</label>
+                                <input type="text" id="ssh_cipher_list" class="bigInputBox" name="ssh_cipher_list" />
+                            </p>
+                            <p>
+                                <label for="ssh_mac_list" class="IPServers">MAC List :</label>
+                                <input type="text" id="ssh_mac_list" class="bigInputBox" name="ssh_mac_list" />
+                                <br>
+                                <div class="ui-state-highlight ui-corner-all warning" style="padding:3px;margin:-5px 5px 0px 5px;display: inline-block;">
+                                    <em><strong>OpenJDK</strong> does not support all MACs and <strong>OracleJDK</strong> is recommended.</em>
+                                </div>
+                            </p>
+                            <p>
+                                <label for="key_exchanges" class="IPServers">Supported Key Exchanges :</label>
+                                <input type="text" id="key_exchanges" class="bigInputBox" name="key_exchanges" />
+                                <br>
+                                <div class="ui-state-highlight ui-corner-all warning" style="padding:3px;margin:-5px 5px 0px 5px;display: inline-block;">
+                                    <em>You can re-enable <strong>diffie-hellman-group1-sha1</strong> if needed, its removed by default.</em>
+                                </div>
+                            </p>
+                            <p>
+                                <label for="max_packet_length" class="IPServers">Max packet length :</label>
+                                <input type="text" id="max_packet_length" class="" name="max_packet_length" />
+                                <label for="max_packet_length" class="IPServers">bytes</label>
+                            </p>
+                            <p>
+                                <label for="min_dh_size" class="IPServers">Minimum DH Key Size :</label>
+                                <select id="min_dh_size" name="min_dh_size">
+                                    <option value="">Auto</option>
+                                    <option value="8192">8192</option>
+                                    <option value="4096">4096</option>
+                                    <option value="2048">2048</option>
+                                    <option value="1024">1024</option>
+                                    <option value="512">512</option>
+                                </select>
+                            </p>
+                            <p>
+                                <label for="max_dh_size" class="IPServers">Maximum DH Key Size :</label>
+                                <select id="max_dh_size" name="max_dh_size">
+                                    <option value="">Auto</option>
+                                    <option value="8192">8192</option>
+                                    <option value="4096">4096</option>
+                                    <option value="2048">2048</option>
+                                    <option value="1024">1024</option>
+                                    <option value="512">512</option>
+                                </select>
+                            </p>
+                            <p clsss="sftpOptions">
+                                <label for="max_channels" class="IPServers">Max Channels Per Connection :</label>
+                                <input type="text" id="max_channels" class="smallInputBox" name="max_channels" />
+                            </p>
+                            <p>
+                            <input type="checkbox" name="ssh_debug_logging" id="ssh_debug_logging" />
+                            <label for="ssh_debug_logging" class="IPServers lblEnableSSHDebugLoggingText">
+                                Enable debug logging
+                            </label>
+                            </p>
+                            <p>
+                            <label for="ssh_text_encoding" class="IPServers lblSSHTextEncodingText">Text Encoding :</label>
+                            <input type="text" id="ssh_text_encoding" name="ssh_text_encoding" />
+                            </p>
+                            <p>
+                            <input type="checkbox" name="ssh_async" id="ssh_async" />
+                            <label for="ssh_async" class="IPServers lblSSHAsyncText">
+                                Use Asynchronous Threading?
+                            </label>
+                            </p>
+                            <p>
+                                <label for="max_async_req" class="IPServers">Max async requests :</label>
+                                <input type="text" id="max_async_req" name="max_async_req" class="smallInputBox" />
+                            </p>
+                            <p>
+                            <label for="ssh_session_timeout" class="IPServers lblSSHSessionTimeoutText">Idle Timeout(seconds) :</label>
+                            <input type="text" id="ssh_session_timeout" name="ssh_session_timeout" />
+                            </p>
+                            <p>
+                            <input type="checkbox" name="ssh_require_password" id="ssh_require_password" />
+                            <label for="ssh_require_password" class="IPServers lblSSHRequirePasswordText">
+                                Require Password Authentication?
+                            </label>
+                            </p>
+                            <p>
+                            <input type="checkbox" name="ssh_require_publickey" id="ssh_require_publickey" />
+                            <label for="ssh_require_publickey" class="IPServers lblSSHRequirePublickeyText">
+                                Require Public Key Authentication?
+                            </label>
+                            </p>
+                        </div>
+                        <div id="ReCaptcha" class="customForm">
+                            <p>
+                            <input type="checkbox" name="recaptcha_enabled" id="recaptcha_enabled" />
+                            <label for="recaptcha_enabled" class="IPServers lblReCaptchaVerificationText">
+                                Enable Re-Captcha verification
+                            </label>
+                            </p>
+                            <p>
+                            <label for="recaptcha_public_key" class="IPServers lblReCaptchaPublicKeyText bigLabel">Site Key :</label>
+                            <input type="text" id="recaptcha_public_key" class="bigInputBox" name="recaptcha_public_key" />
+                            </p>
+                            <p>
+                            <label for="recaptcha_private_key" class="IPServers lblReCaptchaPrivateKeyText bigLabel">Secret Key :</label>
+                            <input type="text" id="recaptcha_private_key" class="bigInputBox" name="recaptcha_private_key" />
+                            </p>
+                            <p>
+                                <label for="recaptcha_version" class="IPServers bigLabel">Re-Captcha Version :</label>
+                                <select id="recaptcha_version" name="recaptcha_version">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                </select>
+                            </p>
+                            <p>
+                                <div class="ui-state-highlight ui-corner-all warning" style="padding:3px;margin:0px 3px;">
+                                    <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+                                        If Recaptcha is enabled but configuration is not proper, all logins will fail.
+                                </div>
+                            </p>
+                        </div>
+                        <div id="IPRestrictions" class="customForm">
+                            <div class="subPanel ui-widget-content leftborder nobg">
+                                <div class="buttonBar buttonBarNoBottom">
+                                    <a id="addNewBanRule" href="#" class="button">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-plus' ></span>Add
+                                    </a>
+                                    <span class="spacer"></span>
+                                    <a id="editBanRule" href="#" class="button">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-document' ></span>Edit
+                                    </a>
+                                    <span class="spacer"></span>
+                                    <a id="removeBanRule" href="#" class="button">
+                                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-trash' ></span>Remove
+                                    </a>
+                                </div>
+                                <div>
+                                    <div class="LargeListBox ui-corner-all ui-widget-content nobg sideScroll" style="width:500px;height:300px;">
+                                        <ol class="nobg selectable
+single sideScroll custom-list ui-sortable ui-selectable" id="bannedIPlist" name="bannedIPlist">
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="buttonBar right">
+                    <a href="#" class="button">
+                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-folder-collapsed' ></span>
+                    <span class="submitActionRestore IPServers btnResetText">Reset To Default</span>
+                    </a>
+                    <a href="#" class="button" id="cancel">
+                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-cancel' ></span>
+                    <span class="submitActionCancel IPServers btnCancelText">Cancel</span>
+                    </a>
+                    <a id="saveContent" href="#" class="button">
+                    <span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-disk' ></span>
+                    <span class="submitActionOk IPServers btnOKText">OK</span>
+                    </a>
+                    </p>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div id="diagnoseDialog" class="smallLabels customForm" style="display:none;">
+        <p>
+            <label for="diag_Protocol" class="bigLabel">Protocol : </label>
+            <input type="text" id="diag_Protocol" readonly class="smallInputBox" />
+            <button aria-disabled="false" onclick="$('#telnetDialog').dialog('open');" role="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="button" style="float: right"><span class="ui-button-text">Telnet</span></button>
+        </p>
+        <p>
+            <label for="diag_IP" class="bigLabel">Host : </label>
+            <input class="manualIP" type="text" id="diag_IP" />
+            <input type="checkbox" id="diag_HostAuto" /><label for="diag_HostAuto">Auto</label>
+        </p>
+        <p class="manualIP">
+            <label for="usePublicIP" class="bigLabel">Your public IP is :</label>
+            <label id="diag_publicIPAddress">....</label>
+        </p>
+        <p>
+            <label for="diag_Port" class="bigLabel">Port : </label>
+            <input type="text" id="diag_Port" class="smallInputBox" readonly />
+        </p>
+        <p class="ftpItems" style="display:none;">
+            <label for="diag_user" class="bigLabel">Username : </label>
+            <input type="text" id="diag_UserName" />
+        </p>
+        <p class="ftpItems" style="display:none;">
+            <label for="diag_pass" class="bigLabel">Pass : </label>
+            <input type="password" id="diag_pass" />
+        </p>
+    </div>
+    <div id="telnetDialog" title="Telnet Client" data-connected="false" data-conid="">
+        <form>
+            <input type="text" name="telnet_host" id="telnet_host" placeholder="Hostname" style="width: 30%; padding: 7px" value="" />
+            <input type="text" name="telnet_port" id="telnet_port" placeholder="Port Number" style="width: 15%; padding: 7px" value="" />
+            <button type="button" name="telnet_connect" id="telnet_connect" role="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" style="padding: 6px 10px">Connect</button>
+            <textarea name="telnet_area" id="telnet_area" style="width: 98.5%; padding: 7px; height: 450px; resize: none; margin-top: 10px"></textarea>
+            <input type="text" name="telnet_cmd" id="telnet_cmd" placeholder="Write here the telnet command and hit enter" style="width: 98.5%; padding: 7px; margin-top: 10px" />
+        </form>
+    </div>
+    <ul id="serverItemContextMenu" class="contextMenu">
+        <li class="start">
+            <a href="#startServer">Start Server</a>
+        </li>
+        <li class="stop separator">
+            <a href="#stopServer">Stop Server</a>
+        </li>
+        <li class="restart separator">
+            <a href="#restartServer">Restart Server</a>
+        </li>
+        <li class="startAllServers separator">
+            <a href="#startAllServers">Start All Servers</a>
+        </li>
+        <li class="diag separator">
+            <a href="#diag">Diagnostics Test</a>
+        </li>
+    </ul>
+</div>
+
+
+
+<div id="WIbannedIPDialog" class="customDialogFrom customForm" title="IP Restriction" style="display: none;">
+    <form action="" name="WIbannedIPDialog">
+            <div id="before_after_Id">
+                <label for="before/after">Insert before/after selection? </label>
+                    <select id="selectionId" style="width: 312px;">
+                        <option value="Before">Before</option>
+                        <option value="After">After</option>
+                    </select>
+                     <label for="" class="metaInfo"></label>
+            </div>
+
+            <div>
+                <label for="Choose one">Choose one : </label>
+                    <select id="chooseoptId" style="width: 312px;">
+                        <option value="A">Allow</option>
+                        <option value="D">Deny</option>
+                        <option value="D">Ban</option>
+                    </select>
+                    <label for="" class="metaInfo"></label>
+            </div>
+
+            <div>
+                <label for="starting IP">Please enter a starting IP : </label>
+                    <input type="text" size="30" id="startingIP" style="width: 312px;">
+                    <label for="" class="metaInfo"></label>
+            </div>
+
+            <div>
+                <label for="stopping IP">Please enter a stopping IP : </label>
+                    <input type="text" size="30" id="stoppingIp" style="width: 312px;">
+                    <label for="" class="metaInfo"></label>
+            </div>
+
+
+    </form>
+</div>

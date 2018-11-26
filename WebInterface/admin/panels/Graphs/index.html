@@ -1,0 +1,87 @@
+<!-- Panel HTML -->
+<div id="pnlGraphs" class="adminPanel">
+	<fieldset>
+		<legend>Connections : </legend>
+		<div class="graphNotes">
+			<span>Current : </span><span id="connectionCurrent" class="ui-priority-primary"></span>, <span>Max : </span><span id="connectionMax" class="ui-priority-primary"></span>
+		</div>
+		<div style="margin:1px px">
+			<span id="connectionsGraph">Loading...</span>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>Outgoing Speed : </legend>
+		<div class="graphNotes">
+			<span>Current : </span><span id="outSpeedCurrent" class="ui-priority-primary"></span>, <span>Max : </span><span id="outSpeedMax" class="ui-priority-primary"></span>
+		</div>
+		<div style="margin:1px px">
+			<span id="outSpeedGraph">Loading...</span>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>Incoming Speed : </legend>
+		<div class="graphNotes">
+			<span>Current : </span><span id="inSpeedCurrent" class="ui-priority-primary"></span>, <span>Max : </span><span id="inSpeedMax" class="ui-priority-primary"></span>
+		</div>
+		<div style="margin:1px px">
+			<span id="inSpeedGraph">Loading...</span>
+		</div>
+	</fieldset>
+	<fieldset id="memoryGraphPanel">
+		<legend id="memoryRelease" style="cursor:pointer;">Memory Use : </legend>
+		<div class="graphNotes">
+			<span>Max : </span><span id="ram_max" class="ui-priority-primary"></span>, <span>Free : </span><span id="ram_free" class="ui-priority-primary"></span>
+		</div>
+		<div style="margin:1px px">
+			<span id="memoryGraph">Loading...</span>
+		</div>
+	</fieldset>
+</div>
+<div class="graphinfo" id="graphinfo">
+	<span class="close">x</span>
+	<div class="title"></div>
+	<div class="nodata">No information available</div>
+	<div class="loader">Loading...</div>
+	<ul class="info">
+		<li>
+			<strong><span class="value user_name"></span></strong>
+			(<span class="value user_protocol"></span>)
+			<span class="value user_ip"></span>
+			<span class="value time"></span>
+			<br>
+			<strong>Item : </strong>
+			<span class="value name"></span>
+			(<span class="value the_file_size size"></span>)
+			 <span class="value the_file_speed size"></span>
+		</li>
+	</ul>
+</div>
+<div class="graphinfo" id="graphtip">
+	<div class="nodata">No information available</div>
+	<div class="loader">Loading...</div>
+	<ul class="info">
+		<li>
+			<strong><span class="value user_name"></span></strong>
+			(<span class="value user_protocol"></span>)
+			<span class="value user_ip"></span>
+			<span class="value time"></span>
+			<br>
+			<strong>Item : </strong>
+			<span class="value name"></span>
+			(<span class="value the_file_size size"></span>)
+			 <span class="value the_file_speed size"></span>
+		</li>
+	</ul>
+</div>
+<div class="clear"></div>
+<ul id="memoryGraphContextMenu" class="contextMenu">
+	<li class="">
+		<a href="#" msg="dumpMemory">Dump Memory to Disk</a>
+	</li>
+	<li class="separator">
+		<a href="#" msg="setMaxServerMemory">Set Max Memory</a>
+	</li>
+	<li class="separator">
+		<a href="#" msg="restartProcess">Restart CrushFTP</a>
+	</li>
+</ul>

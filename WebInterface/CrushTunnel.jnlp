@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.5+" codebase="%base_url%WebInterface/CrushSync/">
+	<information>
+		<title>CrushTunnel</title>
+		<vendor>%base_url%</vendor>
+		<offline-allowed/>
+		<shortcut online="false">
+			<desktop/>
+		</shortcut>
+	    <icon href="logo.png"/>
+	</information>
+	<security><all-permissions/></security>
+	<resources>
+		<j2se version="1.4+" max-heap-size="1024m"/>
+		<jar href="CrushSync.jar"/>
+		<property name="apple.awt.UIElement" value="true"/>
+	</resources>
+	<application-desc main-class="com.crushftp.Daemon" name="AdvancedFileTransferDesktop">
+		<argument>appname=CrushTunnel:::remote.protocol=%user_protocol%:::remote.ip=%user_listen_ip%:::remote.port=%user_port%</argument>
+	</application-desc>
+</jnlp>
