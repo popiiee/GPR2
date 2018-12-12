@@ -28,8 +28,8 @@
 					<label for="replicated_vfs_url"><small>(Ex: 192.168.0.15:7800)</small></label>
 				</p>
 				<p>
-					<input type="checkbox" id="replicated_users_sync" name="replicated_users_sync" />
-					<label for="replicated_users_sync" class="Replication">Replicate User Manager Changes?</label>
+					<input type="checkbox" id="replicate_users" name="replicate_users" />
+					<label for="replicate_users" class="Replication">Replicate User Manager Changes?</label>
 				</p>
 				<p>
 					<input type="checkbox" id="s3crush_replicated" name="s3crush_replicated" />
@@ -39,18 +39,34 @@
 					<input type="checkbox" id="replicate_jobs" name="replicate_jobs" />
 					<label for="replicate_jobs">Replicate Job Changes?</label>
 				</p>
-				<p>
-					<input type="checkbox" id="replicate_sessions" name="replicate_sessions" />
-					<label for="replicate_sessions">Replicate HTTP(s) logged in sessions?</label>
-				</p>
-				<p>
+				<!-- <p>
+					<input type="checkbox" id="replicate_sessions9" name="replicate_sessions9" />
+					<label for="replicate_sessions9">Replicate HTTP(s) logged in sessions?</label>
+				</p> -->
+				<!-- <p>
 					<input type="checkbox" id="replicate_jobs_sync" name="replicate_jobs_sync" />
 					<label for="replicate_jobs_sync">Replicate offline job edits?</label>
-				</p>
+				</p> -->
 				<p>
 					<input type="checkbox" id="replicate_reports" name="replicate_reports" />
 					<label for="replicate_reports">Replicate HTML reports?</label>
 				</p>
+				<p>
+					<input type="checkbox" id="replicate_shares" name="replicate_shares" />
+					<label for="replicate_shares">Replicate Shares?</label>
+				</p>
+				<!-- <p>
+					<input type="checkbox" id="replicate_share_sync" name="replicate_share_sync" />
+					<label for="replicate_share_sync">Replicate offline Shares?</label>
+				</p> -->
+				<p>
+					<input type="checkbox" id="replicate_preferences" name="replicate_preferences" />
+					<label for="replicate_preferences">Replicate Preferences?</label>
+				</p>
+				<!-- <p>
+					<input type="checkbox" id="replicate_preferences_sync" name="replicate_preferences_sync" />
+					<label for="replicate_preferences_sync">Replicate offline Preferences?</label>
+				</p> -->
 				<p>
 					<label for="replicated_server_ips">Allowed IP patterns for server replication :</label>
 					<input class="bigInputBox" type="text" id="replicated_server_ips" name="replicated_server_ips" />
@@ -82,11 +98,11 @@
                     	<input type="checkbox" name="replicated_auto_play_journal" id="replicated_auto_play_journal" />
                     	<label for="replicated_auto_play_journal">VFS Replicated auto play journal</label>
 	                	<div class="ui-state-highlight ui-corner-all" style="padding:3px;display:inline-block;margin:5px 3px;width:570px;position: relative;top:-5px;">
-                        <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
-                        <span class="CrushLDAPGroup lblSearchNoteText">
-                            (Its recommended this option be disabled if the remote server is expected to be offline frequently.)
-                        </span>
-                    </div>
+	                        <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+	                        <span class="CrushLDAPGroup lblSearchNoteText">
+	                            (Its recommended this option be disabled if the remote server is expected to be offline frequently.)
+	                        </span>
+	                    </div>
                 	</div>
                 </p>
 			</td>
@@ -103,7 +119,7 @@
 		</a>
 		<a href="#" class="button" id="saveContent">
 			<span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-disk' ></span>
-			<span class="submitActionOk Replication btnOKText">OK</span>
+			<span class="submitActionOk Replication btnOKText">Save</span>
 		</a>
 	</p>
 </div>

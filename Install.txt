@@ -1,0 +1,24 @@
+Windows Java Install Instructions
+---------------------------------
+We recommend OpenJDK 11 if you don't have an Oracle
+license for Oracle Java.
+
+Download OpenJDK here:  http://jdk.java.net/11/
+
+Take the zip file and unzip it to its own folder named
+"Java" in your CrushFTP folder.  Example:
+CrushFTP9_PC\Java\bin\
+CrushFTP9_PC\Java\conf\
+CrushFTP9_PC\Java\lib\
+.........
+
+The CrushFTP exe will automatically search for this
+folder when launching CrushFTP.
+
+If you are using an old version of Windows, you may
+need to install the VS C++ 2015 Redistributable
+libraries.  Windows versions after Windows 7 won't
+need to do this.
+https://www.microsoft.com/en-us/download/details.aspx?id=48145
+
+If you have any troubles, contact support@crushftp.com.

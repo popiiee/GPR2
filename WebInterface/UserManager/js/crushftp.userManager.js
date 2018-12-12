@@ -236,13 +236,16 @@ var userManager = {
 						{
 							if($(this).attr("inheritedfrom").toLowerCase() == 'default')
 							{
-								if(!ignoreDefaultItems || !ignoreDefaultItems.has($(this).attr("pnlId")))
-									hiddenSections.push($(this).hide());
+								if(!ignoreDefaultItems || !ignoreDefaultItems.has($(this).attr("pnlId"))){
+									if(!$(this).hasClass('.not-allowed'))
+										hiddenSections.push($(this).hide());
+								}
 							}
 						}
 						else
 						{
-							hiddenSections.push($(this).hide());
+							if(!$(this).hasClass('.not-allowed'))
+								hiddenSections.push($(this).hide());
 						}
 					});
 
@@ -266,7 +269,7 @@ var userManager = {
 			userManager.methods.listenChanges(panel);
 		},
 		updateHiddenSectionsCount : function(){
-			var hiddenSections = $(".inheritSet:hidden", userManager.GUIInterface).length;
+			var hiddenSections = $(".inheritSet:hidden:not(.not-allowed)", userManager.GUIInterface).length;
 			if(hiddenSections==0)
 			{
 				$("#hiddenPanelsNote", userManager.GUIInterface).hide();
@@ -274,14 +277,18 @@ var userManager = {
 			}
 			else
 			{
-				$("#hiddenPanelsCount", $("#hiddenPanelsNote", userManager.GUIInterface).show()).html("<strong>" + hiddenSections + "</strong>");
+				$("#hiddenPanelsCount", $("#hiddenPanelsNote", userManager.GUIInterface).show()).html("<strong>" + hiddenSections + " </strong>");
 			}
 		},
 		updateHiddenSectionsCountForPanel : function(panel, hiddenSections){
 			var collapseHandle = $("legend.collapseHandle:first", panel);
+			collapseHandle.parent().find(".no-item").remove();
 			if(hiddenSections == 0)
 			{
 				$("span.hiddenSectionCount", panel).hide();
+				if(panel.find(".allowed").length==0){
+					collapseHandle.after("<div class='no-item'>No settings available in this section</div>");
+				}
 			}
 			else
 			{
@@ -289,7 +296,7 @@ var userManager = {
 				{
 					collapseHandle.after("<span class='hiddenSectionCount notes ienote'></span>");
 				}
-				var sectionNote = hiddenSections <=1 ? "section is" : "sections are";
+				var sectionNote = hiddenSections <=1 ? " section is" : " sections are";
 				$("span.hiddenSectionCount", panel).html((" (Total <strong>" + hiddenSections + "</strong> "+sectionNote+" not being shown)")).show();
 			}
 			if(userManager.onlyVFS)
@@ -581,7 +588,7 @@ var userManager = {
 					{
 						$(this).trigger("click");
 					}
-					userManager.UI.updateHiddenSectionsCountForPanel(parentFs, $(".inheritSet:hidden", parentFs).length);
+					userManager.UI.updateHiddenSectionsCountForPanel(parentFs, $(".inheritSet:hidden:not(.not-allowed)", parentFs).length);
 				});
 				setTimeout(function(){
 					userManager.UI.updateHiddenSectionsCount();
@@ -766,46 +773,49 @@ var userManager = {
 														});
 														return false;
 													}
-													crushFTP.UI.showLoadingIndicator(true);
-													var defaultUser = crushFTP.storage("defaultUser");
-													var salt = "";
-													if(defaultUser && defaultUser.user && defaultUser.user.salt && defaultUser.user.salt == "random")
-													{
-														var pass = panelSetup.generatePasswordUsingPrefs();
-														salt = "<salt>"+pass+"</salt>";
-													}
-													var currentUserForCreateUser = $(document).data("username");
-												    crushFTP.data.getServerItem("server_info/current_datetime_ddmmyyhhmmss", function (serverTime) {
-												        var responseStatusForCreateUser = $(serverTime).find("response_status").text() || "";
-												        userManager.dataRepo.saveUserInfo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><user type=\"properties\"><created_by_username>"+currentUserForCreateUser+"</created_by_username><created_by_email>"+userManager.currentUserEmail+"</created_by_email><created_time>"+responseStatusForCreateUser+"</created_time><username>"+crushFTP.methods.htmlEncode(userName)+"</username><password>"+crushFTP.methods.htmlEncode(password)+"</password>"+salt+"<max_logins>0</max_logins><root_dir>/</root_dir></user>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><vfs type=\"vector\"></vfs>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><permissions type=\"properties\"><item name=\"/\">(read)(view)(resume)</item></permissions>", userName, "new", function(response){
-																crushFTP.UI.hideLoadingIndicator();
-																if(response) {
-																	$(document).data("newUserPass", password);
-																	crushFTP.UI.growl("Message : ", "User created", false, 3000);
-																	$(".reloadUsersLinkMain", "#GUIInterface").trigger("click", [{callback : function(){
-																		if(userList.find("option[userName='"+userName+"']").length==0)
-																		{
-																			userManager.methods.buildUserList(false, $("#filterUserInList").val(), $("#groupSelectList").val(), false, true);
-																		}
-																		var selectedGroup = $("#groupSelectList").find("option:selected");
-																		if(selectedGroup.attr("rel") == "editable")
-																		{
-																			userManager.data.addUsersToGroup(selectedGroup.val(), [userName], function(){
+													function continueAddingUser(){
+														crushFTP.UI.showLoadingIndicator(true);
+														var defaultUser = crushFTP.storage("defaultUser");
+														var salt = "";
+														if(defaultUser && defaultUser.user && defaultUser.user.salt && defaultUser.user.salt == "random")
+														{
+															var pass = panelSetup.generatePasswordUsingPrefs();
+															salt = "<salt>"+pass+"</salt>";
+														}
+														var currentUserForCreateUser = $(document).data("username");
+													    crushFTP.data.getServerItem("server_info/current_datetime_ddmmyyhhmmss", function (serverTime) {
+													        var responseStatusForCreateUser = $(serverTime).find("response_status").text() || "";
+													        userManager.dataRepo.saveUserInfo("<?xml version=\"1.0\" encoding=\"UTF-8\"?><user type=\"properties\"><created_by_username>"+currentUserForCreateUser+"</created_by_username><created_by_email>"+userManager.currentUserEmail+"</created_by_email><created_time>"+responseStatusForCreateUser+"</created_time><username>"+crushFTP.methods.htmlEncode(userName)+"</username><password>"+crushFTP.methods.htmlEncode(password)+"</password>"+salt+"<max_logins>0</max_logins><root_dir>/</root_dir></user>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><vfs type=\"vector\"></vfs>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><permissions type=\"properties\"><item name=\"/\">(read)(view)(resume)</item></permissions>", userName, "new", function(response){
+																	crushFTP.UI.hideLoadingIndicator();
+																	if(response) {
+																		$(document).data("newUserPass", password);
+																		crushFTP.UI.growl("Message : ", "User created", false, 3000);
+																		$(".reloadUsersLinkMain", "#GUIInterface").trigger("click", [{callback : function(){
+																			if(userList.find("option[userName='"+userName+"']").length==0)
+																			{
+																				userManager.methods.buildUserList(false, $("#filterUserInList").val(), $("#groupSelectList").val(), false, true);
+																			}
+																			var selectedGroup = $("#groupSelectList").find("option:selected");
+																			if(selectedGroup.attr("rel") == "editable")
+																			{
+																				userManager.data.addUsersToGroup(selectedGroup.val(), [userName], function(){
+																					userList.find(":selected").removeAttr("selected");
+																					userList.find("option[userName='"+userName+"']").attr("selected", "selected").end().trigger("change");
+																				});
+																			}
+																			else
+																			{
 																				userList.find(":selected").removeAttr("selected");
 																				userList.find("option[userName='"+userName+"']").attr("selected", "selected").end().trigger("change");
-																			});
-																		}
-																		else
-																		{
-																			userList.find(":selected").removeAttr("selected");
-																			userList.find("option[userName='"+userName+"']").attr("selected", "selected").end().trigger("change");
-																		}
-																	}}]);
-																}else{
-																	crushFTP.UI.growl("Failure : ", data, true, true);
-																}
-														});
-												    })
+																			}
+																		}}]);
+																	}else{
+																		crushFTP.UI.growl("Failure : ", data, true, true);
+																	}
+															});
+													    });
+													}
+													crushFTP.Replication.showOptionsOrContinue(continueAddingUser);
 												}
 											}
 											function showPasswordDialog(password)
@@ -1183,52 +1193,106 @@ var userManager = {
 							{
 								function continueDeleting(expire_user)
 								{
-									crushFTP.UI.showLoadingIndicator(true);
-									userManager.data.deleteExtraVFSUsers(selectedUserNames, function(){
-										userManager.dataRepo.saveUserInfo("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><vfs type=\"vector\"></vfs>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><permissions type=\"vector\"></permissions>", selectedUserNames.join(";"), "delete", function(data){
-											if(data)
-											{
-												var usersData = $.xml2json(data, false);
-												if(usersData && usersData["response_status"] && usersData["response_status"]== "OK")
+									function finalRemoveContinue(){
+										crushFTP.UI.showLoadingIndicator(true);
+										userManager.data.deleteExtraVFSUsers(selectedUserNames, function(){
+											userManager.dataRepo.saveUserInfo("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><vfs type=\"vector\"></vfs>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><permissions type=\"vector\"></permissions>", selectedUserNames.join(";"), "delete", function(data){
+												if(data)
 												{
-													//Remove from group added by carlos on 20/02/2015 at 10:48 am GMT -6
-													var usersFormatted = [];
-													selectedUsers.each(function(){
-														usersFormatted.push($.trim($(this).closest("option").attr("username")));
-													});
-													var userList = crushFTP.storage("users");
-													var groupsToCheck = [];
-													for (var i = 0; i <= selectedUserNames.length; i++) {
-														for(var z=0;z<userList.length;z++){
-															if( userList[z].text == selectedUserNames[i]) {
-																var groups = userList[z].groups;
-																if(!groups || !jQuery.isArray(groups))
-																{
-																	groups = [];
+													var usersData = $.xml2json(data, false);
+													if(usersData && usersData["response_status"] && usersData["response_status"]== "OK")
+													{
+														//Remove from group added by carlos on 20/02/2015 at 10:48 am GMT -6
+														var usersFormatted = [];
+														selectedUsers.each(function(){
+															usersFormatted.push($.trim($(this).closest("option").attr("username")));
+														});
+														var userList = crushFTP.storage("users");
+														var groupsToCheck = [];
+														for (var i = 0; i <= selectedUserNames.length; i++) {
+															for(var z=0;z<userList.length;z++){
+																if( userList[z].text == selectedUserNames[i]) {
+																	var groups = userList[z].groups;
+																	if(!groups || !jQuery.isArray(groups))
+																	{
+																		groups = [];
+																	}
+																	$.each(groups, function( index, value ) {
+																		groupsToCheck.push(value.toLowerCase());
+																	});
 																}
-																$.each(groups, function( index, value ) {
-																	groupsToCheck.push(value.toLowerCase());
-																});
 															}
 														}
-													}
 
-													function continueProcess(){
-														crushFTP.UI.showLoadingIndicator(true);
-														userManager.data.storeCurrentUserInfo(false);
-														userManager.placeHolder.removeData("hasChanged");
-														userManager.changedSettings = [];
+														function continueProcess(){
+															crushFTP.UI.showLoadingIndicator(true);
+															userManager.data.storeCurrentUserInfo(false);
+															userManager.placeHolder.removeData("hasChanged");
+															userManager.changedSettings = [];
 
-														for (var i = 0; i < selectedUserNames.length; i++) {
-															$.crushFtpPersonalization.deleteItem("userManager", "users", "edited", selectedUserNames[i]);
-															$.crushFtpPersonalization.deleteItem("userManager", "users", "viewed", selectedUserNames[i]);
-														};
+															for (var i = 0; i < selectedUserNames.length; i++) {
+																$.crushFtpPersonalization.deleteItem("userManager", "users", "edited", selectedUserNames[i]);
+																$.crushFtpPersonalization.deleteItem("userManager", "users", "viewed", selectedUserNames[i]);
+															};
 
-														userManager.methods.showRecentUsersPersonalization();
+															userManager.methods.showRecentUsersPersonalization();
 
-														$(".reloadUsersLinkMain", "#GUIInterface").trigger("click", [{callback : function(){
-															crushFTP.UI.growl("Message : ", "User \"" + selectedUserNames.join("; ") + "\" deleted", false, 3000);
+															$(".reloadUsersLinkMain", "#GUIInterface").trigger("click", [{callback : function(){
+																crushFTP.UI.growl("Message : ", "User \"" + selectedUserNames.join("; ") + "\" deleted", false, 3000);
+																var xml = userManager.data.buildInheritanceXML();
+																userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+																	if(data)
+																	{
+																		crushFTP.UI.growl("Message : ", "Inheritance data saved", false, 3000);
+																		userManager.placeHolder.removeData("hasChanged");
+																		userManager.changedSettings = [];
+																		crushFTP.UI.hideLoadingIndicator();
+																		userManager.methods.removeUsersLocalStorage();
+																		crushFTP.removeStorage("CurrentUserInheritanceDetails");
+																	}
+																	else
+																	{
+																		crushFTP.UI.growl("Failure : Inheritance not saved", data, true, true);
+																		crushFTP.UI.hideLoadingIndicator();
+																	}
+																});
+															}}]);
+														}
+
+														if(groupsToCheck && groupsToCheck.length>0){
+															userManager.data.removeUsersFromGroup("", usersFormatted, false, function(){
+																continueProcess();
+															}, groupsToCheck, true);
+														}
+														else{
+															continueProcess();
+														}
+														//End
+
+														var inheritanceChanged = false;
+														if(selectedUserNames.length>0)
+														{
+															var userList = crushFTP.storage("users");
+															if(userList && userList.length>0)
+															{
+																for(var i=0;i<userList.length;i++)
+																{
+																	if(userList[i] && userList[i].text && userList[i].inheritance)
+																	{
+																		var inheritance = userList[i].inheritance;
+																		var actualinfo = inheritance.length;
+																		inheritance = inheritance.diff(selectedUserNames);
+																		userList[i].inheritance = inheritance;
+																		if(inheritance.length != actualinfo)
+																			inheritanceChanged = true;
+																	}
+																}
+															}
+														}
+														if(inheritanceChanged)
+														{
 															var xml = userManager.data.buildInheritanceXML();
+															crushFTP.UI.showLoadingIndicator(true);
 															userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
 																if(data)
 																{
@@ -1242,74 +1306,23 @@ var userManager = {
 																else
 																{
 																	crushFTP.UI.growl("Failure : Inheritance not saved", data, true, true);
-																	crushFTP.UI.hideLoadingIndicator();
 																}
 															});
-														}}]);
-													}
-
-													if(groupsToCheck && groupsToCheck.length>0){
-														userManager.data.removeUsersFromGroup("", usersFormatted, false, function(){
-															continueProcess();
-														}, groupsToCheck, true);
-													}
-													else{
-														continueProcess();
-													}
-													//End
-
-													var inheritanceChanged = false;
-													if(selectedUserNames.length>0)
-													{
-														var userList = crushFTP.storage("users");
-														if(userList && userList.length>0)
-														{
-															for(var i=0;i<userList.length;i++)
-															{
-																if(userList[i] && userList[i].text && userList[i].inheritance)
-																{
-																	var inheritance = userList[i].inheritance;
-																	var actualinfo = inheritance.length;
-																	inheritance = inheritance.diff(selectedUserNames);
-																	userList[i].inheritance = inheritance;
-																	if(inheritance.length != actualinfo)
-																		inheritanceChanged = true;
-																}
-															}
 														}
 													}
-													if(inheritanceChanged)
+													else
 													{
-														var xml = userManager.data.buildInheritanceXML();
-														crushFTP.UI.showLoadingIndicator(true);
-														userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-															if(data)
-															{
-																crushFTP.UI.growl("Message : ", "Inheritance data saved", false, 3000);
-																userManager.placeHolder.removeData("hasChanged");
-																userManager.changedSettings = [];
-																crushFTP.UI.hideLoadingIndicator();
-																userManager.methods.removeUsersLocalStorage();
-																crushFTP.removeStorage("CurrentUserInheritanceDetails");
-															}
-															else
-															{
-																crushFTP.UI.growl("Failure : Inheritance not saved", data, true, true);
-															}
-														});
+														crushFTP.UI.growl("Failure : ", "Error occured while deleting user \"" + selectedUserNames.join("; ") + "\" \r\n" + data , false, 3000);
 													}
 												}
 												else
 												{
-													crushFTP.UI.growl("Failure : ", "Error occured while deleting user \"" + selectedUserNames.join("; ") + "\" \r\n" + data , false, 3000);
+													crushFTP.UI.growl("Failure : ", data, true, true);
 												}
-											}
-											else
-											{
-												crushFTP.UI.growl("Failure : ", data, true, true);
-											}
-										}, false, false, expire_user);
-									});
+											}, false, false, expire_user);
+										});
+									}
+									crushFTP.Replication.showOptionsOrContinue(finalRemoveContinue);
 								}
 								if($("#chk_expire_user").closest("div").find(".ui-icon-check").length>0)
 								{
@@ -1317,7 +1330,7 @@ var userManager = {
 										jConfirm("Are you sure? <br> <br>The CrushTask item associated with the account expiration on this user will be executed.", "Confirm",  function(_val){
 											if(_val)
 											{
-												continueDeleting(true);
+												continueDeleting();
 											}
 										}, {
 											okButtonText : "Yes",
@@ -1510,54 +1523,60 @@ var userManager = {
 										}
 										else
 										{
-											var groupInfoXML = $(crushFTP.storage("groupInfoXML"));
-											//Method to save group
-											var xml = [];
-											xml.push("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-											xml.push("<groups type=\"properties\">");
+											function continueAddingGroup(){
+												crushFTP.UI.showLoadingIndicator(true);
+												var groupInfoXML = $(crushFTP.storage("groupInfoXML"));
+												//Method to save group
+												var xml = [];
+												xml.push("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+												xml.push("<groups type=\"properties\">");
 
-											if(groupInfoXML && groupInfoXML.length>0)
-											{
-												groupInfoXML.find("result_item result_item").each(function(){
-													var groupAndUsers = $(this).find("*[type='vector']").each(function(){
-														var groupName = $(this).attr("name") || $(this).get(0).tagName;
-														xml.push("<item name=\""+crushFTP.methods.htmlEncode(groupName)+"\" type=\"vector\">");
-														$(this).children().each(function(){
-															xml.push("<item_subitem>"+crushFTP.methods.htmlEncode($(this).text())+"</item_subitem>");
+												if(groupInfoXML && groupInfoXML.length>0)
+												{
+													groupInfoXML.find("result_item result_item").each(function(){
+														var groupAndUsers = $(this).find("*[type='vector']").each(function(){
+															var groupName = $(this).attr("name") || $(this).get(0).tagName;
+															xml.push("<item name=\""+crushFTP.methods.htmlEncode(groupName)+"\" type=\"vector\">");
+															$(this).children().each(function(){
+																xml.push("<item_subitem>"+crushFTP.methods.htmlEncode($(this).text())+"</item_subitem>");
+															});
+															xml.push("</item>");
 														});
-														xml.push("</item>");
 													});
+												}
+
+												xml.push("<item name=\""+crushFTP.methods.htmlEncode(groupName)+"\" type=\"vector\">");
+												var hasItems = false;
+												for(var i=0;i<users.length;i++)
+												{
+													xml.push("<item_subitem>"+users[i]+"</item_subitem>");
+													hasItems = true;
+												}
+												if(!hasItems)
+													xml.push("<item_subitem>placeholder</item_subitem>");
+												xml.push("</item>");
+												xml.push("</groups>");
+												userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+													if(data)
+													{
+														/*userManager.data.addUsersToGroup(groupName, users, function(){*/
+														userManager.data.bindGroupDetails(true, true, groupName);
+														crushFTP.UI.growl("Message : ", "New group \""+ groupName +"\" added (with total "+ selectedUsers.length +" users)", false, 3000);
+														crushFTP.UI.hideLoadingIndicator();
+														setTimeout(function(){
+															$("#groupSelectList", "#GUIInterface").trigger("change");
+														}, 100);
+														/*});*/
+													}
+													else
+													{
+														crushFTP.UI.growl("Failure : ", data, true, true);
+														crushFTP.UI.hideLoadingIndicator();
+													}
 												});
 											}
-
-											xml.push("<item name=\""+crushFTP.methods.htmlEncode(groupName)+"\" type=\"vector\">");
-											var hasItems = false;
-											for(var i=0;i<users.length;i++)
-											{
-												xml.push("<item_subitem>"+users[i]+"</item_subitem>");
-												hasItems = true;
-											}
-											if(!hasItems)
-												xml.push("<item_subitem>placeholder</item_subitem>");
-											xml.push("</item>");
-											xml.push("</groups>");
-											userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-												if(data)
-												{
-													/*userManager.data.addUsersToGroup(groupName, users, function(){*/
-													userManager.data.bindGroupDetails(true, true, groupName);
-													crushFTP.UI.growl("Message : ", "New group \""+ groupName +"\" added (with total "+ selectedUsers.length +" users)", false, 3000);
-													crushFTP.UI.hideLoadingIndicator();
-													setTimeout(function(){
-														$("#groupSelectList", "#GUIInterface").trigger("change");
-													}, 100);
-													/*});*/
-												}
-												else
-												{
-													crushFTP.UI.growl("Failure : ", data, true, true);
-												}
-											});
+											crushFTP.UI.hideLoadingIndicator();
+											crushFTP.Replication.showOptionsOrContinue(continueAddingGroup);
 										}
 									}
 								});
@@ -1648,18 +1667,24 @@ var userManager = {
 														});
 													}
 													xml.push("</groups>");
-													userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-														if(data)
-														{
-															userManager.data.bindGroupDetails(true, false, groupNameNew);
-															crushFTP.UI.growl("Message : ", "Group \""+ groupNameOld +"\" renamed to \"" + groupNameNew + "\"", false, 3000);
-															crushFTP.UI.hideLoadingIndicator();
-														}
-														else
-														{
-															crushFTP.UI.growl("Failure : ", data, true, true);
-														}
-													});
+													function continueRename(){
+														crushFTP.UI.showLoadingIndicator(true);
+														userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+															if(data)
+															{
+																userManager.data.bindGroupDetails(true, false, groupNameNew);
+																crushFTP.UI.growl("Message : ", "Group \""+ groupNameOld +"\" renamed to \"" + groupNameNew + "\"", false, 3000);
+																crushFTP.UI.hideLoadingIndicator();
+															}
+															else
+															{
+																crushFTP.UI.hideLoadingIndicator();
+																crushFTP.UI.growl("Failure : ", data, true, true);
+															}
+														});
+													}
+													crushFTP.UI.hideLoadingIndicator();
+													crushFTP.Replication.showOptionsOrContinue(continueRename);
 												}
 											}
 										});
@@ -1724,25 +1749,30 @@ var userManager = {
 											});
 										}
 										xml.push("</groups>");
-										userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-											if(data)
-											{
-												userManager.data.bindGroupDetails(true, true);
-												crushFTP.UI.growl("Message : ", "Group \""+ groupNameToDelete +"\" deleted", false, 3000);
-												var users = crushFTP.storage("users");
-												for (var i = 0; i < users.length; i++) {
-													var curUserGroups = users[i].groups;
-													if(curUserGroups && curUserGroups.indexOf(groupNameToDelete)>=0)
-														curUserGroups.remove(curUserGroups.indexOf(groupNameToDelete))
+										function continueRemoveGroup(){
+											crushFTP.UI.showLoadingIndicator(true);
+											userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+												if(data)
+												{
+													userManager.data.bindGroupDetails(true, true);
+													crushFTP.UI.growl("Message : ", "Group \""+ groupNameToDelete +"\" deleted", false, 3000);
+													var users = crushFTP.storage("users");
+													for (var i = 0; i < users.length; i++) {
+														var curUserGroups = users[i].groups;
+														if(curUserGroups && curUserGroups.indexOf(groupNameToDelete)>=0)
+															curUserGroups.remove(curUserGroups.indexOf(groupNameToDelete))
+													}
+													crushFTP.storage("users", users);
+													crushFTP.UI.hideLoadingIndicator();
 												}
-												crushFTP.storage("users", users);
-												crushFTP.UI.hideLoadingIndicator();
-											}
-											else
-											{
-												crushFTP.UI.growl("Failure : ", data, true, true);
-											}
-										});
+												else
+												{
+													crushFTP.UI.growl("Failure : ", data, true, true);
+												}
+											});
+										}
+										crushFTP.UI.hideLoadingIndicator();
+										crushFTP.Replication.showOptionsOrContinue(continueRemoveGroup);
 									}
 								});
 							}
@@ -2201,25 +2231,27 @@ var userManager = {
 						}
 					}
 				}
-
-				var xml = userManager.data.buildInheritanceXML();
-				crushFTP.UI.showLoadingIndicator(true);
-				userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-					if(data)
-					{
-						crushFTP.UI.growl("Message : ", "User's inheritance data saved", false, 3000);
-						crushFTP.UI.hideLoadingIndicator();
-						userManager.methods.removeUsersLocalStorage();
-						userManager.placeHolder.removeData("hasChanged");
-						userManager.changedSettings = [];
-						crushFTP.removeStorage("CurrentUserInheritanceDetails");
-						$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
-					}
-					else
-					{
-						crushFTP.UI.growl("Failure : ", data, true, true);
-					}
-				});
+				function continueSavingInheritance(){
+					var xml = userManager.data.buildInheritanceXML();
+					crushFTP.UI.showLoadingIndicator(true);
+					userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+						if(data)
+						{
+							crushFTP.UI.growl("Message : ", "User's inheritance data saved", false, 3000);
+							crushFTP.UI.hideLoadingIndicator();
+							userManager.methods.removeUsersLocalStorage();
+							userManager.placeHolder.removeData("hasChanged");
+							userManager.changedSettings = [];
+							crushFTP.removeStorage("CurrentUserInheritanceDetails");
+							$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
+						}
+						else
+						{
+							crushFTP.UI.growl("Failure : ", data, true, true);
+						}
+					});
+				}
+				crushFTP.Replication.showOptionsOrContinue(continueSavingInheritance);
 				userManager.data.showInheritanceDataForUser(user);
 			});
 
@@ -2284,27 +2316,30 @@ var userManager = {
 							}
 						}
 
-						var xml = userManager.data.buildInheritanceXML();
-						crushFTP.UI.showLoadingIndicator(true);
-						userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-							if(data)
-							{
-								if(selectedOnly)
-									crushFTP.UI.growl("Success!", "All selected users' inheritance data saved", false, 3000);
+						function continueSavingInheritance(){
+							var xml = userManager.data.buildInheritanceXML();
+							crushFTP.UI.showLoadingIndicator(true);
+							userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+								if(data)
+								{
+									if(selectedOnly)
+										crushFTP.UI.growl("Success!", "All selected users' inheritance data saved", false, 3000);
+									else
+										crushFTP.UI.growl("Success!", "All listed users' inheritance data saved", false, 3000);
+									crushFTP.UI.hideLoadingIndicator();
+									userManager.placeHolder.removeData("hasChanged");
+									userManager.changedSettings = [];
+									userManager.methods.removeUsersLocalStorage();
+									crushFTP.removeStorage("CurrentUserInheritanceDetails");
+									$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
+								}
 								else
-									crushFTP.UI.growl("Success!", "All listed users' inheritance data saved", false, 3000);
-								crushFTP.UI.hideLoadingIndicator();
-								userManager.placeHolder.removeData("hasChanged");
-								userManager.changedSettings = [];
-								userManager.methods.removeUsersLocalStorage();
-								crushFTP.removeStorage("CurrentUserInheritanceDetails");
-								$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
-							}
-							else
-							{
-								crushFTP.UI.growl("Failure : ", data, true, true);
-							}
-						});
+								{
+									crushFTP.UI.growl("Failure : ", data, true, true);
+								}
+							});
+						}
+						crushFTP.Replication.showOptionsOrContinue(continueSavingInheritance);
 						userManager.data.showInheritanceDataForUser(crushFTP.storage("userName"));
 					}
 				},{
@@ -2600,6 +2635,15 @@ var userManager = {
 				return false;
 			});
 
+			/*Replication stuff*/
+			crushFTP.Replication.init({
+				replicateHosts:crushFTP.replicateHosts
+			}, "UserManager", $("#GUIInterface"), "", "#saveUserData", function(prefs, _panelname){
+				crushFTP.replicationSavePrefs = prefs;
+				$("#saveUserData", "#GUIInterface").trigger("click");
+				crushFTP.Replication.popupVisible(false);
+		    });
+
 			$(".enterpriseFeatureTag").click(function(){
 				jAlert('<div style="text-align:center">To use this feature, an Enterprise license is required.<br><br> To get more information on features and pricing, see the following links : <br><br><a href="http://crushftp.com/pricing.html#enterprise" tabIndex="-1" target="_blank">Plans &amp; Pricing</a> | <a href="http://www.crushftp.com/crush6wiki/Wiki.jsp?page=Enterprise%20License%20Enhancements" tabIndex="-1" target="_blank">Enterprise License Enhancements</a></div>', "This is an Enterprise License feature");
 				return false;
@@ -2810,64 +2854,73 @@ var userManager = {
 					}
 					xml.push("</groups>");
 
-					userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-						if(data)
-						{
-							userManager.data.bindGroupDetails(true, true, groupSelectList.val());
-							var userList = crushFTP.storage("users");
-							for(var i=0;i<userList.length;i++)
+					function continueRemovingUserFromGroup(){
+						crushFTP.UI.showLoadingIndicator(true);
+						userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+							if(data)
 							{
-								var curUser = userList[i];
-								if(curUser && curUser.text && usersFormatted.has(curUser.text))
+								userManager.data.bindGroupDetails(true, true, groupSelectList.val());
+								var userList = crushFTP.storage("users");
+								for(var i=0;i<userList.length;i++)
 								{
-									var groups = curUser.groups;
-									if(!groups || !jQuery.isArray(groups))
+									var curUser = userList[i];
+									if(curUser && curUser.text && usersFormatted.has(curUser.text))
 									{
-										groups = [];
+										var groups = curUser.groups;
+										if(!groups || !jQuery.isArray(groups))
+										{
+											groups = [];
+										}
+										if(groups && groups.indexOf(groupName) >= 0 && groups.length>groups.indexOf(groupName))
+											groups.remove(groups.indexOf(groupName));
 									}
-									if(groups && groups.indexOf(groupName) >= 0 && groups.length>groups.indexOf(groupName))
-										groups.remove(groups.indexOf(groupName));
 								}
+								//crushFTP.UI.growl("Message : ", "Users \"" +users.join(", ")+ "\" removed from group \""+ groupName + "\"", false, 3000);
+								if(groupSelectList.val()!="all")
+									groupSelectList.trigger("change");
+								crushFTP.UI.hideLoadingIndicator();
 							}
-							//crushFTP.UI.growl("Message : ", "Users \"" +users.join(", ")+ "\" removed from group \""+ groupName + "\"", false, 3000);
-							if(groupSelectList.val()!="all")
-								groupSelectList.trigger("change");
-							crushFTP.UI.hideLoadingIndicator();
-						}
-						else
-						{
-							crushFTP.UI.growl("Failure : ", data, true, true);
-						}
-						if (groupUsernameExists)
-						{
-							xml = userManager.data.buildInheritanceXML();
-							crushFTP.UI.showLoadingIndicator(true);
-							userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-								if(data)
-								{
-									crushFTP.UI.growl("Message : ", "User's inheritance data saved", false, 3000);
-									crushFTP.UI.hideLoadingIndicator();
-									userManager.methods.removeUsersLocalStorage();
-									userManager.placeHolder.removeData("hasChanged");
-									userManager.changedSettings = [];
-									crushFTP.removeStorage("CurrentUserInheritanceDetails");
-									if(!isDelete){
-										$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
+							else
+							{
+								crushFTP.UI.growl("Failure : ", data, true, true);
+							}
+							if (groupUsernameExists)
+							{
+								xml = userManager.data.buildInheritanceXML();
+								crushFTP.UI.showLoadingIndicator(true);
+								userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+									if(data)
+									{
+										crushFTP.UI.growl("Message : ", "User's inheritance data saved", false, 3000);
+										crushFTP.UI.hideLoadingIndicator();
+										userManager.methods.removeUsersLocalStorage();
+										userManager.placeHolder.removeData("hasChanged");
+										userManager.changedSettings = [];
+										crushFTP.removeStorage("CurrentUserInheritanceDetails");
+										if(!isDelete){
+											$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
+										}
+										if(calback)
+											calback();
 									}
-									if(calback)
-										calback();
-								}
-								else
-								{
-									crushFTP.UI.growl("Failure : ", data, true, true);
-								}
-							});
-						}
-						else{
-							if(calback)
-								calback();
-						}
-					});
+									else
+									{
+										crushFTP.UI.growl("Failure : ", data, true, true);
+									}
+								});
+							}
+							else{
+								if(calback)
+									calback();
+							}
+						});
+					}
+					if(!crushFTP.replicationSavePrefs){
+						crushFTP.UI.hideLoadingIndicator();
+						crushFTP.Replication.showOptionsOrContinue(continueRemovingUserFromGroup);
+					}
+					else
+						continueRemovingUserFromGroup();
 				}
 			});
 		},
@@ -2881,6 +2934,8 @@ var userManager = {
             {
                 id = attrToUse;
             }
+            if(chkBox.hasClass("inheritance-set"))
+            	return;
             if(id)
             {
                 var inheritedFrom = false;
@@ -2902,6 +2957,7 @@ var userManager = {
                 {
                     crushFTP.UI.checkUnchekInput(chkBox, true);
                     userManager.UI.disableUncheckedPanel(chkBox, inheritedFrom);
+                    chkBox.addClass('inheritance-set');
                 }
             }
         },
@@ -2909,6 +2965,7 @@ var userManager = {
 		{
 			var dataInheritedFrom = false;
 			attrToUse = attrToUse || "id";
+			_panel.find(".inheritance-set").removeClass('inheritance-set');
 			_panel.find("input[type='text']:not(.ignoreBind),input[type='password']:not(.ignoreBind), textarea:not(.ignoreBind), select:not(.ignoreBind)").each(function(){
 				if($(this).attr(attrToUse))
 				{
@@ -3500,39 +3557,44 @@ var userManager = {
 						});
 					}
 					xml.push("</groups>");
-					userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
-						if(data)
-						{
-							userManager.data.bindGroupDetails(true, true, selectedGroupName, callback);
-							crushFTP.UI.growl("Message : ", "Users \"" +users.join(", ")+ "\" added to group \""+ selectedGroupName + "\"", false, 3000);
-							crushFTP.UI.hideLoadingIndicator();
-						}
-						else
-						{
-							crushFTP.UI.growl("Failure : ", data, true, true);
-						}
-					});
-					if (groupUsernameExists)
-					{
-						xml = userManager.data.buildInheritanceXML();
+					function continueAdding(){
 						crushFTP.UI.showLoadingIndicator(true);
-						userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+						userManager.dataRepo.saveGroupInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
 							if(data)
 							{
-								crushFTP.UI.growl("Message : ", "User's inheritance data saved", false, 3000);
+								userManager.data.bindGroupDetails(true, true, selectedGroupName, callback);
+								crushFTP.UI.growl("Message : ", "Users \"" +users.join(", ")+ "\" added to group \""+ selectedGroupName + "\"", false, 3000);
 								crushFTP.UI.hideLoadingIndicator();
-								userManager.methods.removeUsersLocalStorage();
-								userManager.placeHolder.removeData("hasChanged");
-								userManager.changedSettings = [];
-								crushFTP.removeStorage("CurrentUserInheritanceDetails");
-								$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
 							}
 							else
 							{
 								crushFTP.UI.growl("Failure : ", data, true, true);
 							}
 						});
+						if (groupUsernameExists)
+						{
+							xml = userManager.data.buildInheritanceXML();
+							crushFTP.UI.showLoadingIndicator(true);
+							userManager.dataRepo.saveInheritanceInfo(xml.join("\r\n"), crushFTP.storage("userName"), "update", function(data){
+								if(data)
+								{
+									crushFTP.UI.growl("Message : ", "User's inheritance data saved", false, 3000);
+									crushFTP.UI.hideLoadingIndicator();
+									userManager.methods.removeUsersLocalStorage();
+									userManager.placeHolder.removeData("hasChanged");
+									userManager.changedSettings = [];
+									crushFTP.removeStorage("CurrentUserInheritanceDetails");
+									$("a.reloadUsersLink:visible", "#sideBar").trigger("click");
+								}
+								else
+								{
+									crushFTP.UI.growl("Failure : ", data, true, true);
+								}
+							});
+						}
 					}
+					crushFTP.UI.hideLoadingIndicator();
+					crushFTP.Replication.showOptionsOrContinue(continueAdding);
 				}
 			});
 		},
@@ -4408,6 +4470,9 @@ var userManager = {
 				serverGroup : serverGroup,
 				username : userName
 			};
+			if(crushFTP.replicationSavePrefs){
+				objData.ui_save_preferences_item = crushFTP.replicationSavePrefs;
+			}
 			if(action == "delete")
 			{
 				delete objData.username;
@@ -4532,6 +4597,9 @@ var userManager = {
 				xmlItem : "groups",
 				groups : groupXML
 			};
+			if(crushFTP.replicationSavePrefs){
+				objData.ui_save_preferences_item = crushFTP.replicationSavePrefs;
+			}
 			crushFTP.data.serverRequest(objData,
 			function(data, XMLHttpRequest, textStatus, errorThrown){
 				if(data)
@@ -4580,6 +4648,9 @@ var userManager = {
 				xmlItem : "inheritance",
 				inheritance : inheritanceXML
 			};
+			if(crushFTP.replicationSavePrefs){
+				objData.ui_save_preferences_item = crushFTP.replicationSavePrefs;
+			}
 			crushFTP.data.serverRequest(objData,
 			function(data, XMLHttpRequest, textStatus, errorThrown){
 				if(data)
@@ -4689,9 +4760,12 @@ var userManager = {
 			userManager.placeHolder = $("#placeHolder");
 			userManager.GUIInterface = $("#GUIInterface");
 			$(document).data("pageTitle", document.title);
+			crushFTP.UI.showLoadingIndicator(true);
 			userManager.methods.prepareDataRepo(function(){
 				userManager.methods.bindEmailTemplates();
+				crushFTP.UI.showLoadingIndicator(true);
 				userManager.methods.loadPanels(false, function(){
+					userManager.methods.applyLimitedAdminRestrictions();
 					userManager.methods.buildUserList();
 					userManager.UI.initEvents();
 					userManager.data.bindGroupDetails();
@@ -4818,6 +4892,7 @@ var userManager = {
 		{
 			var prefs = $(document).data("GUIXMLPrefs");
 			var templateList = $("#emailTemplatesList").empty();
+			var emailTemplatesDialog = $("#emailTemplatesDialog");
 			if(prefs && prefs.email_templates)
 			{
 				crushFTP.methods.rebuildSubItems(prefs.email_templates, "email_templates");
@@ -4850,30 +4925,34 @@ var userManager = {
 					if(controlData)
 					{
 						templateDetails.find("#emailTemplateEmailFrom").html(controlData.emailFrom);
+						templateDetails.find("#emailTemplateEmailFromEdit").val(controlData.emailFrom);
 						templateDetails.find("#emailTemplateSubject").html(controlData.emailSubject);
+						templateDetails.find("#emailTemplateSubjectEdit").val(controlData.emailSubject);
 						templateDetails.find("#emailTemplateBody").html(controlData.emailBody);
+						templateDetails.find("#emailTemplateBodyEdit").val(controlData.emailBody);
 						if(controlData.emailCC)
 						{
-							templateDetails.find("#emailTemplateEmailCC").html(controlData.emailCC).parent().show().prev().show();
-						}
-						else
-						{
-							templateDetails.find("#emailTemplateEmailCC").parent().hide().prev().hide();
+							templateDetails.find("#emailTemplateEmailCC").html(controlData.emailCC);
+							templateDetails.find("#emailTemplateEmailCCEdit").val(controlData.emailCC);
 						}
 						if(controlData.emailBCC)
 						{
-							templateDetails.find("#emailTemplateEmailBCC").html(controlData.emailBCC).parent().show().prev().show();
+							templateDetails.find("#emailTemplateEmailBCC").html(controlData.emailBCC);
+							templateDetails.find("#emailTemplateEmailBCCEdit").val(controlData.emailBCC);
 						}
-						else
+						if(controlData.emailReplyTo)
 						{
-							templateDetails.find("#emailTemplateEmailBCC").parent().hide().prev().hide();
+							templateDetails.find("#emailTemplateEmailReplyTo").html(controlData.emailReplyTo);
+							templateDetails.find("#emailTemplateEmailReplyToEdit").val(controlData.emailReplyTo);
 						}
+						var editItems = emailTemplatesDialog.find(".template-editmode").hide();
+						var viewItems = emailTemplatesDialog.find(".template-viewmode").show();
 					}
 					else
 					{
 						templateDetails.find("#emailTemplateEmailFrom, #emailTemplateSubject, #emailTemplateBody, #emailTemplateEmailCC, #emailTemplateEmailBCC").html("");
 					}
-					$("#emailTemplatesDialog").dialog({
+					emailTemplatesDialog.dialog({
     					position : { 'my': 'center', 'at': 'center' }
 					});
 				}
@@ -4883,7 +4962,7 @@ var userManager = {
 				}
 			});
 
-			$("#emailTemplatesDialog").form().dialog({
+			emailTemplatesDialog.form().dialog({
 				autoOpen: false,
 				width: 700,
 				modal: true,
@@ -4901,7 +4980,18 @@ var userManager = {
 							var selected = "";
 							if(templateList.val()!="")
 								selected = templateList.find("option:selected").text();
-							userManager.afterEmailTemplate(selected, false, templateList.find("option:selected").data("controlData"));
+							if(emailTemplatesDialog.find("#editEmailTemplate").is(":visible"))
+								userManager.afterEmailTemplate(selected, false, templateList.find("option:selected").data("controlData"));
+							else{
+								var selectedData = $.extend(true, {}, templateList.find("option:selected").data("controlData"));
+								selectedData.emailFrom = crushFTP.methods.htmlEncode(emailTemplatesDialog.find("#emailTemplateEmailFromEdit").val());
+								selectedData.emailSubject = crushFTP.methods.htmlEncode(emailTemplatesDialog.find("#emailTemplateSubjectEdit").val());
+								selectedData.emailBody = crushFTP.methods.htmlEncode(emailTemplatesDialog.find("#emailTemplateBodyEdit").val());
+								selectedData.emailCC = crushFTP.methods.htmlEncode(emailTemplatesDialog.find("#emailTemplateEmailCCEdit").val());
+								selectedData.emailBCC = crushFTP.methods.htmlEncode(emailTemplatesDialog.find("#emailTemplateEmailBCCEdit").val());
+								selectedData.emailReplyTo = crushFTP.methods.htmlEncode(emailTemplatesDialog.find("#emailTemplateEmailReplyToEdit").val());
+								userManager.afterEmailTemplate(selected, false, selectedData);
+							}
 							delete userManager.afterEmailTemplate;
 						}
 						$(this).dialog("close");
@@ -4913,6 +5003,38 @@ var userManager = {
 						$("#emailTemplatesList").get(0).selectedIndex = 0;
 						$("#emailTemplatesList").trigger("change");
 					},100);
+					var editItems = emailTemplatesDialog.find(".template-editmode").hide();
+					var viewItems = emailTemplatesDialog.find(".template-viewmode").show();
+					emailTemplatesDialog.find("#editEmailTemplate").unbind().click(function(){
+						viewItems.hide();
+						editItems.show();
+						setTimeout(function(){
+							emailTemplatesDialog.find("#emailTemplateBodyEdit").htmlarea('dispose');
+							emailTemplatesDialog.find("#emailTemplateBodyEdit").htmlarea({
+					            toolbar: [
+					                    "bold", "italic", "underline",
+					                    "|",
+					                    "h1", "h2", "h3",
+					                    "|",
+					                    "orderedList", "unorderedList",
+					                    "|",
+					                    "justifyleft", "justifycenter", "justifyright",
+					                    "|",
+					                    "forecolor",
+					                    "|",
+					                    "image",
+					                    "|",
+					                    "link", "unlink",
+					                    "|",
+					                    "increasefontsize", "decreasefontsize",
+					                    "|",
+					                    "html"
+					                ],
+					            css : "/WebInterface/Resources/css/jHtmlArea/editor.css"
+					        });
+						});
+						return false;
+					})
 				}
 			});
 		},
@@ -4989,7 +5111,8 @@ var userManager = {
 				"tunnels",
 				"CustomForms",
 				"registration_name",
-				"rid"
+				"rid",
+				"replicate_session_host_port"
 			];
 			var infoItemsToFetch = [
 				"machine_is_linux",
@@ -5002,17 +5125,6 @@ var userManager = {
 				"version_info_str"
 			];
 			crushFTP.data.getSelectedXMLPrefsDataFromServer(settingItemsToFetch.join(","), infoItemsToFetch.join(","), "GUIXMLPrefs", function(allPrefs){
-				var v9_beta = $(allPrefs).find("v9_beta").text() == "true";
-                if(!crushFTP.V9Beta && v9_beta){
-                    var sheet = (function() {
-                        var style = document.createElement("style");
-                        style.appendChild(document.createTextNode(""));
-                        document.head.appendChild(style);
-                        return style.sheet;
-                    })();
-                    sheet.insertRule(".v9-only { display: inherit !important; }", 0);
-                }
-                crushFTP.V9Beta = v9_beta;
 				userManager.data.loadServerInfo();
 				var _mainServerInstance = $("#mainServerInstance").empty();
 				if(allPrefs)
@@ -5032,6 +5144,7 @@ var userManager = {
 							}
 						}
 					});
+					crushFTP.replicateHosts = $(allPrefs).find("replicate_session_host_port").text();
 					if(_mainServerInstance.find("option").length>0)
 					{
 						_mainServerInstance.prepend("<option value=''>Main</option>");
@@ -5078,6 +5191,9 @@ var userManager = {
 							$(".adminOnly").remove();
 						}
 					}
+					if(userInfo && userInfo.allowed_config){
+						userManager.currentUsersAllowedConfigs = userInfo.allowed_config;
+					}
 					var customizations = [];
 					var logo = "";
 					$(xmlData).find("customizations_subitem").each(function(){
@@ -5105,57 +5221,67 @@ var userManager = {
 					logoElem.show();
 					if(!dontBindGroups)
 						userManager.dataRepo.bindConnectionGroupList(allPrefs);
-					userManager.dataRepo.bindUserList(function(userList){
-						if(userList)
+
+					var curUserList, CurUserInfo, CurUserXml, groupInfo, groupXml, inheritanceInfo, inheritanceXml, roots, loaded = 0;
+					var serverGroup = $("#userConnectionGroups").val() || "MainUsers";
+					function continueMerge(){
+						loaded++;
+						if(loaded<5)
+							return;
+						crushFTP.storage("users", curUserList);
+						userManager.methods.showRecentUsersPersonalization(true);
+						if(groupInfo)
 						{
-							crushFTP.storage("users", userList);
-							if($.isCrush7)
+							crushFTP.storage("groupInfo", groupInfo);
+							crushFTP.storage("groupInfoXML", groupXml);
+						}
+						if(inheritanceInfo)
+						{
+							crushFTP.storage("inheritanceInfo", inheritanceInfo);
+							crushFTP.storage("inheritanceInfoXML", inheritanceXml);
+							crushFTP.serverConfig = crushFTP.serverConfig || {};
+							crushFTP.serverConfig.userRoot = $(roots).find("user\\.root").text() || "/";
+							crushFTP.serverConfig.serverRoot = $(roots).find("server\\.root").text() || "/";
+							if(callback)
 							{
-								userManager.methods.showRecentUsersPersonalization(true);
+								callback();
 							}
-							//load Default user data from server
-							userManager.dataRepo.refreshDefaultUserData(function(info, xml){
-								if(info)
-								{
-									//Get groups information
-									var serverGroup = $("#userConnectionGroups").val() || "MainUsers";
-									userManager.dataRepo.getGroupInfo("group", serverGroup, function(info, xml){
-										if(info)
-										{
-											crushFTP.storage("groupInfo", info);
-											crushFTP.storage("groupInfoXML", xml);
-											// Get inheritance information
-											userManager.dataRepo.getGroupInfo("inheritance", serverGroup, function(info, xml){
-												if(info)
-												{
-													crushFTP.storage("inheritanceInfo", info);
-													crushFTP.storage("inheritanceInfoXML", xml);
-													crushFTP.data.serverRequest({
-														command: "getServerRoots"
-													}, function(roots){
-														crushFTP.serverConfig = crushFTP.serverConfig || {};
-														crushFTP.serverConfig.userRoot = $(roots).find("user\\.root").text() || "/";
-														crushFTP.serverConfig.serverRoot = $(roots).find("server\\.root").text() || "/";
-														if(callback)
-														{
-															callback();
-														}
-													});
-												}
-											});
-										}
-									});
-								}
-								else
-								{
-									crushFTP.UI.hideLoadingIndicator();
-								}
-							});
+							if(!userManager.loadingPanels)
+								crushFTP.UI.hideLoadingIndicator();
 						}
-						else
-						{
-							crushFTP.UI.hideLoadingIndicator();
+						else{
+							if(!userManager.loadingPanels)
+								crushFTP.UI.hideLoadingIndicator();
 						}
+					}
+					userManager.dataRepo.bindUserList(function(_userList){
+						curUserList = _userList;
+						crushFTP.storage("users", _userList);
+						continueMerge();
+						userManager.dataRepo.refreshDefaultUserData(function(_userInfo, _userXml){
+							CurUserInfo = _userInfo;
+							CurUserXml = _userXml;
+							continueMerge();
+						});
+
+						userManager.dataRepo.getGroupInfo("group", serverGroup, function(_groupInfo, _groupXml){
+							groupInfo = _groupInfo;
+							groupXml = _groupXml;
+							continueMerge();
+						});
+
+						userManager.dataRepo.getGroupInfo("inheritance", serverGroup, function(_inheritanceInfo, _inheritanceXml){
+							inheritanceInfo = _inheritanceInfo;
+							inheritanceXml = _inheritanceXml;
+							continueMerge();
+						});
+
+						crushFTP.data.serverRequest({
+							command: "getServerRoots"
+						}, function(_roots){
+							roots = _roots;
+							continueMerge();
+						});
 					});
 				}
 				if(crushFTP.curUserInfo && crushFTP.curUserInfo.data)
@@ -5172,6 +5298,20 @@ var userManager = {
 					});
 				}
 			});
+		},
+		applyLimitedAdminRestrictions: function(){
+			var roles = userManager.currentUsersAllowedConfigs || '';
+			var curUserRoles = roles.split(',');
+			var panels = $("#panels");
+			if(!roles || curUserRoles.length == 0 || roles === 'allowed_config'){
+				panels.find("[config]").addClass('allowed');
+				return;
+			}
+			for(var i=0; i<curUserRoles.length;i++){
+				var curRole = $.trim(curUserRoles[i]);
+				panels.find("[config='"+curRole+"']").addClass('allowed');
+			}
+			panels.find("[config]:not(.allowed)").addClass('not-allowed');
 		},
 		removeUsersLocalStorage : function()
 		{
@@ -5736,6 +5876,7 @@ var userManager = {
 					if(window.panelEvents)
 						$("#eventActionPanel", panelEvents._panel).hide();
 					var loadPreview = $.extend(true, {}, userManager.data.loadPreview);
+					delete crushFTP.replicationSavePrefs;
 					userManager.dataRepo.getUserInfo(userName, function(info, xmlData){
 						userManager.data.showInheritanceDataForUser(userName);
 						userManager.data.fetchInheritanceDataForUser(function(){
@@ -6201,40 +6342,64 @@ var userManager = {
 		loadPanels : function(params, callback){
 			var panels = $("#panels");
 			crushFTP.UI.notification(false);
+			var loadedPanels = [];
+			function loadingDone(){
+				loadedPanels = loadedPanels.sort(function(a,b){
+					if (a.index < b.index) { return 1; }
+					if (a.index > b.index) { return -1; }
+					return 0;
+				});
+				for (var i = loadedPanels.length - 1; i >= 0; i--) {
+					var curpnl = loadedPanels[i];
+					var pnlHtml = $(curpnl.html);
+					var _panel = curpnl.panel;
+					buildButtons(pnlHtml);
+					$(".tabs", pnlHtml).tabs();
+					panels.append(pnlHtml);
+					var initParam = false;
+					var initScript = "panel" + _panel + "._panel = $('#pnl" + _panel + "');panel" + _panel + ".init();";
+					if(params && params.loadPlugin)
+					{
+						initParam = params.loadPlugin;
+						initScript = "panel" + _panel + "._panel = $('#pnl" + _panel + "');panel" + _panel + ".init('"+initParam+"');";
+					}
+					try{
+						eval(initScript);
+						userManager.methods.initLayoutEvents(pnlHtml, _panel);
+					}
+					catch(ex){
+						if(ex && ex.toString() != "")
+						{
+							crushFTP.UI.growl("Error", _panel + ".init(); " + ex, true);
+						}
+					}
+				};
+				userManager.loadingPanels = false;
+				if(callback)
+				{
+					callback();
+				}
+			}
 			function loadNextPanel(index)
 			{
 				index = index || 0;
 				if(userManager.panelsToLoad.length>index)
 				{
 					var panel = userManager.panelsToLoad[index];
+					userManager.loadingPanels = true;
 					index += 1;
 					$.ajax({
 						url : "panels/"+panel+"/index.html?c2f="+crushFTP.getCrushAuth(),
 						cache : true,
 						success : function(response) {
-							var curPanel = $(response);
-							panels.append(curPanel);
-							buildButtons(curPanel);
-							$(".tabs", curPanel).tabs();
 							crushFTP.methods.getScript("panels/"+panel+"/interface.js?c2f="+crushFTP.getCrushAuth(), function() {
-								var initParam = false;
-								var initScript = "panel" + panel + ".init();";
-								if(params && params.loadPlugin)
-								{
-									initParam = params.loadPlugin;
-									initScript = "panel" + panel + ".init('"+initParam+"');";
-								}
-								try{
-									eval(initScript);
-									userManager.methods.initLayoutEvents(curPanel, panel);
-									loadNextPanel(index);
-								}
-								catch(ex){
-									if(ex && ex.toString() != "")
-									{
-										crushFTP.UI.growl("Error", panel + ".init(); " + ex, true);
-										loadNextPanel(index);
-									}
+								loadedPanels.push({
+									panel: panel,
+									index: index,
+									html: response
+								});
+								if(loadedPanels.length == userManager.panelsToLoad.length){
+									loadingDone();
 								}
 							});
 						},
@@ -6242,16 +6407,10 @@ var userManager = {
 						{
 							var msg = "Sorry but there was an error: " + xhr.status + " " + xhr.statusText + " while loading panel : " + panel;
 							crushFTP.UI.notification(msg, true);
-							loadNextPanel(index);
+							// loadNextPanel(index);
 						}
 					});
-				}
-				else
-				{
-					if(callback)
-					{
-						callback();
-					}
+					loadNextPanel(index);
 				}
 			}
 			loadNextPanel();

@@ -63,7 +63,10 @@ window.locale = {
         "uploadedMultipleFilesText" : "All files uploaded."
     }
 };
+window.userAudit = {log:function(){}, init:function(){}};
 window.dateSeparator = "/";
+window.maxAllowedFileSizeForInlineEdit = 1024;
+window.allowedFileExtensionsForInlineEdit = "txt,html,htm,css,js,log,xml";
 // FTP WebInterface Localization options
 var localizations = {};
 localizations.slideshow = {};
@@ -300,6 +303,7 @@ localizations.UserOptionsWindowHideCheckboxLabelText = "Hide Checkbox Column ";
 localizations.UserOptionsWindowHideFilterLabelText = "Hide Filter Section ";
 localizations.UserOptionsWindowAutostartUploadLabelText = "When choosing file to upload, auto start upload. ";
 localizations.UserOptionsWindowLoadJavaAppletLabelText = "When loading the interface, load the Java applet.";
+localizations.UserOptionsWindowDisableWaveformLabelText = "Disable inline audio playback";
 localizations.UserOptionsWindowDisableCompressionLabelText = "Disable compression on the Java applet. ";
 localizations.UserOptionsWindowChangePasswordHeaderText = "Change your password ";
 localizations.UserOptionsWindowChangePasswordCurPassLabelText = "Current Password: ";
@@ -389,6 +393,11 @@ localizations.RevisionsWindowHeaderText = "Revisions";
 localizations.RenameWindowHeaderText = "Rename";
 localizations.RenamePanelSaveLinkText = "Save";
 localizations.RenamePanelCancelLinkText = "Cancel";
+
+//Edit file panel
+localizations.EditFileWindowHeaderText = "Edit a file";
+localizations.EditFilePanelSaveButtonText = "Save";
+localizations.EditFilePanelCancelButtonText = "Cancel";
 
 localizations.ZipNameWindowHeaderText = "Zip file name";
 localizations.ZipNamePanelSaveLinkText = "OK";
@@ -1757,7 +1766,7 @@ if (jQuery)(function ($) {
                                                     filtered.push(l[i]);
                                             }
                                             else
-                                            	filtered.push(l[i]);
+                                                filtered.push(l[i]);
                                         }
                                     };
                                     window.l = filtered;
@@ -1876,6 +1885,7 @@ if (jQuery)(function ($) {
                                                 '#paths': crushFTPTools.encodeURILocal(unescape(path)),
                                                 '#random': Math.random()
                                             });
+                                            userAudit.log(path + " downloaded");
                                         } else {
                                             errorThrown = errorThrown || "getXMLListing failed";
                                             $.growlUI("Error : " + errorThrown, errorThrown, o.GrowlTimeout, "", o.GrowlWithCloseButton);
@@ -6210,6 +6220,7 @@ if (jQuery)(function ($) {
                                 '#paths': crushFTPTools.encodeURILocal(unescape(stringToCopy)),
                                 '#random': Math.random()
                             });
+                            userAudit.log(stringToCopy + " downloaded");
                         }
                         else
                         {
@@ -6218,6 +6229,7 @@ if (jQuery)(function ($) {
                                 '#path': crushFTPTools.encodeURILocal(unescape(stringToCopy)),
                                 '#random': Math.random()
                             });
+                            userAudit.log(stringToCopy + " downloaded");
                         }
                     } else { //advanced
                         /*close prior msgs's*/
@@ -6611,6 +6623,7 @@ if (jQuery)(function ($) {
                             '#os' : window.OSName,
                             '#random': Math.random()
                         });
+                        userAudit.log("Sync agent downloaded. App name: " + appName);
                         $.growlUI(getLocalizationKey("DownloadStartedAlertTitleText"), '&nbsp;', o.GrowlTimeout);
                         if($("div#filesBasket").dialog("isOpen"))
                         {
@@ -6639,6 +6652,7 @@ if (jQuery)(function ($) {
                         '#os' : window.OSName,
                         '#random': Math.random()
                     });
+                    userAudit.log("CrushFTPDrive downloaded");
                     $.growlUI(getLocalizationKey("DownloadStartedAlertTitleText"), '&nbsp;', o.GrowlTimeout);
                 }
 
@@ -6651,6 +6665,7 @@ if (jQuery)(function ($) {
                         '#os' : window.OSName,
                         '#random': Math.random()
                     });
+                    userAudit.log("AttachmentRedirector downloaded");
                     $.growlUI(getLocalizationKey("DownloadStartedAlertTitleText"), '&nbsp;', o.GrowlTimeout);
                 }
 
@@ -8485,6 +8500,7 @@ if (jQuery)(function ($) {
                             $("#shareOptionDiv").parent().find(".closeButton").show(500);
                             if(quickShare)
                             {
+                                userAudit.log("Shared as a quick Share: " + fileName);
                                 if (origMsg.indexOf("ERROR:") == 0 && origMsg.indexOf("email_failed")<0) {
                                     var msg = $("<div style='margin:10px 0px;line-height:25px;'>" + message + "<br/><br/>" + "</div>");
                                     msg.dialog({
@@ -8581,6 +8597,7 @@ if (jQuery)(function ($) {
                             }
                             else
                             {
+                                userAudit.log("Shared: " + fileName);
                                 if(origMsg.indexOf("Denied") == 0)
                                 {
                                     alert(getLocalizationKey("ShareInternalSelectUserDeniedMessage"));
@@ -8701,6 +8718,7 @@ if (jQuery)(function ($) {
                                 $("#shareOptionDiv").parent().find(".closeButton").show(500);
                                 if(quickShare)
                                 {
+                                    userAudit.log("Shared as a quick Share: " + fileName);
                                     if (origMsg.indexOf("ERROR:") == 0 && origMsg.indexOf("email_failed")<0) {
                                         var msg = $("<div style='margin:10px 0px;line-height:25px;'>" + message + "<br/><br/>" + "</div>");
                                         msg.dialog({
@@ -8797,6 +8815,7 @@ if (jQuery)(function ($) {
                                 }
                                 else
                                 {
+                                    userAudit.log("Shared: " + fileName);
                                     if(origMsg.indexOf("Denied") == 0)
                                     {
                                         alert(getLocalizationKey("ShareInternalSelectUserDeniedMessage"));
@@ -8915,11 +8934,7 @@ if (jQuery)(function ($) {
                             url: url,
                             success: function (response) {
                                 loading.hide();
-                                performAction("editTextDiv");
-                                if($("div#filesBasket").dialog("isOpen"))
-                                    $(".blockMsg").css("z-index", 1002);
-                                var $popup = $("#editTextDiv");
-                                $("#txtFileContent", $popup).val(response)[0].focus();
+                                window.popupEditFile(response, destinationPath, fileName);
                             }
                         });
                     }
@@ -9052,6 +9067,7 @@ if (jQuery)(function ($) {
                             url: o.ajaxCallURL,
                             data: obj,
                             success: function (response) {
+                                userAudit.log("Keywords for "+stringToCopy+" updated");
                                 var responseText = getActionResponseText(response);
                                 $popup.find(".buttonPanel").removeClass("wait");
                                 responseText = $.trim(responseText);
@@ -9208,6 +9224,7 @@ if (jQuery)(function ($) {
                             '#random': Math.random(),
                             '#path': pathToDownload
                         }, "POST", "paths");
+                        userAudit.log("getKeywords invoked for " + pathToDownload)
                     }
                     else
                     {
@@ -9299,6 +9316,7 @@ if (jQuery)(function ($) {
                             '#random': Math.random(),
                             '#path': fileName
                         });
+                        userAudit.log(fileName + " downloaded");
                     } else {
                         if (context) {
                             el = currentContext();
@@ -9480,6 +9498,7 @@ if (jQuery)(function ($) {
                                 '#random': Math.random(),
                                 '#path': crushFTPTools.encodeURILocal(unescape(stringToCopy))
                             });
+                            userAudit.log(stringToCopy + " downloaded");
                         } else {
                             $.growlUI(getLocalizationKey("DownloadNothingSelectedGrowlText"), "&nbsp;", o.GrowlTimeout, "growlError");
                             return;
@@ -9569,6 +9588,7 @@ if (jQuery)(function ($) {
                                 url: o.ajaxCallURL,
                                 data: obj,
                                 success: function (response) {
+                                    userAudit.log(pathName + oldName + " renamed to " + pathName + newName);
                                     setTimeout(function(){
                                         $curElem.unblock();
                                     }, 500);
@@ -9784,6 +9804,7 @@ if (jQuery)(function ($) {
                                 url: o.ajaxCallURL,
                                 data: obj,
                                 success: function (response) {
+                                    userAudit.log(pathName + oldName + " renamed to " + pathName + newName);
                                     var responseText = getActionResponseText(response);
                                     if (responseText.length > 0) {
                                         $.growlUI(getLocalizationKey("ProblemWhileRenamingGrowlText"), getLocalizationKey("ProblemWhileRenamingDescGrowlText") + responseText, o.GrowlTimeout, "growlError", o.GrowlWithCloseButton);
@@ -10694,6 +10715,52 @@ if (jQuery)(function ($) {
                         } else {
                             $(".changePasswordPanel", "#userOptions").hide();
                         }
+                        var twofactorAuth = $("#twofactorAuth");
+                        twofactorAuth.find(".action-button").hide();
+                        twofactorAuth.find("#btnSetup2FA").unbind().click(function(){
+                            var that = $(this);
+                            twofactorAuth.find(".setup-button").hide();
+                            twofactorAuth.find(".action-button").show();
+                            var qrCodePanel = twofactorAuth.find("#qrCodePanel").empty();
+                            var qrid = Math.random();
+                            qrCodePanel.append("<img src='/WebInterface/function/?command=getQR&c2f="+crushFTPTools.getCrushAuth()+"&qrid=" + qrid +"' />");
+                            twofactorAuth.find("#btnSetup2FAConfirm").unbind().click(function(){
+                                var obj = {
+                                    command: "confirmQR",
+                                    qrid: qrid
+                                };
+                                obj.c2f = crushFTPTools.getCrushAuth();
+                                loading.show(true);
+                                $.ajax({
+                                    type: "POST",
+                                    url: o.ajaxCallURL,
+                                    data: obj,
+                                    async: true,
+                                    success: function (data) {
+                                        loading.hide(true);
+                                        var response = $(data).find("response:first").text();
+                                        if(response.indexOf("ERROR")==0){
+                                            growl("Error :", response, true, 3500);
+                                        }
+                                        else{
+                                            growl("Success :", "Two factor authentication setup is successful.", false, 3500);
+                                            twofactorAuth.find(".setup-button").show();
+                                            twofactorAuth.find(".action-button").hide();
+                                            twofactorAuth.find("#qrCodePanel").empty();
+                                            $("#userOptions").find(".tabs").find("li:first").find("a").click();
+                                            $.unblockUI();
+                                        }
+                                    }
+                                });
+                            });
+                        });
+
+                        twofactorAuth.find("#btnSetup2FACancel").unbind().click(function(){
+                            twofactorAuth.find(".setup-button").show();
+                            twofactorAuth.find(".action-button").hide();
+                            twofactorAuth.find("#qrCodePanel").empty();
+                            return false;
+                        });
 
                         var menuListBar = [];
                         var menuListContextMenu = [];
@@ -13850,7 +13917,7 @@ if (jQuery)(function ($) {
                             break;
                         case "HideUserOptionChangePassword":
                             if(custItem.value && custItem.value == "true")
-                                $("#userOptionChangePassword").hide();
+                                $(".changePasswordPanel").hide();
                             break;
                         case "HideUserOptionGeneratePassword":
                             if(custItem.value && custItem.value == "true")
@@ -13992,13 +14059,39 @@ if (jQuery)(function ($) {
                                 window.clickOnParentOfFileName = true;
                             }
                             break;
-                        case "homeCustomTextFormat":
+                         case "homeCustomTextFormat":
                             if(custItem.value)
                                 window.homeCustomTextFormat = custItem.value;
                             break;
                         case "directCopyLinkWebInterfaceFriendly":
                             if(custItem.value == "true")
                                 window.directCopyLinkWebInterfaceFriendly = true;
+                            break;
+                        case "maxAllowedFileSizeForInlineEdit":
+                            window.maxAllowedFileSizeForInlineEdit = parseInt(custItem.value);
+                            break;
+                        case "allowedFileExtensionsForInlineEdit":
+                            window.allowedFileExtensionsForInlineEdit = custItem.value;
+                            break;
+                        case "UserOption2fa":
+                            if (custItem.value == "true")
+                            {
+                                $.cssRule({
+                                    ".twofactorAuthPanel": [
+                                        ["display", "block"]
+                                    ]
+                                });
+                            }
+                            break;
+                        case "enableUserInformationPopup":
+                            if(custItem.value == "true")
+                            {
+                                if(!window.userAudit.v){
+                                    $.getScript("/WebInterface/jQuery/js/userAudit.js").done(function(){
+                                        window.userAudit.init();
+                                    });
+                                }
+                            }
                             break;
                         default:
                             break;
@@ -14579,6 +14672,90 @@ if (jQuery)(function ($) {
                     });
                     manageSharesPanel.empty().append('<iframe frameborder="0" scrolling="auto" style="width: 100%;background-color: #fff;margin:0px;padding:0px;height:600px;" name="cftp_iframeManageShares" id="cftp_iframeManageShares" src="/WebInterface/ManageShares/index.html?popup=true&'+lang+'" hspace="0" allowtransparency="false"></iframe>');
                     manageSharesPanel.dialog("open");
+                }
+
+                window.popupEditFile = function(content, destinationPath, fileName)
+                {
+                    var h = window.innerHeight ? window.innerHeight : $(window).height();
+                    h = h * 0.92;
+                    var editFilePopup = $("#editFilePopup").removeClass("resized").dialog({
+                        autoOpen: false,
+                        closeOnEscape: false,
+                        dialogClass : "manageShareWindow",
+                        title : localizations.EditFileWindowHeaderText,
+                        draggable: true,
+                        width: "80%",
+                        maxHeight: h,
+                        height : 650,
+                        minWidth : 800,
+                        modal: true,
+                        buttons: {},
+                        resizable: true,
+                        zIndex : 2100,
+                        position: { my: "center", at: "center", of: window },
+                        buttons: [
+                            {
+                                text: localizations.EditFilePanelCancelButtonText || "Cancel",
+                                icon: "ui-icon-close",
+                                click: function(){
+                                    $(this).dialog("close");
+                                }
+                            },
+                            {
+                                text: localizations.EditFilePanelSaveButtonText || "Save",
+                                icon: "ui-icon-disk",
+                                click: function(){
+                                    var content = $("#editFilePopup").find("#txtFileContent").val();
+                                    var that = $(this);
+                                    var obj = {
+                                        command: "savetext",
+                                        file_content: crushFTPTools.encodeURILocal(unescape(content)),
+                                        upload_path: crushFTPTools.encodeURILocal(unescape(fileName)),
+                                        random: Math.random()
+                                    };
+                                    obj.c2f = crushFTPTools.getCrushAuth();
+                                    loading.show(true);
+                                    $.ajax({
+                                        type: "POST",
+                                        url: o.ajaxCallURL,
+                                        data: obj,
+                                        async: true,
+                                        success: function (data) {
+                                            loading.hide(true);
+                                            var response = $(data).find("response:first").text();
+                                            if(response.indexOf("ERROR")==0){
+                                                growl("Error :", response, true, 3500);
+                                            }
+                                            else{
+                                                growl("Success :", "File saved", false, 3500);
+                                                that.dialog("close");
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        ],
+                        open : function()
+                        {
+
+                        },
+                        create: function(event, ui) {
+                            $(event.target).parent().css('position', 'fixed');
+                        },
+                        resizeStop: function(event, ui) {
+                            editFilePopup.width("100%");
+                            if(ui.size.height > 650)
+                                editFilePopup.find("textarea").height(ui.size.height - 50);
+                            else
+                                editFilePopup.find("textarea").height(600);
+                        },
+                        close : function()
+                        {
+                            $("body").css("overflow", "auto");
+                        }
+                    });
+                    editFilePopup.empty().append('<textarea style="width: 98%;height: 96%;min-height: 100px;z-index: auto;position: relative;line-height: normal;font-size: 11px;transition: none 0s ease 0s;background: transparent !important;margin: 5px;" id="txtFileContent">'+content+'</textarea>');
+                    editFilePopup.dialog("open");
                 }
 
                 function rotateImage(imgControl, flag)
@@ -16424,13 +16601,18 @@ if (jQuery)(function ($) {
                         var varHideItemsStartingWithDot = $.cookie(o.CookieHideItemStartingWithDot);
                         varHideItemsStartingWithDot = varHideItemsStartingWithDot == "true";
                         var refresh = varHideItemsStartingWithDot != $("#hideItemsStartingWithDot").is(':checked');
-
+                        var beforeSave = $.cookie("disableInlineAudioPlayback") + "";
                         hideItemsStartingWithDot($("#hideItemsStartingWithDot").is(':checked'), true);
                         hideCheckBoxColumn($("#hideCheckBoxColumn").is(':checked'), true);
                         hideFilter($("#hideFilter").is(':checked'), true);
                         autoUploadFlagSet($("#autoUploadFlag").is(':checked'), true);
                         autoAppletFlagSet($("#autoAppletFlag").is(':checked'), true);
                         noCompressionFlagSet($("#noCompressionFlag").is(':checked'), true);
+                        disableInlineAudioPlayback($("#disableWaveform").is(':checked'), true);
+                        var afterSave = $.cookie("disableInlineAudioPlayback") + "";
+                        if(beforeSave != afterSave){
+                            refresh = true;
+                        }
                         if(refresh){
                             refreshView();
                             $(".refreshButton").click();
@@ -16475,6 +16657,11 @@ if (jQuery)(function ($) {
                             $("#noCompressionFlag").attr("checked", "checked");
                         } else {
                             $("#noCompressionFlag").removeAttr("checked");
+                        }
+                        if ($.cookie("disableInlineAudioPlayback") + "" == "true") {
+                            $("#disableWaveform").attr("checked", "checked");
+                        } else {
+                            $("#disableWaveform").removeAttr("checked");
                         }
                     }
                     $.unblockUI();
@@ -16553,6 +16740,15 @@ if (jQuery)(function ($) {
                         expires: 365
                     };
                     $.cookie(o.CookieNoCompressionFlag, flag, options);
+                }
+
+                //Set cookie to use compression in upload/download flag
+                window.disableInlineAudioPlayback = function (flag) {
+                    var options = {
+                        path: '/',
+                        expires: 365
+                    };
+                    $.cookie("disableInlineAudioPlayback", flag, options);
                 }
 
                 //Command to start tunnel in applet to boost speed
@@ -17364,6 +17560,7 @@ if (jQuery)(function ($) {
                         expires: 365
                     };
                     $(document).data(o.CookieCopiedFiles, stringToCopy);
+                    userAudit.log(stringToCopy + " copied");
                     var msgToShow = getLocalizationKey("CopyActionGrowlText");
                     if (flag) {
                         msgToShow = getLocalizationKey("CutActionGrowlText");
@@ -17978,6 +18175,7 @@ if (jQuery)(function ($) {
                                     },
                                     success: function (response) {
                                         startPastePolling(response);
+                                        userAudit.log(fileNames + " pasted to " + destinationPath);
                                     },
                                     error: function () {
                                         $(".mainProcessIndicator").hide();
@@ -18276,6 +18474,7 @@ if (jQuery)(function ($) {
                                     '#paths': crushFTPTools.encodeURILocal(unescape(stringToCopy)),
                                     '#random': Math.random()
                                 });
+                                userAudit.log(stringToCopy + " downloaded");
                                 selectDeselectAllItems(false, false, basket);
                                 $.growlUI(getLocalizationKey("DownloadStartedAlertTitleText"), '&nbsp;', o.GrowlTimeout);
                                 if($("div#filesBasket").dialog("isOpen"))
@@ -18344,6 +18543,7 @@ if (jQuery)(function ($) {
                                 params['#zipName'] = fileName;
                             }
                             submitAction(params);
+                            userAudit.log(stringToCopy + " downloaded");
                             selectDeselectAllItems(false, false, basket);
                             $.growlUI(getLocalizationKey("DownloadStartedAlertTitleText"), '&nbsp;', o.GrowlTimeout);
                         }
@@ -18548,6 +18748,7 @@ if (jQuery)(function ($) {
                         timeout : 10000000,
                         data: obj,
                         success: function (response) {
+                            userAudit.log(fileName + " unzipped");
                             var responseText = getActionResponseText(response);
                             if (responseText.length > 0) {
                                 if(isZip)
@@ -18715,6 +18916,7 @@ if (jQuery)(function ($) {
                             timeout : 10000000,
                             data: obj,
                             success: function (response) {
+                                userAudit.log(unescape(fileName)+ " deleted");
                                 //_loadingIndicator.dialog({modal : false});
                                 loading.hide();
                                 var responseText = getActionResponseText(response);
@@ -19972,6 +20174,11 @@ if (jQuery)(function ($) {
                     } else {
                         $("#noCompressionFlag").removeAttr("checked");
                     }
+                    if ($.cookie("disableInlineAudioPlayback") + "" == "true") {
+                        $("#disableWaveform").attr("checked", "checked");
+                    } else {
+                        $("#disableWaveform").removeAttr("checked");
+                    }
                     initTabs();
                     $("#shareOptionDiv").data("html", $("#shareOptionDiv").html());
                 }
@@ -20769,6 +20976,9 @@ if (jQuery)(function ($) {
                 //Generate inline player added by carlos
                 function generateInlinePlayers(elem){
                     if(o.buggyBrowser || inlinePlayer_enable == 'false'){ return; }
+                    $('#userOptionDisableWaveform').show();
+                    if($.cookie("disableInlineAudioPlayback") + "" == "true")
+                        return;
                     elem = elem || $(document);
                     setTimeout(function(){
                         stopAllPlayback();

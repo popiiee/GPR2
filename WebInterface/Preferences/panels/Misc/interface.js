@@ -64,6 +64,7 @@ panelMisc.init = function(){
 	{
 		$("#beep_connect", _panel).removeAttr("checked").trigger("change").closest("span").hide();
 	}
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelMisc.bindData = function()
@@ -104,7 +105,7 @@ panelMisc.saveContent = function()
 			{
 				crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 			}
-		});
+		}, panelMisc.saveParams);
 	}
 	else
 	{

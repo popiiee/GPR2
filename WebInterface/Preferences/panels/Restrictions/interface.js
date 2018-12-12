@@ -47,6 +47,7 @@ panelRestrictions.init = function(){
 	crushFTP.methods.setPageTitle(panelRestrictions.localization.Header, true);
 	panelRestrictions.bindData();
 	panelRestrictions.bindEvents();
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelRestrictions.bindData = function()
@@ -108,7 +109,7 @@ panelRestrictions.saveContent = function()
 			{
 				crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 			}
-		});
+		}, panelRestrictions.saveParams);
 	}
 	else
 	{

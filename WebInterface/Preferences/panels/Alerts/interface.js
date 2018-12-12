@@ -55,6 +55,7 @@ panelAlerts.init = function(){
 	crushFTP.methods.setPageTitle(panelAlerts.localization.Header, true);
 	panelAlerts.bindData();
 	panelAlerts.bindEvents();
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelAlerts.validateData = function(){
@@ -413,6 +414,7 @@ panelAlerts.saveContent = function()
 						crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 					}
 				}
+				, panelAlerts.saveParams
 			);
 		}
 		else

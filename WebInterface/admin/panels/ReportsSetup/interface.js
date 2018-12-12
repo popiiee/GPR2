@@ -260,6 +260,13 @@ panelReportsSetup.bindEvents = function()
             });
             return false;
         }
+        if(panelReportsSetup._panel.find("#reportName").val() == "UserFolderAccess" && $("#search_url").val() == "" && $("#search_name").val() == "")
+        {
+            jAlert("You have to enter search phrase at least for one field from URL or VFS name as Name searches by `contains` and url teaches by `starts with`", "Message", function(){
+                panelReportsSetup._panel.find("#search_url").focus().select();
+            });
+            return false;
+        }
         var params = panelReportsSetup.serializeReportElements();
         var parameters = params.join("&");
         parameters = parameters + "&c2f=" + crushFTP.getCrushAuth();
@@ -637,13 +644,15 @@ panelReportsSetup.getFormDetails = function(formId)
 
 panelReportsSetup.serializeReportElements = function(delimiter)
 {
-	function elemName(name)
+	function elemName(name, _reportName)
 	{
 		if(name == "linked_vfs_users" || name == "expire_account" || name == "expire_password") return name;
-		if(name.indexOf("_")>=0)
-		{
-			name = name.substr(0, name.indexOf("_"));
-		}
+        if(_reportName != "UserFolderAccess"){
+    		if(name.indexOf("_")>=0)
+    		{
+    			name = name.substr(0, name.indexOf("_"));
+    		}
+        }
 		return name;
 	}
 	var params = [];
@@ -698,7 +707,7 @@ panelReportsSetup.serializeReportElements = function(delimiter)
 		}
 		else
 		{
-			params.push(elemName($(this).attr("id")) + delimiter + $(this).val());
+			params.push(elemName($(this).attr("id"), reportName) + delimiter + $(this).val());
 		}
 	});
 	if(isDateRange)

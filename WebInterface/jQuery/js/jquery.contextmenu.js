@@ -367,13 +367,15 @@ function applyPrivsOnMenu(elem)
 	var ext = "";
 	var hasPreview = false;
 	var basket = false;
+	var dataRow;
 	if(elem)
 		basket = elem.hasClass("contextMenuItem");
 	basket = basket ? "_basket" : "";
 	if($("body").data("currentView" + basket) == "Thumbnail"){
 		if(elem.data("dataRow")){
-			privs = elem.data("dataRow").privs.toString();
-			hasPreview = elem.data("dataRow").preview.toString() != "0";
+			dataRow = elem.data("dataRow");
+			privs = dataRow.privs.toString();
+			hasPreview = dataRow.preview.toString() != "0";
 		}
 		if(!elem.hasClass("directoryThumb"))
 		{
@@ -386,9 +388,9 @@ function applyPrivsOnMenu(elem)
 	else {
 		privs = unescape(elem.attr("privs"));
 		hasPreview = elem.attr("preview") &&  elem.attr("preview") != "0";
+		dataRow = elem.parent().data("dataRow");
 		if(basket)
 		{
-			var dataRow = elem.parent().data("dataRow");
 			if(dataRow){
 				privs = dataRow.privs.toString();
 				hasPreview = dataRow.preview.toString() != "0";
@@ -433,6 +435,8 @@ function applyPrivsOnMenu(elem)
 		var _deleteDir = privs.indexOf("(deletedir)")>=0;
 		var _download = privs.indexOf("(read)")>=0;
 		var _sync = privs.indexOf("syncName=")>=0;
+
+		var editItem = myMenu.find("a[command*='edit']").parent().hide();
 
 		if(elem.hasClass("directory") || elem.hasClass("directoryThumb")) {
 			if(!_deleteDir){
@@ -531,6 +535,16 @@ function applyPrivsOnMenu(elem)
 		{
 			exploreZip.show();
 		}
+		function canEditInline(){
+			var size = window.maxAllowedFileSizeForInlineEdit || 1024;
+			size = size * 1024;
+			var str = window.allowedFileExtensionsForInlineEdit || "";
+			var itemSize = parseInt(dataRow.sizeB);
+			if(_write && ext && str.split(",").indexOf(ext)>=0 && itemSize <= size){
+				editItem.show();
+			}
+		}
+		canEditInline();
 		myMenu.find("li.custom").show();
 		if(myMenu.find("li:visible").length==0)
 			myMenu.hide();

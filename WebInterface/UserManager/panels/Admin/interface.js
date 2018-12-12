@@ -8,7 +8,6 @@ panelAdmin.localization = {};
 
 // Panel details
 var panelName = "Admin";
-panelAdmin._panel = $("#pnl" + panelName);
 
 // Localizations
 panelAdmin.localization = {
@@ -22,6 +21,118 @@ panelAdmin.init = function(){
 	applyLocalizations(panelName, localizations.panels);
 	window.dataBindEvents.push(panelAdmin.bindData);
 	panelAdmin.bindEvents();
+	panelAdmin.prepareRolesSection();
+}
+
+panelAdmin.prepareRolesSection = function(){
+	var roles = userManager.userRoles || [];
+	var pnlUserRoles = panelAdmin._panel.find("#user-roles");
+	var pnl = pnlUserRoles.find(".panel");
+	for (var i = 0; i < roles.length; i++) {
+		var curSection = roles[i];
+		pnl.append('<h3>'+curSection.label+' <span class="select-items">Select <a href="#" class="selectAll">All</a> | <a href="#" class="selectNone">None</a> | <a href="#" class="selectInverse">Inverse</a></span></h3>');
+		var sectionItems = $("<div class='options'><p></p></div>");
+		var para = sectionItems.find("p");
+		for (var j = 0; j < curSection.items.length; j++) {
+			var curItem = curSection.items[j];
+			para.append('<div class="option"><input type="checkbox" name="user_role_'+curItem.key+'" id="user_role_'+curItem.key+'" key="'+curItem.key+'" /><label class="field-label" for="user_role_'+curItem.key+'">'+curItem.label+'</label></div>')
+		}
+		pnl.append(sectionItems);
+	};
+
+	var lastSearchedItem;
+
+	pnlUserRoles.find("#userRolesFilter").unbind("keyup").keyup(function (evt) {
+		var evt = (evt) ? evt : ((event) ? event : null);
+		var phrase = this.value;
+		if (lastSearchedItem && lastSearchedItem === phrase) {
+			return false;
+		}
+		pnl.find("div.options").find(".nothing-found").remove();
+		if(phrase){
+			pnl.find("div.option").hide();
+			pnl.find("label:Contains('"+phrase+"')").closest("div.option").show();
+			pnl.find("div.options").each(function(index, el) {
+				if($(this).find(".option:visible").length==0){
+					$(this).prepend('<div class="nothing-found">No matching item found in this section.</div>');
+				}
+			});
+		}
+		else{
+			pnl.find("div.option").show();
+		}
+		lastSearchedItem = phrase;
+	});
+
+	pnlUserRoles.find("h3 > .select-items a").click(function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		if($(this).is(".selectAll")){
+			$(this).closest('h3').next().find(".option:visible").each(function(index, el) {
+				crushFTP.UI.checkUnchekInput($(this).find("input"), true);
+			});
+		}
+		else if($(this).is(".selectNone")){
+			$(this).closest('h3').next().find(".option").each(function(index, el) {
+				crushFTP.UI.checkUnchekInput($(this).find("input"), false);
+			});
+		}
+		else if($(this).is(".selectInverse")){
+			$(this).closest('h3').next().find(".option:visible").each(function(index, el) {
+				crushFTP.UI.checkUnchekInput($(this).find("input"), !$(this).find("input").is(":checked"));
+			});
+		}
+	});
+
+	pnlUserRoles.find(".filters .select-items a").click(function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		if($(this).is(".selectAll")){
+			pnl.find(".option:visible").each(function(index, el) {
+				crushFTP.UI.checkUnchekInput($(this).find("input"), true);
+			});
+		}
+		else if($(this).is(".selectNone")){
+			pnl.find(".option").each(function(index, el) {
+				crushFTP.UI.checkUnchekInput($(this).find("input"), false);
+			});
+		}
+		else if($(this).is(".selectInverse")){
+			pnl.find(".option:visible").each(function(index, el) {
+				crushFTP.UI.checkUnchekInput($(this).find("input"), !$(this).find("input").is(":checked"));
+			});
+		}
+	});
+
+	setTimeout(function(){
+		panelAdmin.rolesDialog = pnlUserRoles.dialog({
+			title : "Admin user permissions: ",
+			width: 800,
+			modal: true,
+			autoOpen: false,
+			resizable: false,
+			closeOnEscape: true,
+			buttons: {
+				"OK" : function(){
+					var selection = [];
+					pnl.find("input:checked").each(function(index, el) {
+						selection.push($(this).attr("key"));
+					});
+					if(panelAdmin.onUserRolesSelection)
+						panelAdmin.onUserRolesSelection(selection);
+					userManager.methods.itemsChanged(true);
+					$(this).dialog("close");
+				}
+			},
+			open : function(){
+				pnl.find(".option").each(function(index, el) {
+					crushFTP.UI.checkUnchekInput($(this).find("input"), false);
+				});
+				if(panelAdmin.onUserRolesSectionOpen)
+					panelAdmin.onUserRolesSectionOpen();
+			}
+		});
+	}, 100);
 }
 
 panelAdmin.clearItems = function(dataPanel)
@@ -39,10 +150,11 @@ panelAdmin.bindData = function(userInfo, jsonDeep, panel)
 		panel.removeClass("inheritValSet");
 	}
 	panelAdmin.clearItems(dataPanel);
+	delete panelAdmin.curUserPermissions;
+	delete panelAdmin.curUserOtherPermissions;
 	if(userInfo.user)
 	{
 		userManager.data.bindValuesFromJson(dataPanel, userInfo.user, false, panel);
-
 		var dataInheritedFrom = false;
 		var curData = userManager.methods.seperateValueAndInheritValue(crushFTP.data.getValueFromJson(userInfo.user, "site"));
 		var value = curData.value;
@@ -60,6 +172,9 @@ panelAdmin.bindData = function(userInfo, jsonDeep, panel)
 			userManager.data.setInheritPropertyOfSection($("div.siteSettings", dataPanel), "site", true);
 		}
 		userManager.methods.showInheritValueLabel($("div.siteSettings", dataPanel), dataInheritedFrom);
+		var curAllowedConfigData = userManager.methods.seperateValueAndInheritValue(crushFTP.data.getValueFromJson(userInfo.user, "allowed_config"));
+		var allowedConfigValue = curAllowedConfigData.value;
+		panelAdmin.curUserPermissions = allowedConfigValue;
 	}
 	userManager.UI.panelsPostbindEvent(dataPanel, panel);
 	if (!$(document).data("crushftp_enterprise"))
@@ -71,7 +186,8 @@ panelAdmin.bindData = function(userInfo, jsonDeep, panel)
 	{
 		$(".enterpriseFeatureTag", panel).hide();
 	}
-	$("#user_admin,#connect", panelAdmin._panel).trigger('change');
+	$("#connect", panelAdmin._panel).trigger('change');
+	$("#user_admin").trigger('change');
 };
 
 panelAdmin.bindEvents = function()
@@ -91,34 +207,17 @@ panelAdmin.bindEvents = function()
 	});
 
 	var limitedUserRoles = $("#limitedUserRoles").addClass('ui-state-disabled');
-	/*$("#user_admin", panelAdmin._panel).change(function(){
-		if(!$(this).is(":checked"))
-		{
-			var changedItem = $(this);
-			var editingUserData = crushFTP.storage("currentUser");
-			if(editingUserData && editingUserData.user && editingUserData.user.username)
-			{
-				var loggedInUser = crushFTP.storage("username");
-				var editingUser = editingUserData.user.username;
-				if(loggedInUser.toLowerCase() == editingUser.toLowerCase())
-				{
-					jConfirm("You are making changes to current logged in user, this setting may restrict you from using web interface, Are you sure you want to do that?", "Confirm", function(value){
-						crushFTP.UI.checkUnchekInput(changedItem, !value);
-					});
-				}
-			}
-		}
-	});*/
+	var adminUserPermissions = $("#adminUserPermissions").addClass('ui-state-disabled');
 	var limitedUserRolesPanel = $("#limitedUserRolesPanel");
 	limitedUserRolesPanel.dialog("destroy").find("input").removeAttr("checked");
 	$("#connect", panelAdmin._panel).change(function(){
 		if(!$("#connect", panelAdmin._panel).is(":checked"))
 		{
 			limitedUserRoles.removeClass('ui-state-disabled');
-			/*$("#adminSiteSettings").find(".siteField:not(#connect)").each(function(){
-				$(this).removeAttr("disabled");
-				$(this).parent().next().removeClass('ui-state-disabled');
-			});*/
+			adminUserPermissions.addClass('ui-state-disabled');
+			if($("#user_admin", panelAdmin._panel).is(":checked")){
+				adminUserPermissions.removeClass('ui-state-disabled');
+			}
 		}
 		else
 		{
@@ -126,8 +225,21 @@ panelAdmin.bindEvents = function()
 			limitedUserRolesPanel.find("input").each(function(){
 				$(this).removeAttr("checked");
 			});
+			adminUserPermissions.addClass('ui-state-disabled');
 		}
 	});
+
+	$("#user_admin", panelAdmin._panel).change(function(){
+		if($(this).is(":checked"))
+		{
+			adminUserPermissions.removeClass('ui-state-disabled');
+		}
+		else
+		{
+			adminUserPermissions.addClass('ui-state-disabled');
+		}
+	});
+
 
 	limitedUserRolesPanel.dialog({
 		title : "Limited Admin Roles: ",
@@ -138,16 +250,22 @@ panelAdmin.bindEvents = function()
 		closeOnEscape: true,
 		buttons: {
 			"OK" : function(){
+				if(limitedUserRolesPanel.find("input").not(":checked").length==0){
+					jAlert("You can't select all items while setting up permissions", "Error", {
+						okButtonText : "OK"
+					});
+					return false;
+				}
 				$(this).dialog( "close" );
 			}
 		},
 		open : function(){
 			setTimeout(function(){
 				$("#user_admin").trigger('change');
-        $(".roleGroup").find("input").trigger("change")
-        setTimeout(function(){
-          $("#limitedUserRolesPanel").find("input[type='checkbox'][rel]:checked").trigger("change");
-        },100);
+        		$(".roleGroup").find("input").trigger("change")
+        		setTimeout(function(){
+          			$("#limitedUserRolesPanel").find("input[type='checkbox'][rel]:checked").trigger("change");
+        		},100);
 			}, 100);
 		}
 	});
@@ -193,7 +311,7 @@ panelAdmin.bindEvents = function()
 		if($(this).is("#user_admin"))
 		{
 			if($(this).is(":checked"))
-				limitedUserRolesPanel.find("input").not("#user_admin").removeAttr('checked').attr("disabled", "disabled");
+				limitedUserRolesPanel.find("input").not("#user_admin").not("[id^='job']").removeAttr('checked').attr("disabled", "disabled");
 			else
 				limitedUserRolesPanel.find("input").removeAttr("disabled");
 		}
@@ -213,6 +331,30 @@ panelAdmin.bindEvents = function()
 		else
 			limitedUserRolesPanel.find(".roles").find('input').removeAttr('checked').trigger('change');
 		return false;
+	});
+
+	$("#adminUserPermissions", panelAdmin._panel).click(function(event) {
+		if($(this).hasClass('ui-state-disabled'))return false;
+		panelAdmin.onUserRolesSectionOpen = function(){
+			if(panelAdmin.curUserPermissions){
+				var items = panelAdmin.curUserPermissions.split(",");
+				var otherConfigs = [];
+				for (var i = 0; i < items.length; i++) {
+					var curItem = $.trim(items[i]);
+					if(!crushFTP.UI.checkUnchekInput(panelAdmin.rolesDialog.find("input[key='"+curItem+"']"), true).length)
+					{
+						otherConfigs.push(curItem);
+					}
+				}
+				if(otherConfigs.length>0){
+					panelAdmin.curUserOtherPermissions = otherConfigs;
+				}
+			}
+		}
+		panelAdmin.onUserRolesSelection = function(selection){
+			panelAdmin.curUserPermissions = selection.join(",");
+		}
+		panelAdmin.rolesDialog.dialog("open");
 	});
 };
 
@@ -260,6 +402,13 @@ panelAdmin.generateXML = function()
 		var formPanel = $(this).closest("td").next();
 		xml += "\r\n" + userManager.data.buildXMLToSubmitForm(formPanel);
 	});
+	if(panelAdmin.curUserPermissions){
+		var otherPermissions = panelAdmin.curUserOtherPermissions || [];
+		var permissions = panelAdmin.curUserPermissions;
+		if(otherPermissions.length>0)
+			permissions += "," + otherPermissions.join(",");
+		xml += "<allowed_config>"+permissions+"</allowed_config>";
+	}
 	xml += panelAdmin.generateSpecialItemsXML("SitePrefs");
 	return xml;
 }

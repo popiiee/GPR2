@@ -176,6 +176,8 @@ var crushUpload = (function() {
         };
 
         function showUploadForm(items){
+            items = items.filter(function(item){return !item.formProcessed})
+            if(items.length==0)return;
             if(!invoke("isCommonFormShown")){
                 invoke("showUploadFormAdvanced", [true, 0, items]);
                 continueWithFileForm = items;
@@ -859,7 +861,8 @@ var crushUpload = (function() {
             }, 500);
             return {
                 name : crush.textEncode(file.fullPath),
-                id : file.id
+                id : file.id,
+                formProcessed: file.formProcessed
             }
         };
 
@@ -1051,6 +1054,9 @@ var crushUpload = (function() {
                 error.sizeExceed = undefined;
             }
             error.nameSizeExceed = !fileNameSizeAllowed(file.name) ? loc("fileNameSizeExceed").replace(/{x}/g, embed.invoke("maxFilesnameLength")) : "";
+            if(error.fileExtenstionNotAllowed || error.nameSizeExceed || error.sizeExceed){
+                file.formProcessed = true;
+            }
 
             var doesnotHaveError = !error.exists && !error.existsOnServer && !error.sizeExceed && !error.fileExtenstionNotAllowed && !error.nameSizeExceed;
             if(doesnotHaveError && folder && folderExistsOnServer(folder) && folder !== "/"){
@@ -4396,3 +4402,38 @@ var crushUpload = (function() {
 }());
 
 crushUpload.init();
+
+if (!Array.prototype.filter){
+  Array.prototype.filter = function(func, thisArg) {
+    'use strict';
+    if ( ! ((typeof func === 'Function' || typeof func === 'function') && this) )
+        throw new TypeError();
+
+    var len = this.length >>> 0,
+        res = new Array(len), // preallocate array
+        t = this, c = 0, i = -1;
+    if (thisArg === undefined){
+      while (++i !== len){
+        // checks to see if the key was set
+        if (i in this){
+          if (func(t[i], i, t)){
+            res[c++] = t[i];
+          }
+        }
+      }
+    }
+    else{
+      while (++i !== len){
+        // checks to see if the key was set
+        if (i in this){
+          if (func.call(thisArg, t[i], i, t)){
+            res[c++] = t[i];
+          }
+        }
+      }
+    }
+
+    res.length = c; // shrink down array to proper size
+    return res;
+  };
+}

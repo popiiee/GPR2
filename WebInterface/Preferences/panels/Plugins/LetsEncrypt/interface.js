@@ -39,6 +39,8 @@ pluginLetsEncrypt.bindData = function(index, pluginID)
 		{
 			curPlugin = pluginPrefs[index];
 		}
+        // if(typeof curPlugin.challenge_path == "undefined")
+        //     curPlugin.challenge_path = [{"text" : "./Webinterface/"}];
 		pluginLetsEncrypt.bindPluginDetails(curPlugin);
 	}
 	pluginLetsEncrypt.bindEvents();
@@ -70,7 +72,9 @@ pluginLetsEncrypt.bindEvents = function()
                 file_mode : curElem.attr("FileMode") || 'server',
                 existingVal : $("#" + curElem.attr("rel"), _plugin).val(),
                 callback : function(selectedPath){
-                    $("#" + curElem.attr("rel"), _plugin).val(selectedPath).trigger("change");
+                    if(!crushFTP.methods.getFileExtension(selectedPath))
+                        selectedPath += "letsencrypt_keystore.jks";
+                    $("#" + curElem.attr("rel"), _plugin).val(selectedPath).trigger("change").validateNow();
                 }
             });
             return false;
@@ -93,7 +97,7 @@ pluginLetsEncrypt.bindEvents = function()
                 if($(this).attr("id"))
                 {
                     var curVal = $(this).val();
-                    if($(this).attr("id") == "keystore_path" || $(this).attr("id") == "challenge_path"){
+                    if($(this).attr("id") == "keystore_path"){
                         data[$(this).attr("id")] = crushFTP.methods.htmlEncode(curVal);
                     }
                     else{

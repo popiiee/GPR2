@@ -18,7 +18,7 @@
 				<fieldset class="ui-widget-content nobg">
 					<legend class="collapseHandle pointer"></legend>
 					<div class="dataDiv">
-						<fieldset id="webInterfaceCustomization" class="ui-widget-content nobg" filterKeywords="webinterface customizations color font background border header style align" pnlId="webInterface1">
+						<fieldset id="webInterfaceCustomization" class="ui-widget-content nobg" filterKeywords="webinterface customizations color font background border header style align" pnlId="webInterface1" config="web_customizations">
 							<table quickLocate="Customizations">
 								<tr>
 									<td id="webCustomizationsCheck" propertyType="panelWebInterface:Customizations" class="checkboxArea ui-widget-content rightborder nobg specialProperty">
@@ -473,6 +473,7 @@
 																	<li class="ui-widget-content" key="HideUserOptionJavaCompression" defaultVal="true">User Options : Hide Option - 'Disable java applet compression'</li>
 																	<li class="ui-widget-content" key="HideUserOptionChangePassword" defaultVal="true">User Options : Hide Option - 'Change Password'</li>
 																	<li class="ui-widget-content" key="HideUserOptionGeneratePassword" defaultVal="true">User Options : Hide generate random password button</li>
+																	<li class="ui-widget-content" key="UserOption2fa" defaultVal="true">Enable two factor registration</li>
 																	<li class="ui-widget-content" key="inlinePlayer_visible" defaultVal="true">Audio inline player : Enable</li>
 																	<li class="ui-widget-content" key="inlinePlayer_graphvisible" _type="waveformType" defaultVal="true">Audio inline player : Show  waveform</li>
 																	<li class="ui-widget-content" key="inlinePlayer_playqueue" defaultVal="true">Audio inline player : Play Queue</li>
@@ -492,7 +493,9 @@
 																	<li class="ui-widget-content" key="maxUploadItemsWarningMessage" defaultVal="Selecting large amount files to upload with web uploader is not recommended, you might face performance issues. We suggest using zip to combine files.">Max items upload warning message</li>
 																	<li class="ui-widget-content" key="uploadWindowShowNameInsteadOfFullPath" defaultVal="true">Upload window: show file name instead of full path</li>
 																	<li class="ui-widget-content" key="directCopyLinkWebInterfaceFriendly" defaultVal="true">Create quickview friendly link while generating direct link</li>
-
+																	<li class="ui-widget-content" key="maxAllowedFileSizeForInlineEdit" defaultVal="1024">Edit file: max file size allowed to edit in browser (in Kilobytes, anything above 1mb may kill your browser)</li>
+																	<li class="ui-widget-content" key="allowedFileExtensionsForInlineEdit" defaultVal="txt,html,htm,css,js,log,xml">Edit file: extensions to allow for in browser editing (comma separated)</li>
+																	<li class="ui-widget-content" key="enableUserInformationPopup" defaultVal="true">Enable debug popup</li>
 																</ol>
 															</div>
 														</div>
@@ -520,7 +523,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="custom javascript script web webinterface" pnlId="webInterface2">
+						<fieldset class="ui-widget-content nobg" filterKeywords="custom javascript script web webinterface" pnlId="webInterface2" config="javascript">
 							<table quickLocate="Custom Javascript">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -540,7 +543,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="custom css web webinterface theme color layout style" pnlId="webInterface3">
+						<fieldset class="ui-widget-content nobg" filterKeywords="custom css web webinterface theme color layout style" pnlId="webInterface3" config="css">
 							<table quickLocate="Custom CSS">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -566,7 +569,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="webinterface buttons customize" pnlId="webInterface4">
+						<fieldset class="ui-widget-content nobg" filterKeywords="webinterface buttons customize" pnlId="webInterface4" config="web_buttons">
 							<table id="buttonsPanel" quickLocate="Buttons">
 								<tr>
 									<td id="webButtonsCheck" propertyType="panelWebInterface:Buttons" class="checkboxArea ui-widget-content rightborder nobg specialProperty">
@@ -697,7 +700,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="custom form upload message paste" pnlId="webInterface5">
+						<fieldset class="ui-widget-content nobg" filterKeywords="custom form upload message paste" pnlId="webInterface5" config="forms">
 							<table quickLocate="Forms">
 								<tr>
 									<td id="webFormsCheck" propertyType="panelWebInterface:Forms" class="checkboxArea ui-widget-content rightborder nobg spec specialProperty">
@@ -768,7 +771,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="virtual domain" pnlId="webInterface6">
+						<fieldset class="ui-widget-content nobg" filterKeywords="virtual domain" pnlId="webInterface6" config="domain_root_list">
 							<table quickLocate="Virtual Domains">
 								<tr>
 									<td id="domainRootListCheck" propertyType="panelWebInterface:Domains" class="checkboxArea ui-widget-content rightborder nobg specialProperty">
@@ -860,7 +863,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="Alternate HTTP domain names" pnlId="webInterface11">
+						<fieldset class="ui-widget-content nobg" filterKeywords="Alternate HTTP domain names" pnlId="webInterface11" config="alt_http_domains">
 						    <table quickLocate="Alternate HTTP Domains">
 							    <tr>
 								    <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -885,7 +888,7 @@
 							    </tr>
 						    </table>
 					    </fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="disallow listings index.html" pnlId="webInterface7">
+						<fieldset class="ui-widget-content nobg" filterKeywords="disallow listings index.html" pnlId="webInterface7" config="DisallowListingDirectories">
 							<table quickLocate="Disallow directory listings">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -901,7 +904,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="captcha recaptcha login settings" pnlId="webInterface10">
+						<fieldset class="ui-widget-content nobg" filterKeywords="captcha recaptcha login settings" pnlId="webInterface10" config="recaptcha_required_web">
 							<table quickLocate="Set recaptcha for logins">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -917,7 +920,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="server side include" pnlId="webInterface8">
+						<fieldset class="ui-widget-content nobg" filterKeywords="server side include" pnlId="webInterface8" config="WebServerSSI">
 							<table quickLocate="Enable ServerSideInclude (SSI)">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -933,7 +936,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="index.html webserver" pnlId="webInterface9">
+						<fieldset class="ui-widget-content nobg" filterKeywords="index.html webserver" pnlId="webInterface9" config="WebServerMode">
 							<table quickLocate="Serve HTML 'index.html' file instead of directory listing">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">

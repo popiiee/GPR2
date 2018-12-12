@@ -23,6 +23,7 @@
 						<option value="WelcomeFormsSearch">Welcome Forms Search</option>
 						<option value="UserFolderSizes">User Folder Sizes</option>
 						<option value="UserFolderPermissions">User Folder Permissions</option>
+						<option value="UserFolderAccess">User Folder Access</option>
 						<option value="UserUsage">User Usage</option>
 						<option value="UserEvents">User Events</option>
 						<!-- <option value="NewFiles">New Files</option> -->
@@ -56,7 +57,7 @@
 			<div class="customForm" style="position:relative;">
 				<table width="100%" class="valignMiddle">
 					<tr>
-						<td width="70px"><label class="vtip" title="mm/dd/yyyy" for="startDate">Start Date : </label></td>
+						<td width="70px"><label class="vtip" title="mm/dd/yyyy" for="startDate">Start Date: </label></td>
 						<td>
 							<input type="text" class="reportElement" id="startDate" />
 							<select id="dateRange">
@@ -78,11 +79,11 @@
 						</td>
 					</tr>
 					<tr>
-						<td><label class="vtip" title="mm/dd/yyyy" for="endDate">End Date : </label></td>
+						<td><label class="vtip" title="mm/dd/yyyy" for="endDate">End Date: </label></td>
 						<td><input class="reportElement" type="text" id="endDate" /></td>
 					</tr>
 					<tr>
-						<td><label for="usernames">User Name : </label></td>
+						<td><label for="usernames">User Name: </label></td>
 						<td>
 							<input type="text" class="bigInputBox reportElement" id="usernames" />
 							<a href="#" class="button slim" id="pickUsers" style="padding: 3px 10px;position: absolute;top: inherit !important;margin: -4px 0px 0px 10px;">
@@ -110,13 +111,13 @@
 	<div id="reportConfiguration" style="padding: 10px;border:0px;background:#fff;border-radius: 0px;border-bottom: 1px solid #eee;" class="ui-widget-content">
 		<h1 style="border: 0px;border-bottom: 1px solid #eee;border-radius: 0px;padding: 10px 0px;">Report configuration</h1>
 		<div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigTopDownloadsUploads">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigTopDownloadsUploads">
 				<p>
-					<label for="downloadCount">List how many downloaded files : </label>
+					<label for="downloadCount">List how many downloaded files: </label>
 					<input type="text" value="100" class="reportElement" id="downloadCount" />
 				</p>
 				<p>
-					<label for="uploadCount_1">List how many uploaded files : </label>
+					<label for="uploadCount_1">List how many uploaded files: </label>
 					<input type="text" value="100" class="reportElement" id="uploadCount_1" />
 				</p>
 				<p>
@@ -130,7 +131,7 @@
 					<label for="showFormInfo_1">Show Upload Form Info (if available)</label>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigSharesSummary">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigSharesSummary">
 				<p>
 					<input type="checkbox" id="showPaths_1" class="reportElement" />
 					<label for="showPaths_1">Show File Paths</label>
@@ -142,13 +143,13 @@
 					<label for="showFormInfo_1">Show Share Info (if available)</label>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigAccountActivitySummary">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigAccountActivitySummary">
 				<p>
 					<input type="checkbox" class="reportElement" id="reverseDNS_1" />
 					<label for="reverseDNS_1">Do reverse DNS Lookup on IPs</label>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigUploadDownloadSummary">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigUploadDownloadSummary">
 				<p style="line-height:25px;display:none;">
 					<input type="checkbox" checked id="showUploads" class="reportElement" />
 					<label for="showUploads">Show Uploads</label>
@@ -175,9 +176,9 @@
 					<label for="showPaths_2">Show Paths</label>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigAuditSummary">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigAuditSummary">
 				<p>
-					<label for="searchFilename">File Name : </label>
+					<label for="searchFilename">File Name: </label>
 					<select id="searchFilename" class="reportElement">
 						<option value="contains">Contains</option>
 						<option value="equals">Equals</option>
@@ -187,7 +188,7 @@
 					<input type="text" id="filename" class="reportElement" />
 				</p>
 				<p>
-					<label for="searchPath_1">Path : </label>
+					<label for="searchPath_1">Path: </label>
 					<span class="spacer"></span>&nbsp;
 					<select id="searchPath_1" class="reportElement">
 						<option value="starts with">Starts With</option>
@@ -196,6 +197,15 @@
 						<option value="equals">Equals</option>
 					</select>
 					<input type="text" id="path_1" value="/" class="reportElement" />
+				</p>
+				<p>
+					<label for="successLogin">Login Status: </label>
+					&nbsp;
+					<select id="successLogin" class="reportElement">
+						<option value="any" selected="selected">Any</option>
+						<option value="true">Successful Login</option>
+						<option value="false">Failed login</option>
+					</select>
 				</p>
 				<p>
 					<input type="checkbox" checked id="showUploads" class="reportElement" />
@@ -238,7 +248,7 @@
 					<label for="showPaths_2">Show Paths</label>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigUploadDownloadRatios">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigUploadDownloadRatios">
 				<p style="display: none;">
 					<input checked type="checkbox" id="showBytes" class="reportElement" />
 					<label for="showBytes">Show Bytes</label>
@@ -273,7 +283,7 @@
 			</div>
 			<div class="reportConfig ui-helper-hidden" id="reportConfigWhoDownloadedFile">
 				<p>
-					<label for="searchFilename">File Name : </label>
+					<label for="searchFilename">File Name: </label>
 					<select id="searchFilename" class="reportElement">
 						<option value="contains">Contains</option>
 						<option value="equals">Equals</option>
@@ -283,7 +293,7 @@
 					<input type="text" id="filename" class="reportElement" />
 				</p>
 				<p>
-					<label for="searchPath_1">Path : </label>
+					<label for="searchPath_1">Path: </label>
 					<span class="spacer"></span>&nbsp;
 					<select id="searchPath_1" class="reportElement">
 						<option value="starts with">Starts With</option>
@@ -296,7 +306,7 @@
 			</div>
 			<div class="reportConfig ui-helper-hidden" id="reportConfigWhoUploadedFile">
 				<p>
-					<label for="searchFilename">File Name : </label>
+					<label for="searchFilename">File Name: </label>
 					<select id="searchFilename" class="reportElement">
 						<option value="contains">Contains</option>
 						<option value="equals">Equals</option>
@@ -306,7 +316,7 @@
 					<input type="text" id="filename" class="reportElement" />
 				</p>
 				<p>
-					<label for="searchPath_1">Path : </label>
+					<label for="searchPath_1">Path: </label>
 					<span class="spacer"></span>&nbsp;
 					<select id="searchPath_1" class="reportElement">
 						<option value="starts with">Starts With</option>
@@ -319,7 +329,7 @@
 			</div>
 			<div class="reportConfig ui-helper-hidden" id="reportConfigWhoDeletedFile">
 				<p>
-					<label for="searchFilename">File Name : </label>
+					<label for="searchFilename">File Name: </label>
 					<select id="searchFilename" class="reportElement">
 						<option value="contains">Contains</option>
 						<option value="equals">Equals</option>
@@ -329,7 +339,7 @@
 					<input type="text" id="filename" class="reportElement" />
 				</p>
 				<p>
-					<label for="searchPath_1">Path : </label>
+					<label for="searchPath_1">Path: </label>
 					<span class="spacer"></span>&nbsp;
 					<select id="searchPath_1" class="reportElement">
 						<option value="starts with">Starts With</option>
@@ -342,7 +352,7 @@
 			</div>
 			<div class="reportConfig ui-helper-hidden" id="reportConfigWhoRenamedFile">
 				<p>
-					<label for="searchFilename">File Name : </label>
+					<label for="searchFilename">File Name: </label>
 					<select id="searchFilename" class="reportElement">
 						<option value="contains">Contains</option>
 						<option value="equals">Equals</option>
@@ -352,7 +362,7 @@
 					<input type="text" id="filename" class="reportElement" />
 				</p>
 				<p>
-					<label for="searchPath_1">Path : </label>
+					<label for="searchPath_1">Path: </label>
 					<span class="spacer"></span>&nbsp;
 					<select id="searchPath_1" class="reportElement">
 						<option value="starts with">Starts With</option>
@@ -363,7 +373,7 @@
 					<input type="text" id="path_1" value="/" class="reportElement" />
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigCurrentLogins">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigCurrentLogins">
 				<p>
 					<span class="ui-state-highlight ui-corner-all warning" style="padding:5px;display:inline-block;margin:0px 3px;">
 						<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
@@ -379,13 +389,13 @@
 					<label for="showFiles_2">Show Files Transferred</label>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigUploadFormsSearch">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigUploadFormsSearch">
 				<p>
-					<label for="uploadCount_2">List How Many Uploaded Files : </label>
+					<label for="uploadCount_2">List How Many Uploaded Files: </label>
 					<input type="text" value="100" id="uploadCount_2" class="smallInputBox reportElement" />
 				</p>
 				<p>
-					<label for="uploadForm">Upload Form : </label>
+					<label for="uploadForm">Upload Form: </label>
 					<select class="inputBox reportElement" id="uploadForm">
 					</select>
 					<a href="#" id="showUploadFormPopup" style="display: inline-block;margin-top: 1px;position: absolute;margin-left: 5px;">Show Form</a>
@@ -401,17 +411,17 @@
 					<label for="showFormInfo_2">Show Upload Form Info (If available)</label>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigWelcomeFormsSearch">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigWelcomeFormsSearch">
 				<p>
-					<label for="welcomeForm">Welcome Form : </label>
+					<label for="welcomeForm">Welcome Form: </label>
 					<select class="inputBox" id="welcomeForm">
 					</select>
 					<a href="#" id="showWelcomeFormPopup" style="display: inline-block;margin-top: 1px;position: absolute;margin-left: 5px;">Show Form</a>
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigUserFolderSizes">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigUserFolderSizes">
 				<!-- <p>
-					<label for="searchPath_2">Path : </label>
+					<label for="searchPath_2">Path: </label>
 					<span class="spacer"></span>&nbsp;
 					<select id="searchPath_2" class="reportElement">
 						<option value="starts with">Starts With</option>
@@ -422,24 +432,43 @@
 					<input type="text" id="path_2" value="/" class="reportElement" />
 				</p> -->
 				<p>
-					<label for="depth_1">Depth : </label>
+					<label for="depth_1">Depth: </label>
 					<input type="text" value="10" id="depth_1" class="smallInputBox reportElement" />
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigUserFolderPermissions">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigUserFolderPermissions">
 				<p>
-					<label for="linked_vfs_users">Only list users linked to these user's VFS : </label>
+					<label for="linked_vfs_users">Only list users linked to these user's VFS: </label>
 					<input type="text" id="linked_vfs_users" class="bigInputBox reportElement" />
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigUserUsage">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigUserFolderAccess">
+				<p>
+					<label for="search_url">Search for URL starting with:</label>
+					<input type="text" id="search_url" class="bigInputBox reportElement" />
+					<label for="search_url" style="font-size: 11px;">
+						(Example URLs: FILE://C:/Users/files/ or ftp://myftp.somedomain.com/folder/ or SMB3://servername/share/)
+					</label>
+				</p>
+				<p>
+					<label for="search_name">Search for VFS item name containing:</label>
+					<input type="text" id="search_name" class="bigInputBox reportElement" />
+				</p>
+				<p>
+					<span class="ui-state-highlight ui-corner-all warning" style="padding:5px;display:inline-block;margin:0px 3px;">
+						<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+						Name searches by "contains" and url teaches by "starts with"
+					</span>
+				</p>
+			</div>
+			<div class="reportConfig ui-helper-hidden" id="reportConfigUserUsage">
 				<p>
 					Nothing to configure
 				</p>
 			</div>
-			<div class="reportConfig ui-helper-hidden"  id="reportConfigNewFiles">
+			<div class="reportConfig ui-helper-hidden" id="reportConfigNewFiles">
 				<p>
-					<label for="searchPath_3">Path : </label>
+					<label for="searchPath_3">Path: </label>
 					<select id="searchPath_3" class="reportElement">
 						<option value="starts with">Starts With</option>
 						<option value="ends with">Ends With</option>
@@ -452,16 +481,16 @@
 					<label for="onlyFolders">Only Folders?</label>
 				</p>
 				<p>
-					<label for="depth_2">Depth : </label>
+					<label for="depth_2">Depth: </label>
 					<input type="text" value="3" id="depth_2" class="smallInputBox reportElement" />
 				</p>
 				<p>
-					<label class="ui-priority-primary">Email Notification Setup : </label>
+					<label class="ui-priority-primary">Email Notification Setup: </label>
 				</p>
 				<table class="subPanel ui-widget-content leftborder nobg" width="100%">
 					<tr>
 						<td width="80px;" class="right" style="vertical-align:middle;">
-							<label for="from_1">From : </label>
+							<label for="from_1">From: </label>
 						</td>
 						<td>
 							<input type="text" class="bigInputBox reportElement" id="from_1" name="from_1">
@@ -469,7 +498,7 @@
 					</tr>
 					<tr>
 						<td class="right" style="vertical-align:middle;">
-							<label for="to_1">To : </label>
+							<label for="to_1">To: </label>
 						</td>
 						<td>
 							<input type="text" class="bigInputBox reportElement" value="%user_email%" id="to_1" name="to_1">
@@ -477,7 +506,7 @@
 					</tr>
 					<tr>
 						<td class="right" style="vertical-align:middle;">
-							<label for="cc_1">CC : </label>
+							<label for="cc_1">CC: </label>
 						</td>
 						<td>
 							<input type="text" class="bigInputBox reportElement" id="cc_1" name="cc_1">
@@ -485,7 +514,7 @@
 					</tr>
 					<tr>
 						<td class="right" style="vertical-align:middle;">
-							<label for="bcc_1">BCC : </label>
+							<label for="bcc_1">BCC: </label>
 						</td>
 						<td>
 							<input type="text" class="bigInputBox reportElement" id="bcc_1" name="bcc_1">
@@ -493,7 +522,7 @@
 					</tr>
 					<tr>
 						<td class="right" style="vertical-align:middle;">
-							<label for="subject_1" >Subject : </label>
+							<label for="subject_1" >Subject: </label>
 						</td>
 						<td>
 							<input type="text" class="bigInputBox reportElement" value="New files are waiting..." id="subject_1" name="subject_1" />
@@ -501,7 +530,7 @@
 					</tr>
 					<tr>
 						<td class="right" style="vertical-align:top;">
-							<label for="body_1">Body : </label>
+							<label for="body_1">Body: </label>
 						</td>
 						<td>
 							<textarea id="body_1"  style="height:200px;width:500px;" class="reportElement" name="body_1">There are new files waiting for you.  Below is a list of new files:
@@ -514,7 +543,7 @@
 			<div class="reportConfig ui-helper-hidden" id="reportConfigJobSchedules"></div>
 			<div class="reportConfig ui-helper-hidden" id="reportConfigExpiringAccounts">
 				<p>
-					<label for="days">Days Until Expiration : </label>
+					<label for="days">Days Until Expiration: </label>
 					<input type="text" id="days" value="7" class="smallInputBox reportElement" />
 				</p>
 				<p>

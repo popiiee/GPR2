@@ -778,28 +778,34 @@ var crushFTP = {
         loadSelectedPrefs: function(settingKeys, infoKeys, callback) {
             var that = this;
             try{
-                that.getSelectedServerSettings(settingKeys, function(settings){
-                    that.getServerItem("server_settings/server_list", function(server_list){
-                        if(server_list && server_list.getElementsByTagName){
-                            var listItems = server_list.getElementsByTagName("result_value")[0];
+                var settings, list, info, loaded = 0;
+
+                function continueMerge(){
+                    if(loaded<3)
+                        return;
+                    if(list && list.getElementsByTagName){
+                        var listItems = list.getElementsByTagName("result_value")[0];
                             if(settings && settings.getElementsByTagName){
                                 var settingsItems = settings.getElementsByTagName("result_value")[0];
                                 var server_list = settings.createElement("server_list");
                                 var cloneListItems = listItems.cloneNode(true);
                                 server_list.appendChild(cloneListItems);
-                                settingsItems.appendChild(server_list);
-                                that.getSelectedServerInfo(infoKeys, function(info){
-                                    if(info && info.getElementsByTagName){
-                                        var infoItems = info.getElementsByTagName("result_value")[0].children;
-                                        if(infoItems && infoItems.length){
-                                            for (var i = infoItems.length - 1; i >= 0; i--) {
-                                                var clone = infoItems[i].cloneNode(true);
-                                                settingsItems.appendChild(clone);
-                                            };
+                                if(settingsItems && settingsItems.appendChild){
+                                    settingsItems.appendChild(server_list);
+                                        if(info && info.getElementsByTagName){
+                                            var infoItems = info.getElementsByTagName("result_value")[0].children;
+                                            if(infoItems && infoItems.length){
+                                                for (var i = infoItems.length - 1; i >= 0; i--) {
+                                                    var clone = infoItems[i].cloneNode(true);
+                                                    settingsItems.appendChild(clone);
+                                                };
+                                            }
                                         }
-                                    }
+                                        callback(settings);
+                                }
+                                else{
                                     callback(settings);
-                                });
+                                }
                             }
                             else{
                                 callback();
@@ -808,35 +814,52 @@ var crushFTP = {
                         else{
                             callback(false);
                         }
-                    }, crushFTP.ajaxCallURLBase);
+                }
+
+                that.getSelectedServerSettings(settingKeys, function(msg){
+                    settings = msg;
+                    loaded++;
+                    continueMerge();
                 });
+
+                that.getServerItem("server_settings/server_list", function(server_list){
+                    list = server_list;
+                    loaded++;
+                    continueMerge();
+                    }, crushFTP.ajaxCallURLBase);
+
+                that.getSelectedServerInfo(infoKeys, function(_info){
+                    info = _info;
+                    loaded++;
+                    continueMerge();
+                });
+
             }catch(ex){
                 crushFTP.UI.growl("Error : ", ex.message, true, true);
             }
         },
         getSelectedXMLPrefsDataFromServer: function(settingKeys, infoKeys, dataKey, callback, callback2) {
             var items = [];
-            crushFTP.data.loadSelectedPrefs(settingKeys, infoKeys, function(data) {
-                if ($(data).find("result_value").length > 0) {
-                    data = data.getElementsByTagName("result_value")[0];
-                    items = $.xml2json(data);
+            var _prefs, _allJobs, loaded = 0, availableJobs = [];
+
+            function continueMerge(){
+                if(loaded<2)
+                    return;
+                if ($(_prefs).find("result_value").length > 0) {
+                    _prefs = _prefs.getElementsByTagName("result_value")[0];
+                    items = $.xml2json(_prefs);
                     crushFTP.storage(dataKey, items);
-                    crushFTP.storage(dataKey + "_RAW", data);
+                    crushFTP.storage(dataKey + "_RAW", _prefs);
                 }
-                var availableJobs = [];
-                crushFTP.data.serverRequest({
-                        command: "getJob"
-                    },
-                    function(jobs) {
-                        if (jobs && typeof jobs.getElementsByTagName != "undefined") {
-                            if (jobs.getElementsByTagName("result_value") && jobs.getElementsByTagName("result_value").length > 0) {
-                                $(jobs).find("result_value_subitem").each(function(index, el) {
+                if (_allJobs && typeof _allJobs.getElementsByTagName != "undefined") {
+                    if (_allJobs.getElementsByTagName("result_value") && _allJobs.getElementsByTagName("result_value").length > 0) {
+                        $(_allJobs).find("result_value_subitem").each(function(index, el) {
                                     availableJobs.push($(this).text());
                                 });
                                 $(document).data("AvailableJobs", availableJobs.sort());
 
                                 var onlyJobSchedules = [];
-                                $(jobs).find("result_value_subitem").each(function(index, el) {
+                        $(_allJobs).find("result_value_subitem").each(function(index, el) {
                                     if ($(this).text().indexOf("_") != 0)
                                         onlyJobSchedules.push($(this).text());
                                 });
@@ -845,10 +868,23 @@ var crushFTP = {
                                     callback2();
                             }
                         }
-                    });
                 if (callback) {
-                    callback(data);
+                    callback(_prefs);
                 }
+            }
+
+            crushFTP.data.loadSelectedPrefs(settingKeys, infoKeys, function(data) {
+                _prefs = data;
+                loaded++;
+                continueMerge();
+                    });
+
+            crushFTP.data.serverRequest({
+                command: "getJob"
+            }, function(jobs) {
+                _allJobs = jobs;
+                loaded++;
+                continueMerge();
             });
         },
         setXMLPrefs: function(dataKey, dataType, dataAction, entryData, callback, options) {
@@ -1713,6 +1749,10 @@ var crushFTP = {
             else
                 return decodeURIComponent(results[1].replace(/\+/g, " "));
         },
+        getFileExtension: function(filename) {
+            var ext = /^.+\.([^.]+)$/.exec(filename);
+            return ext == null ? "" : ext[1].toLowerCase();
+        },
         isVisibleOnScreen: function(elem) {
             if (!elem || elem.length == 0) return;
             var docViewTop = $(window).scrollTop();
@@ -1730,6 +1770,16 @@ var crushFTP = {
                 scripts[i].parentNode.removeChild(scripts[i]);
             }
             return div.innerHTML;
+        },
+        difference: function(object, base) {
+            function changes(object, base) {
+                return _.transform(object, function(result, value, key) {
+                    if (!_.isEqual(value, base[key])) {
+                        result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
+                    }
+                });
+            }
+            return changes(object, base);
         }
     }
 };

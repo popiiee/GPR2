@@ -138,14 +138,20 @@ table.tablesorter .header {
 
 /*Main Navigation Bar Menu*/
 .mainNavigation {
-    background-color: #F5B451;
+    background-color: #c4690d;
     border: 1px solid #eee;
+    color: #fff;
 }
 ul.topnav li a {
-    color: #000;
+    color: #fff;
+    animation: all 1s ease-in-out;
+    transition: 0.3s;
 }
 ul.topnav li a:hover, ul.topnav li a.hovered {
     background-color: #eee;
+    color: #000;
+    border-bottom-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 ul.topnav li span {
     background-color: #C6DD82;
@@ -722,7 +728,8 @@ td.subdirectory {
     margin-top: 1px;
 }
 .themeBlock.default {
-    background-color: #F5B451;
+    background-color: #c4690d;
+    color: #fff;
 }
 .themeBlock.dark {
     background-color: #000;
@@ -2427,10 +2434,10 @@ td .framePreviewBox div {
     float: left;
     width: 200px;
     height: auto;
-    background-color: #F5B451;
+    background-color: #c4690d;
     margin: 0px;
     padding: 0px;
-    color: #000;
+    color: #fff;
     margin-top: 24px;
     border: 1px solid #eee;
     border-radius: 4px;
@@ -2920,4 +2927,108 @@ a.copybodytoclip{
 .chrome #userOptionAutoLoadJavaApplet
 {
     display: none !important;
+}
+#mainNavigation .topnav li.menuItem.write{
+    display: none !important;
+}
+#userOptionDisableWaveform{
+    display: none;
+}
+.twofactorAuthPanel{
+    display: none;
+}
+#btnSetup2FA,#btnSetup2FAConfirm{
+    padding: 5px 15px;
+    border-radius: 3px;
+}
+#qrCodePanel img {
+    margin: 50px;
+}
+.userInfo{
+    right: 15px;
+    padding: 4px 3px;
+    border: 1px solid #eee;
+    position: absolute;
+    border-radius: 10px;
+    margin-top: 3px;
+    background: #ddd;
+    height: 12px;
+    overflow: hidden;
+    cursor: pointer;
+}
+.userInfo .userName{
+    position: relative;
+    top: -11px;
+}
+.userInfo .usericon{
+    background-image: url(/WebInterface/Resources/images/user.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px;
+    width: 12px;
+    height: 21px;
+    position: relative;
+    filter: grayscale(100);
+    display: inline-block;
+    border-right: 1px solid #b5b5b5;
+    top: -5px;
+    left: -3px;
+    padding-right: 10px;
+    border-radius: 10px;
+}
+.userInfo .infoicon{
+    background-image: url(/WebInterface/Resources/images/help_plain.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 11px;
+    width: 12px;
+    height: 12px;
+    position: relative;
+    filter:grayscale(100);
+    display: inline-block;
+    position: relative;
+    top: -9px;
+}
+.userInfo:hover{
+    border-color: #8a8a8a;
+    background-color: #fff;
+}
+.userInfo:hover .usericon, .userInfo:hover .infoicon{
+    filter: grayscale(0);
+}
+#userinfoPanel h2{
+    cursor: move;
+}
+#userinfoPanel
+{
+    position: absolute;
+    right: 10px;
+    background: #fff;
+    z-index: 99999;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 1px 1px 4px 0px #8a8a8a;
+    width: 320px;
+    background-color: #000;
+    color: #fff;
+    opacity: 0.6;
+}
+#userinfoPanel:hover{
+    opacity: 1;
+}
+#userinfoPanel .info {
+    clear: both;
+    padding: 8px;
+}
+#userinfoPanel .value {
+    float: right;
+    text-align: left;
+    word-break: break-word;
+    width: 195px;
+}
+#userinfoPanel .label {
+    float: left;
+    text-align: right;
+    width: 100px;
 }

@@ -60,6 +60,14 @@
 				<label class="Banning lblHackAttemptSettingNoteText2" for="hack_usernames">(Comma separated)</label>
 			</p>
 			<p>
+				<label for="max_password_resets_per_minute">
+				Maximum of</label> <input id="max_password_resets_per_minute" name="max_password_resets_per_minute" class="smallInputBox" type="text" /> <label>reset requests per minute, then ignore the requests.</label>
+			</p>
+			<p>
+				<label for="max_connection_single_ip">
+				Maximum of</label> <input id="max_connection_single_ip" name="max_connection_single_ip" class="smallInputBox" type="text" /> <label>connections from a single unique ip, then deny connections until they disconnect.</label>
+			</p>
+			<p>
 				<span class="Banning lblIPRestrictionsAndBansText ui-priority-primary">
 					IP Restrictions and Bans:
 				</span>
@@ -91,7 +99,7 @@
 					</a>
 				</div>
 				<div class="clear"></div>
-				<p class="v9-only">
+				<p>
 					<label class="ui-priority-primary" for="max_denied_ips">Max count for Denied IPs:</label>
 					<input id="max_denied_ips" name="max_denied_ips" class="smallInputBox" type="text" />
 				</p>
@@ -164,7 +172,7 @@
 				</a>
 				<a href="#" class="button" id="saveContent">
 					<span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-disk' ></span>
-					<span class="submitActionOk Banning btnOKText">OK</span>
+					<span class="submitActionOk Banning btnOKText">Save</span>
 				</a>
 			</p>
 		</td>

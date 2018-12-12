@@ -70,7 +70,8 @@ crushReports.reports.AuditSummary = function(data, tpl) {
                     username : $(this).find("username:first").text(),
                     date : $(this).find("date:first").text(),
                     ip : $(this).find("ip:first").text(),
-                    size : 0
+                    size : 0,
+                    success_login : $(this).find("success_login:first").text()
                 } : {
                     username : $(this).find("username:first").text(),
                     url : $(this).find("url:first").text(),
@@ -434,6 +435,14 @@ crushReports.reports.AuditSummary = function(data, tpl) {
             data : "ip"
         }, {
             data : "username"
+        }, {
+            "data": "success_login",
+            "render": function(data) {
+                if(data == "true"){
+                    return "Successful";
+                }
+                return "Failed";
+            }
         }, {
             "data": "date",
             "render": function(data) {

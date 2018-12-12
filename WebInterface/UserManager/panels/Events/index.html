@@ -16,10 +16,10 @@
         </tr>
         <tr>
             <td class="customForm nobg">
-                <fieldset class="ui-widget-content nobg">
+                <fieldset class="ui-widget-content nobg" config="events">
                     <legend class="collapseHandle pointer"></legend>
                     <div class="dataDiv">
-                        <fieldset class="ui-widget-content nobg" filterKeywords="event email notify upload plugin execute form smtp body from" pnlId="events1">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="event email notify upload plugin execute form smtp body from" pnlId="events1" config="events">
                             <legend style="font-size: inherit;color: inherit;background: transparent;border: 0;"></legend>
                             <table id="userEvents">
                                 <tr>
@@ -114,6 +114,9 @@
                                                                                 <input type="checkbox" class="ignoreBind excludeXML eventListAction" rel="(download)" id="evtCB_download" /><label for="evtCB_download">Downloads </label>
                                                                             </span>&nbsp;
                                                                             <span>
+                                                                                <input type="checkbox" class="ignoreBind excludeXML eventListAction" rel="(pre_download)" id="evtCB_pre_download" /><label for="evtCB_pre_download">Pre-Download </label>
+                                                                            </span>&nbsp;
+                                                                            <span>
                                                                                 <input type="checkbox" class="ignoreBind excludeXML eventListAction" rel="(connect)" id="evtCB_connect" /><label for="evtCB_connect">Connects </label>
                                                                             </span>&nbsp;
                                                                             <span>
@@ -154,6 +157,9 @@
                                                                             </span>&nbsp;
                                                                             <span>
                                                                                 <input type="checkbox" class="ignoreBind excludeXML eventListAction" rel="(share_download)" id="evtCB_share_download" /><label for="evtCB_share_download">Downloads </label>
+                                                                            </span>&nbsp;
+                                                                            <span>
+                                                                                <input type="checkbox" class="ignoreBind excludeXML eventListAction" rel="(share_pre_download)" id="evtCB_share_pre_download" /><label for="evtCB_share_pre_download">Pre-Download </label>
                                                                             </span>&nbsp;
                                                                             <span>
                                                                                 <input type="checkbox" class="ignoreBind excludeXML eventListAction" rel="(share_connect)" id="evtCB_share_connect" /><label for="evtCB_share_connect">Connects </label>
@@ -447,6 +453,7 @@
 															</div>
 															<div id="pluginActionPanel" class="customForm ui-widget-content nobg" style="padding:5px;margin-bottom:5px;">
 																<select id="pluginsAvailable" class="ignoreBind">
+                                                                    <option value="CrushTask">CrushTask (User Defined)</option>
 																</select>
 																<p>
 																	<div class="ui-state-highlight ui-corner-all warning" style="padding:3px;display:block;margin:0px 3px;">

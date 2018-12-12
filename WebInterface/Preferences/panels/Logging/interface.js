@@ -105,6 +105,7 @@ panelLogging.init = function(){
 	crushFTP.methods.setPageTitle(panelLogging.localization.Header, true);
 	panelLogging.bindEvents();
 	panelLogging.bindData();
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelLogging.bindData = function()
@@ -452,7 +453,7 @@ panelLogging.saveContent = function()
 			{
 				crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 			}
-		});
+		}, panelLogging.saveParams);
 	}
 	else
 	{

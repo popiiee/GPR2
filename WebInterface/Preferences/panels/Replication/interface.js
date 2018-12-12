@@ -36,6 +36,14 @@ panelReplication.bindData = function()
 	{
 		prefs.replicated_vfs_ping_interval = [{text :"60"}]
 	}
+	if(typeof prefs.replicate_preferences == "undefined")
+	{
+		prefs.replicate_preferences = [{text :"true"}]
+	}
+	if(typeof prefs.replicate_preferences_sync == "undefined")
+	{
+		prefs.replicate_preferences_sync = [{text :"true"}]
+	}
 	bindValuesFromXML(_panel, prefs);
 }
 

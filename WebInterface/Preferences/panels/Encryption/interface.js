@@ -10,6 +10,8 @@ panelEncryption.localization = {};
 var panelName = "Encryption";
 var _panel = $("#pnl" + panelName);
 
+panelEncryption.saveParams = {};
+
 // Localizations
 panelEncryption.localization = {
     headerText: "",
@@ -60,10 +62,18 @@ localizations.panels[panelName] = $.extend(panelEncryption.localization, localiz
 
 // Interface methods
 panelEncryption.init = function() {
+    panelEncryption.saveParams = {};
     applyLocalizations(panelName, localizations.panels);
     crushFTP.methods.setPageTitle(panelEncryption.localization.Header, true);
     panelEncryption.bindData();
     panelEncryption.bindEvents();
+    crushFTP.Replication.init(common.data.ServerPrefs(), "Preferences", _panel, panelName, "#saveContent", function(prefs, _panelname){
+        panelEncryption.saveParams.ui_save_preferences = prefs;
+        panelEncryption.saveParams.ui_save_preferences_item = _panelname;
+        itemsChanged(true);
+        _panel.find("#saveContent").click();
+        crushFTP.Replication.popupVisible(false);
+    });
 }
 
 panelEncryption.defaultPopupData = {
@@ -291,6 +301,8 @@ panelEncryption.bindEvents = function() {
         $("#cipherDisabledWarning").show();
         return false;
     });
+
+    $(".ssl-guide", _panel).sslGuideButton();
 
     $("a#deselectAllCiphers", _panel).click(function() {
         $("#filter_disabled_ciphers").val("");
@@ -1064,7 +1076,7 @@ panelEncryption.saveContent = function() {
             } else {
                 crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
             }
-        });
+        }, panelEncryption.saveParams);
     } else {
         crushFTP.UI.growl("No changes made", "", false, 3000);
     }

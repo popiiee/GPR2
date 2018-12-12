@@ -8,7 +8,6 @@ panelTunnels.localization = {};
 
 // Panel details
 var panelName = "Tunnels";
-panelTunnels._panel = $("#pnl" + panelName);
 
 // Localizations
 panelTunnels.localization = {

@@ -15,7 +15,7 @@
 
     <script type="text/javascript" src="/WebInterface/jQuery/js/h5utils.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.4.1.min.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jQueryRotate.2.2.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery-ui-1.12/jquery-ui.min.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.dragout.js"></script>
@@ -842,6 +842,7 @@
                   <ul>
                     <li><a href="#preferences"><span class="ui-icon ui-icon-gear"></span> <span id="UserOptionsWindowHeaderText">Preferences</span></a></li>
                     <li class="changePasswordPanel"><a href="#changePassword"><span class="ui-icon ui-icon-key"></span> <span id="UserOptionsWindowChangePasswordHeaderText">Change Password</span></a></li>
+                    <li class="twofactorAuthPanel"><a href="#twofactorAuth"><span class="ui-icon ui-icon-locked"></span> <span id="UserOptionsWindow2faHeaderText">Setup 2 factor auth</span></a></li>
                   </ul>
                   <div id="preferences">
                     <div class="buttonPanel">
@@ -876,6 +877,13 @@
                             <label for="autoAppletFlag" id="UserOptionsWindowLoadJavaAppletLabelText">When loading the interface, load the Java applet.</label>
                             <br/>
                         </span>
+                        <span id="userOptionDisableWaveform">
+                            <input type="checkbox" id="disableWaveform"
+                                name="disableWaveform" />
+                            <label for="disableWaveform" id="UserOptionsWindowDisableWaveformLabelText">
+                                Disable inline audio playback</label>
+                            <br />
+                        </span>
                     </div>
                     <div style="text-align:right;margin-top:10px;padding-top:10px;border-top: 1px solid #eee;">
                         <!-- <input id="btnSaveUserOptions" onclick="saveUserOptions(true);" class="UserOptionsWindowCancelButtonText" value="Cancel" type="button" /> -->
@@ -907,6 +915,17 @@
                             </div>
                         </div>
                     </div>
+                  </div>
+                  <div id="twofactorAuth" class="twofactorAuthPanel">
+                        <div id="qrCodePanel">
+                        </div>
+                        <div class="setup-button">
+                            <button id="btnSetup2FA" class="UserOptionsWindowSetup2FAButtonText">Setup</button>
+                        </div>
+                        <div class="action-button">
+                            <a id="btnSetup2FACancel" class="UserOptionsWindowSetup2FAButtonText" href="#">Cancel</a>
+                            <button id="btnSetup2FAConfirm" class="UserOptionsWindowSetup2FAButtonText">Confirm</button>
+                        </div>
                   </div>
                 </div>
     		</div>
@@ -1021,7 +1040,7 @@
                 </h2>
                 <div class="buttonPanel">
                     <hr />
-                    <textarea style="width: 99%" id="txtFileContent" rows="100"></textarea>
+                    <textarea style="width: 99%;height: calc(100vh - 200px);min-height: 100px;" id="txtFileContent"></textarea>
                     <div style="clear:both;margin:10px;"></div>
                     <a class="button cancel" href="javascript:void(0);"><span id="KeywordsWindowCancelLinkText">Cancel</span></a>
                     <a class="button update" href="javascript:void(0);"><span id="KeywordsWindowUpdateLinkText">Update</span></a>
@@ -1365,6 +1384,8 @@
             <div id="manageSyncPanel" style="padding: 0px;marging:0px;">
             </div>
             <div id="manageSharesPanel" style="padding: 0px;marging:0px;">
+            </div>
+            <div id="editFilePopup" style="padding: 0px;marging:0px;">
             </div>
             <div id="revisionsDialog" style="padding: 0px;marging:0px;">
             </div>

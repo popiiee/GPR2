@@ -46,6 +46,7 @@ window.unsafechars = ":";
 
 $(document).ready(function() {
     if (!window.isInitComplete) {
+        localStorage.removeItem("loginTime");
         if (typeof window.localizations == "undefined")
             window.localizations = {};
         window.localizations = $.extend({}, defaultStrings, window.localizations);
@@ -589,6 +590,7 @@ function doLogin(e) {
     $("#loginWheel").show();
     $("#btnLogin").addClass('disabled');
     $.growlUI("", L("AuthenticatingMsgText"), 5000, "", false);
+    localStorage.setItem("loginTime", new Date().getTime());
 }
 
 function doLogin2(e) {
@@ -751,6 +753,7 @@ function doLogin2(e) {
                     window.location = link;
                     return false;
                 }
+                localStorage.setItem("loginTime", new Date().getTime());
                 success_login = true;
             } else if (response == "password_expired") {
                 $("#login").show();

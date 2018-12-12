@@ -386,6 +386,7 @@ localizations.UserOptionsWindowHideCheckboxLabelText = "Hide Checkbox Column ";
 localizations.UserOptionsWindowHideFilterLabelText = "Hide Filter Section ";
 localizations.UserOptionsWindowAutostartUploadLabelText = "When choosing file to upload, auto start upload. ";
 localizations.UserOptionsWindowLoadJavaAppletLabelText = "When loading the interface, load the Java applet.";
+localizations.UserOptionsWindowDisableWaveformLabelText = "Disable inline audio playback";
 localizations.UserOptionsWindowDisableCompressionLabelText = "Disable compression on the Java applet. ";
 localizations.UserOptionsWindowChangePasswordHeaderText = "Change your password ";
 localizations.UserOptionsWindowChangePasswordCurPassLabelText = "Current Password: ";

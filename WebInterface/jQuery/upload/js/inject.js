@@ -353,6 +353,13 @@ $(function() {
     }
 
     window.uploadNotifications = function(type){
+        var _files = [];
+        var files = type.files || [];
+        for (var i = 0; i < files.length; i++) {
+            var curFile = files[i];
+            _files.push(curFile.uploading_to + " Size: " + curFile.size);
+        }
+        userAudit.log(type.type + ": " + _files.join(","));
         if(window.parent.postMessage){
             window.parent.postMessage(type, "*");
         }

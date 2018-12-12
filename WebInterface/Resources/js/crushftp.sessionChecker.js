@@ -152,6 +152,7 @@
 					remaining = secs + " " + secondsLabel;
 				}
 			}
+			window.sessionRemaining = remaining;
 			return remaining;
 		}
 

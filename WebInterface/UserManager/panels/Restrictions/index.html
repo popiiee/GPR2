@@ -18,7 +18,7 @@
 				<fieldset class="ui-widget-content nobg">
 					<legend class="collapseHandle pointer"></legend>
 					<div class="dataDiv">
-						<fieldset class="ui-widget-content nobg" filterKeywords="restrictions account expires delete date" pnlId="restrictions1">
+						<fieldset class="ui-widget-content nobg" filterKeywords="restrictions account expires delete date" pnlId="restrictions1" config="account_expire">
 							<table quickLocate="Account Expiration">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg expiration_pnl">
@@ -66,7 +66,29 @@
 												<tr>
 													<td>
 														<label for="account_expire_rolling_days">Extend expiration if used every x days : </label>
-														<input  class="validate" valtype="float" type="text" id="account_expire_rolling_days" />
+														<input class="validate smallInputBox" valtype="float" type="text" id="account_expire_rolling_days" />
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<label for="account_expire_advance_days_notify">How many days in advance to notify user of account expiration?</label>
+														<input class="validate smallInputBox" valtype="float" type="text" id="account_expire_advance_days_notify" />
+													</td>
+												</tr>
+												<tr class="adminOnly">
+													<td style="padding:5px 0px;">
+														<div id="expirationTask" class="subPanel ui-widget-content leftborder nobg" style="padding-top: 10px;">
+															<label for="account_expire_notify_task">Execute CrushTask to notify about account expiration</label>
+															<select id="account_expire_notify_task" name="account_expire_notify_task" style="width:145px;">
+																<option value="">Please select</option>
+															</select>
+															<span class="ui-state-highlight ui-corner-all" style="padding:3px;display:inline-block;margin:-3px 3px;position:absolute;margin-top:-8px;">
+																<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+																<span class="">
+																	You can add tasks from <a href="/WebInterface/Preferences/index.html" target="_blank" style="text-decoration: underline;">Preferences</a> -> Plugins -> CrushTask
+																</span>
+															</span>
+														</div>
 													</td>
 												</tr>
 											</table>
@@ -75,40 +97,68 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="expire password days" pnlId="restrictions2">
+						<fieldset class="ui-widget-content nobg" filterKeywords="expire password days" pnlId="restrictions2" config="expire_password_days">
 							<table  quickLocate="Password Expiration">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
 										<input type="checkbox" />
 									</td>
 									<td class="settingsArea">
-										<div class="fields">
-											<div>
-												<input type="checkbox" id="expire_password" />
-												<label for="expire_password">Expire Password.</label>
-											</div>
-											<div class="safari-notop">
-												<label for="expire_password_days">Days </label>
-												<input  class="validate" valtype="float" type="text" id="expire_password_days" />
-												<a id="btnExpireNow" href="javascript:void(0);" class="button">
-													<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-key"></span>
-													<span class="">
-														Expire now
-													</span>
-												</a>
-											</div>
-											<div>
-												<label for="expire_password_when" style="top:0px;">
-													Password will expire on :
-												</label>
-												<span class="liveData" id="expire_password_when"></span>
-											</div>
-										</div>
+										<table>
+											<tr>
+												<td>
+													<input type="checkbox" id="expire_password" />
+													<label for="expire_password">Expire Password.</label>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<label for="expire_password_days">Days </label>
+													<input  class="validate" valtype="float" type="text" id="expire_password_days" />
+													<a id="btnExpireNow" href="javascript:void(0);" class="button">
+														<span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-key"></span>
+														<span class="">
+															Expire now
+														</span>
+													</a>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<label for="expire_password_when" style="top:0px;">
+														Password will expire on :
+													</label>
+													<span class="liveData" id="expire_password_when"></span>
+												</td>
+											</tr>
+											<tr>
+												<td style="padding-top: 10px;">
+													<label for="password_expire_advance_days_notify">How many days in advance to notify user of password expiration?</label>
+													<input class="validate smallInputBox" valtype="float" type="text" id="password_expire_advance_days_notify" />
+												</td>
+											</tr>
+											<tr class="adminOnly">
+												<td style="padding:5px 0px;">
+													<div id="expirationTask" class="subPanel ui-widget-content leftborder nobg" style="padding-top: 10px;">
+														<label for="password_expire_notify_task">Execute CrushTask to notify about password expiration</label>
+														<select id="password_expire_notify_task" name="password_expire_notify_task" style="width:145px;">
+															<option value="">Please select</option>
+														</select>
+														<span class="ui-state-highlight ui-corner-all" style="padding:3px;display:inline-block;margin:-3px 3px;position:absolute;margin-top:-8px;">
+															<span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+															<span class="">
+																You can add tasks from <a href="/WebInterface/Preferences/index.html" target="_blank" style="text-decoration: underline;">Preferences</a> -> Plugins -> CrushTask
+															</span>
+														</span>
+													</div>
+												</td>
+											</tr>
+										</table>
 									</td>
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="maximum logins simultaneous concurrent" pnlId="restrictions3">
+						<fieldset class="ui-widget-content nobg" filterKeywords="maximum logins simultaneous concurrent" pnlId="restrictions3" config="max_logins">
 							<table quickLocate="Max Simultaneous Login">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -124,7 +174,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="attempts logins block disable account failure" pnlId="restrictions16">
+						<fieldset class="ui-widget-content nobg" filterKeywords="attempts logins block disable account failure" pnlId="restrictions16" config="failure_count_max">
 							<table quickLocate="Disable account after too many login attempts">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -156,7 +206,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="maximum logins ip unique kick oldest session" pnlId="restrictions4">
+						<fieldset class="ui-widget-content nobg" filterKeywords="maximum logins ip unique kick oldest session" pnlId="restrictions4" config="max_logins_ip">
 							<table quickLocate="Max Logins Per IP">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -177,7 +227,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="ignore maximum logins connections" pnlId="restrictions5">
+						<fieldset class="ui-widget-content nobg" filterKeywords="ignore maximum logins connections" pnlId="restrictions5" config="ignore_max_logins">
 							<table quickLocate="Ignore Server's Max Connections and Always Allow Login">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -193,7 +243,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="day of week connect" pnlId="restrictions6">
+						<fieldset class="ui-widget-content nobg" filterKeywords="day of week connect" pnlId="restrictions6" config="day_of_week_allow">
 							<table quickLocate="Allow User to Connect to These Days">
 								<tr>
 									<td id="allowedConnectionDaysCheck" propertyType="panelRestrictions:AllowedDays" class="checkboxArea ui-widget-content rightborder nobg specialProperty">
@@ -236,7 +286,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="hours of day" pnlId="restrictions7">
+						<fieldset class="ui-widget-content nobg" filterKeywords="hours of day" pnlId="restrictions7" config="hours_of_day">
 							<table quickLocate="Hours of the day a user may connect">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -251,7 +301,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="share sharing usershare" pnlId="restrictions8">
+						<fieldset class="ui-widget-content nobg" filterKeywords="share sharing usershare" pnlId="restrictions8" config="allow_user_shares">
 							<table quickLocate="Allow receiving of shared items from other users">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -266,7 +316,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="ip restrictions banning restricted limit allow deny starting ending" pnlId="restrictions9">
+						<fieldset class="ui-widget-content nobg" filterKeywords="ip restrictions banning restricted limit allow deny starting ending" pnlId="restrictions9" config="ip_restrictions">
 							<table quickLocate="IP Restrictions">
 								<tr>
 									<td id="ipRestrictionsCheck" propertyType="panelRestrictions:IPRestrictions" class="checkboxArea ui-widget-content rightborder nobg specialProperty">
@@ -320,7 +370,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="allowed protocols https sftp webdav max connections ftps" pnlId="restrictions10">
+						<fieldset class="ui-widget-content nobg" filterKeywords="allowed protocols https sftp webdav max connections ftps" pnlId="restrictions10" config="CONNECTIONS_PER_PROTOCOL">
 							<table quickLocate="Max connections per protocol">
 								<tr>
 									<td id="connectionsPerProtocolCheck" propertyType="panelRestrictions:ConnectionsPerProtocol" class="checkboxArea ui-widget-content rightborder nobg specialProperty">
@@ -383,7 +433,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="require encryption FTPS" pnlId="restrictions11">
+						<fieldset class="ui-widget-content nobg" filterKeywords="require encryption FTPS" pnlId="restrictions11" config="require_encryption">
 							<table quickLocate="Require encryption?">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -393,7 +443,7 @@
 										<div class="fields">
 											<input type="checkbox" id="require_encryption" />
 											<label for="require_encryption">
-												Require encryption?</label><div style="clear: both;">
+												Require encryption ?</label><div style="clear: both;">
 												</div>
 											(Only applies to FTPS since FTPS can change from clear text to encryption... the
 											connection has been made. You may allow some accounts like anon... to be clear,
@@ -403,7 +453,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="ssh public private key sftp trusted" pnlId="restrictions12">
+						<fieldset class="ui-widget-content nobg" filterKeywords="ssh public private key sftp trusted" pnlId="restrictions12" config="ssh_public_keys">
 							<table quickLocate="List of paths to trusted public SSH key files">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -438,7 +488,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="ssh public private key sftp trusted password" pnlId="restrictions13">
+						<fieldset class="ui-widget-content nobg" filterKeywords="ssh public private key sftp trusted password" pnlId="restrictions13" config="publickey_password">
 							<table quickLocate="Require public key and password for authentication">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -521,7 +571,7 @@
 								</tr>
 							</table>
 						</fieldset-->
-						<fieldset class="ui-widget-content nobg" filterKeywords="file encryption key decrypt pgp private public" pnlId="restrictions14">
+						<fieldset class="ui-widget-content nobg" filterKeywords="file encryption key decrypt pgp private public" pnlId="restrictions14" config="PGP_SETUP">
 							<table quickLocate="PGP Key Setup">
 								<tr>
 									<td class="checkboxArea ui-widget-content rightborder nobg">
@@ -689,7 +739,7 @@
 								</tr>
 							</table>
 						</fieldset>
-						<fieldset class="ui-widget-content nobg" filterKeywords="content block zip aes rar byte" pnlId="restrictions15">
+						<fieldset class="ui-widget-content nobg" filterKeywords="content block zip aes rar byte" pnlId="restrictions15" config="content_restriction">
 							<table quickLocate="Content Restriction">
 								<tr>
 									<td id="extensionBlockCheck" propertyType="panelRestrictions:extensionBlockRules" class="checkboxArea ui-widget-content rightborder nobg specialProperty">

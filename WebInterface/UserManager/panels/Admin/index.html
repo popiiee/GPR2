@@ -16,10 +16,10 @@
         </tr>
         <tr>
             <td class="customForm nobg">
-                <fieldset class="ui-widget-content nobg">
+                <fieldset class="ui-widget-content nobg" config="SITE">
                     <legend class="collapseHandle pointer"></legend>
                     <div class="dataDiv">
-                        <fieldset class="ui-widget-content nobg" filterKeywords="admin site kick ban zip chown chgrp chmod email password remote admin user sub delegate" pnlId="admin1">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="admin site kick ban zip chown chgrp chmod email password remote admin user sub delegate" pnlId="admin1" config="SITE">
                             <table quickLocate="Admin preferences">
                                 <tr>
                                     <td id="sitePrefsCheck" propertyType="panelAdmin:SitePrefs" class="checkboxArea ui-widget-content rightborder nobg extraFields">
@@ -118,16 +118,22 @@
                                                 </span>
                                                 <div style="clear: both;"></div>
                                             </div>
-                                            <input type="checkbox" id="connect" class="ignoreBind siteField" />
-                                            <label for="connect">
-                                                Remote Server Administration (Everything)</label>
-                                            <div style="clear: both;height:10px;">
-                                            </div>
                                             <div>
+                                                <input type="checkbox" id="connect" class="ignoreBind siteField" />
+                                                <label for="connect">
+                                                    Remote Server Administration (Everything)</label>
+                                            </div>
+                                            <div style="margin-top: 10px;">
                                                 <a id="limitedUserRoles" href="javascript:void(0);" class="button">
                                                     <span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-locked"></span>
                                                     <span class="">
                                                         Setup Roles
+                                                    </span>
+                                                </a>
+                                                <a id="adminUserPermissions" href="javascript:void(0);" class="button" style="margin-left: 6px;">
+                                                    <span style="display:inline-block;margin:0px 3px 0px -7px;float:left;" class="pointer ui-icon ui-icon-person"></span>
+                                                    <span class="">
+                                                        Setup Permissions (limited admin only)
                                                     </span>
                                                 </a>
                                             </div>
@@ -276,7 +282,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="limited admin group sub delegate" pnlId="admin2">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="limited admin group sub delegate" pnlId="admin2" config="admin_group_name">
                             <table quickLocate="User can administer group named">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -291,7 +297,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="unsafe password characters" pnlId="admin3">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="unsafe password characters" pnlId="admin3" config="unsafe_password_chars">
                             <table quickLocate="Unsafe Password Characters">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -306,7 +312,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="number of characters for random passwords" pnlId="admin4">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="number of characters for random passwords" pnlId="admin4" config="random_password_length">
                             <table quickLocate="Number of characters for random passwords">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -321,7 +327,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="new password minimum length" pnlId="admin5">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="new password minimum length" pnlId="admin5" config="min_password_length">
                             <table quickLocate="New password minimum length">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -336,7 +342,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password numeric characters" pnlId="admin6">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password numeric characters" pnlId="admin6" config="min_password_numbers">
                             <table quickLocate="Minimum numeric characters">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -351,7 +357,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password lower case characters" pnlId="admin7">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password lower case characters" pnlId="admin7" config="min_password_lowers">
                             <table quickLocate="Minimum lower case characters">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -366,7 +372,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password upper case characters" pnlId="admin8">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password upper case characters" pnlId="admin8" config="min_password_uppers">
                             <table quickLocate="Minimum upper case characters">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -381,7 +387,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password special characters" pnlId="admin9">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="minimum password special characters" pnlId="admin9" config="min_password_specials">
                             <table quickLocate="Minimum special characters">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -396,7 +402,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-widget-content nobg" filterKeywords="password history count" pnlId="admin10">
+                        <fieldset class="ui-widget-content nobg" filterKeywords="password history count" pnlId="admin10" config="password_history_count">
                             <table quickLocate="Password history count">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -416,4 +422,17 @@
             </td>
         </tr>
     </table>
+    <div id="user-roles">
+        <div class="filters">
+            <label>Filter: <input type="text" id="userRolesFilter" placeholder="Enter phrase to filter"></label>
+            <span class="select-items">Select <a href="#" class="selectAll">All</a> | <a href="#" class="selectNone">None</a> | <a href="#" class="selectInverse">Inverse</a></span>
+        </div>
+        <span class="ui-state-highlight ui-corner-all warning" style="padding:3px;display:inline-block;margin:0px 3px;width: 98%">
+            <span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>
+            <span class="">
+                <strong>If nothing is selected it will allow modifying all items.</strong>
+            </span>
+        </span>
+        <div class="panel"></div>
+    </div>
 </div>

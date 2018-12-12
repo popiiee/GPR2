@@ -25,8 +25,41 @@ localizations.panels[panelDashboard.panelName] = $.extend(panelDashboard.localiz
 
 // Interface methods
 panelDashboard.init = function(){
+	panelDashboard.showHistoricData(false);
 	applyLocalizations(panelDashboard.panelName, localizations.panels);
 	panelDashboard.bindEvents();
+}
+
+panelDashboard.showHistoricData = function(date){
+	var dashboardStatus = $('#dashboardStatus');
+	if(!date){
+		panelDashboard.isLive = true;
+		delete panelDashboard.loadedDate;
+		dashboardStatus.addClass('online');
+		dashboardStatus.find(".next").addClass('disabled');
+		dashboardStatus.find(".prev").removeClass('disabled');
+		return false;
+	}
+	panelDashboard.loadedDate = date;
+	dashboardStatus.removeClass('online');
+	var dt = moment(date,"YYMMDD HHmm");
+	dashboardStatus.find('.date > .value').text(dt.format("YYYY-MM-DD HH:mm"));
+	dt = dt.add(5, 'minutes');
+	var curDate = moment();
+	if(dt.isAfter(curDate) || dt.isSame(curDate)){
+		dashboardStatus.find(".next").addClass('disabled');
+	}
+	else{
+		dashboardStatus.find(".next").removeClass('disabled');
+	}
+	dt = dt.subtract(10, 'minutes');
+	if(dt.isAfter(panelDashboard.lastSnapshotDate) || dt.isSame(panelDashboard.lastSnapshotDate)){
+		dashboardStatus.find(".prev").removeClass('disabled');
+	}
+	else{
+		dashboardStatus.find(".prev").addClass('disabled');
+	}
+	panelDashboard.isLive = false;
 }
 
 panelDashboard.bindEvents = function(){
@@ -47,6 +80,100 @@ panelDashboard.bindEvents = function(){
 		evt.preventDefault();
 		return false;
 	});
+
+	$("#changeSnapshotTime").datetimepicker({
+        timeFormat: 'hh:mm',
+        dateFormat : 'ymmdd',
+        showOn: "both",
+        buttonImage: "/WebInterface/Resources/images/calendar.png",
+        buttonImageOnly: true,
+        maxDate: new Date(),
+        stepMinute: 5,
+        onClose: function(date){
+        	panelDashboard.gethistoricalData(date);
+        }
+    });
+    var dashboardStatus = $('#dashboardStatus');
+    dashboardStatus.find(".cancel").click(function(){
+    	panelDashboard.showHistoricData(false);
+    	crushFTP.methods.removeTextRangeSelection();
+    	return false;
+    });
+
+    dashboardStatus.find(".prev, .next").click(function(){
+    	var curTime = moment();
+    	var minute = curTime.minute();
+    	var closest = Math.round(minute/5)*5;
+    	curTime.minute(closest);
+    	var useDate = panelDashboard.loadedDate || curTime;
+    	if($(this).hasClass('disabled'))
+    		return false;
+    	if(useDate){
+    		var dt = panelDashboard.loadedDate ? moment(panelDashboard.loadedDate, "YYMMDD HHmm") : useDate;
+    		if($(this).is(".prev")){
+    			dt = dt.subtract(5, 'minutes');
+    		}
+    		else if($(this).is(".next")){
+    			dt = dt.add(5, 'minutes');
+    			var curDate = moment();
+    			if(dt.isSame(curDate) || dt.isAfter(curDate)){
+    				panelDashboard.showHistoricData(false);
+    				crushFTP.methods.removeTextRangeSelection();
+    				return false;
+    			}
+    		}
+    		panelDashboard.gethistoricalData(dt.format("YYMMDD HHmm"));
+    	}
+    	crushFTP.methods.removeTextRangeSelection();
+    	return false;
+    });
+    $('#lastSnapshotTime').click(function(){
+    	if($(this).attr("date")){
+    		panelDashboard.gethistoricalData($(this).attr("date"));
+    	}
+    	crushFTP.methods.removeTextRangeSelection();
+    	return false;
+    })
+}
+
+panelDashboard.gethistoricalData = function(date){
+	if(!date){
+		panelDashboard.showHistoricData(false);
+		return;
+	}
+	var dt = date.split(" ")[0];
+	var tm = date.split(" ")[1].split(":").join("");
+	if(dt && tm){
+		var loadedDate = panelDashboard.loadedDate ? panelDashboard.loadedDate + "" : "";
+		panelDashboard.showHistoricData(date);
+		crushFTP.data.serverRequest({
+			command: "getDashboardHistory",
+			history_date: dt,
+			history_time: tm
+		},
+		function(data){
+			var xml = data.getElementsByTagName("result_value")[0];
+			var status = $(data).find("response_status").text();
+			if(status.toLowerCase() === "ok"){
+				var items = $.xml2json(xml);
+				$('[_id="connected_users"]', '#speedInformation').text("-");
+				panelDashboard.bindData(items.getDashboardItems, xml.getElementsByTagName("getDashboardItems")[0]);
+				var statInfo = $.xml2json($.xml2json(xml.getElementsByTagName("getStatHistory")[0]));
+				if(statInfo){
+					panelGraphs.bindGraphsData(statInfo, true);
+				}
+			}
+			else{
+				// if(!loadedDate){
+				// 	panelDashboard.showHistoricData(false);
+				// }
+				// else{
+				// 	panelDashboard.showHistoricData(loadedDate);
+				// }
+				crushFTP.UI.growl("Failure", status, true, 3000);
+			}
+		});
+	}
 }
 
 panelDashboard.serverStatResetAction = function(action)
@@ -126,11 +253,15 @@ panelDashboard.bindData  = function(items, xml){
         {
         	for (var i = 0; i < drives.length; i++) {
         		var curData = drives[i];
-        		drivespaceAlerts.append('<li class="ui-widget-content bottomborder nobg" style="padding:3px;"><div class="ui-priority-primary wrapword" style="margin:0px 5px 0px 0px;float:left;max-width:80px;font-size:11px;">'+curData.name+'</div><div style="float:right;">'+ curData.val +'</div><div style="clear:both;"></div></li>');
+        		drivespaceAlerts.append('<li class="ui-widget-content bottomborder nobg" style="padding:3px;"><div class="ui-priority-primary wrapword" style="margin:0px 5px 0px 0px;float:left;max-width:190px;font-size:11px;">'+curData.name+'</div><div style="float:right;">'+ curData.val +'</div><div style="clear:both;"></div></li>');
         	};
         }
         else
         	drivespaceAlerts.append('<li style="text-align:center;">Nothing to show</li>');
+	}
+	else{
+		var drivespaceAlerts = $("#drivespaceAlerts", panelDashboard._panel).empty();
+		drivespaceAlerts.append('<li style="text-align:center;">Nothing to show</li>');
 	}
 	if($(xml).find("recent_hammering").length>0)
 	{
@@ -154,6 +285,10 @@ panelDashboard.bindData  = function(items, xml){
         else
         	hammeringAlerts.append('<li style="text-align:center;">Nothing to show</li>');
 	}
+	else{
+		var hammeringAlerts = $("#hammeringAlerts", panelDashboard._panel).empty();
+		hammeringAlerts.append('<li style="text-align:center;">Nothing to show</li>');
+	}
 	if($(xml).find("last_logins_subitem").length>0)
 	{
 		var logins = [];
@@ -170,6 +305,10 @@ panelDashboard.bindData  = function(items, xml){
         }
         else
         	lastLogins.append('Nothing to show');
+	}
+	else{
+		var lastLogins = $("#lastLogins", panelDashboard._panel).empty();
+		lastLogins.append('Nothing to show');
 	}
 	items.connected_users = 0;
 	if($(xml).find("connected_users").length>0)
@@ -226,11 +365,11 @@ panelDashboard.bindData  = function(items, xml){
 	        }
 	    }
 	});
-
 	adminPanel.data.bindValuesFromJson(panelDashboard._panel, items, "_id");
 	if ($(document).data("crushftp_enterprise"))
 	{
 		var serverInfo = crushFTP.storage("serverInfo");
+		serverInfo.connected_users = items.connected_users;
 		adminPanel.data.bindValuesFromJson(panelDashboard._panel, serverInfo, "_id");
 		$(".replication-info", panelDashboard._panel).show();
 	}
@@ -401,6 +540,7 @@ panelDashboard.bindData  = function(items, xml){
 			}
 		}
 	});
+
 	if(!$("#totalJobs", panelDashboard._panel).attr("dataFetched")){
 		crushFTP.data.serverRequest({
 			command: "getJob",
@@ -421,6 +561,25 @@ panelDashboard.bindData  = function(items, xml){
 						total = jobSummary.result_value.result_value_subitem.length;
 					}
 					$("#totalJobs", panelDashboard._panel).attr("dataFetched","true").text(total);
+				}
+			}
+		});
+		crushFTP.data.serverRequest({
+			command: "getDashboardHistory"
+		},
+		function(data){
+			if(data.getElementsByTagName("response_data") && data.getElementsByTagName("response_data").length > 0)
+			{
+				data = data.getElementsByTagName("response_data")[0];
+				var dashboardHistory = $.xml2json(data);
+				if(dashboardHistory && dashboardHistory.result_value){
+					var result_value = dashboardHistory.result_value;
+					var lastSnapshotTime = $('#lastSnapshotTime');
+					lastSnapshotTime.attr("date", result_value.history_date+' '+result_value.history_time);
+					var dateTime = moment(result_value.history_date+''+result_value.history_time,"YYMMDDHHmm");
+					panelDashboard.lastSnapshotDate = dateTime;
+					lastSnapshotTime.text(dateTime.format("YYYY-MM-DD hh:mm A"))
+					$("#changeSnapshotTime").datetimepicker("option", "minDate", dateTime.toDate());
 				}
 			}
 		});

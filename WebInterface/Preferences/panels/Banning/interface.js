@@ -52,6 +52,7 @@ panelBanning.init = function() {
     crushFTP.methods.setPageTitle(panelBanning.localization.Header, true);
     panelBanning.bindData();
     panelBanning.bindEvents();
+    setupPrefsReplicationSave(_panel, panelName);
 };
 
 panelBanning.bindData = function() {
@@ -59,6 +60,14 @@ panelBanning.bindData = function() {
     if(typeof prefs.max_denied_ips == "undefined")
     {
         prefs.max_denied_ips = [{text:"100"}];
+    }
+    if(typeof prefs.max_password_resets_per_minute == "undefined")
+    {
+        prefs.max_password_resets_per_minute = [{text:"10"}];
+    }
+    if(typeof prefs.max_connection_single_ip == "undefined")
+    {
+        prefs.max_connection_single_ip = [{text:"100"}];
     }
     bindValuesFromXML(_panel, prefs);
     if (prefs.ip_restrictions) {
@@ -766,12 +775,12 @@ panelBanning.saveContent = function() {
                     } else {
                         crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
                     }
-                });
+                }, panelBanning.saveParams);
             } else {
                 crushFTP.UI.hideIndicator();
                 crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
             }
-        });
+        }, panelBanning.saveParams);
     } else {
         crushFTP.UI.growl("No changes made", "", false, 3000);
     }

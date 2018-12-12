@@ -8,10 +8,7 @@ panelEvents.localization = {};
 
 // Panel details
 var panelName = "Events";
-panelEvents._panel = $("#pnl" + panelName);
-var pluginPlaceHolder = $("#pluginPlaceHolder", panelEvents._panel);
-var eventList = $("#eventList", panelEvents._panel);
-var event_action_list = $("#event_action_list", panelEvents._panel);
+var pluginPlaceHolder,eventList,event_action_list;
 
 // Localizations
 panelEvents.localization = {
@@ -22,6 +19,9 @@ localizations.panels[panelName] = $.extend(panelEvents.localization, localizatio
 
 // Interface methods
 panelEvents.init = function(){
+    pluginPlaceHolder = $("#pluginPlaceHolder", panelEvents._panel);
+    eventList = $("#eventList", panelEvents._panel);
+    event_action_list = $("#event_action_list", panelEvents._panel);
     applyLocalizations(panelName, localizations.panels);
     window.dataBindEvents.push(panelEvents.bindData);
     panelEvents.bindEvents();
@@ -192,7 +192,13 @@ panelEvents.bindPluginsList = function(panel, refresh, callback){
             {
                 addPluginName(availablePlugins[i].plugins_subitem_subitem);
             }
+            if(availablePlugins.length==0){
+                addPluginName("CrushTask");
+            }
             pluginsAvailable.append(pluginOpts);
+        }
+        else{
+            addPluginName("CrushTask");
         }
 
         var availableJobs = $(document).data("AvailableJobsNoEvents");
@@ -1584,8 +1590,10 @@ panelEvents.bindEvents = function()
     $("a#pickEmailTemplate", panelEvents._panel).click(function(){
         $("#emailTemplatesDialog").dialog("open");
         var that = $(this);
+        var editBtn = $("#emailTemplatesDialog").find("#editEmailTemplate").hide();
         userManager.afterEmailTemplate = function(name, cancel, data)
         {
+            editBtn.show();
             if(cancel)
                 return;
             else if(data)

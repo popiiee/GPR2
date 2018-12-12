@@ -17,13 +17,14 @@
         </style>
         <![endif]-->
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.2.1.min.js"></script>
+        <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.4.1.min.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.json-2.2.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery-ui-1.8.23.min.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.scrollTo-1.4.2-min.js"></script>
         <script type="text/javascript" src="js/jquery-ui-timepicker-addon.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.blockUI.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jqueryUI.forms.js"></script>
+        <script type="text/javascript" src="/WebInterface/Resources/js/jquery.UI.ComboBox.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.xml2json.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.json2xml.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.alerts.js"></script>
@@ -44,6 +45,7 @@
         <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.PickUserPopup.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.commonMethods.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.sessionChecker.js"></script>
+        <script type="text/javascript" src="/WebInterface/Resources/js/infoPopup.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.validator.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jQuery.passwordValidator.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.encryptPassword.js"></script>
@@ -54,6 +56,8 @@
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.animate-shadow.js"></script>
         <script type="text/javascript" src="/WebInterface/Resources/js/jquery.autoSuggest.js"></script>
         <script type="text/javascript" src="/WebInterface/admin/js/crushftp.adminPanel.js"></script>
+        <script type="text/javascript" src = "/WebInterface/Resources/js/crushftp.replicationSave.js"></script>
+        <script type="text/javascript" src="js/crushftp.audit.js"></script>
         <script type="text/javascript" src="js/crushftp.taskDesigner.js"></script>
         <script type="text/javascript" src="js/crushTask.defaults.js"></script>
         <script type="text/javascript" src="/WebInterface/admin/js/crushftp.telnet.inject.js"></script>
@@ -187,6 +191,10 @@
                                 </span>
                                 <span class="">Setup</span>
                             </a>
+                            <a href="#" class=" no-link" id="jobAuditTrail">
+                                <span style='display: inline-block;margin: 0px -1px -3px -9px;' class='pointer ui-icon ui-icon-calendar'></span>
+                                <span>Change Log</span>
+                            </a>
                             <a href="#" class=" no-link" id="addBreakpointsAll">
                                 <span style='display: inline-block;margin: 0px -1px -3px -9px;' class='pointer ui-icon ui-icon-flag'></span>
                                 <span>Add breakpoint to each step</span>
@@ -207,7 +215,7 @@
                                 <span style='display: inline-block;margin: 0px -1px -3px -9px;' class='pointer ui-icon ui-icon-arrowrefresh-1-w'></span>
                                 <span>Undo Paste <span class="secs"></span></span>
                             </a>
-                            <a href="#" class="button" id="saveChanges" style="float:right;margin:3px 5px 2px 0px;">
+                            <a href="#" class="button top-save-button saveJobsButton" id="saveChanges" style="float:right;margin:3px 5px 2px 0px;">
                                 <span style='display: inline-block;margin: 0px 3px 0px -10px; float: left;' class='pointer ui-icon ui-icon-disk'></span>
                                 <span>Save Changes</span>
                             </a>
@@ -325,6 +333,12 @@
                                                 Pick
                                             </span>
                                         </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <label for="job_log_name">Job log file name :</label>
+                                        <input type="text" id="schedule_job_log_name" _id="job_log_name" style="margin-bottom:5px;width:200px;" />
                                     </td>
                                 </tr>
                                 <tr>
@@ -452,6 +466,12 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td colspan="3">
+                                            <label for="job_nextRun">Starting from :</label>
+                                            <input type="text" class="excludeXML" id="nextRun" _id="job_nextRun" />
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td colspan="3" style="text-align:right;"><a style="z-index: 999;clear: both;position: relative;" href="javascript:void(0);" class="showXML">Show XML</a></td>
                                     </tr>
                                 </table>
@@ -468,131 +488,152 @@
                                 </span>
                                 <div id="existingJobsPanel" class="jobsMenuOverlay customShadow2 ui-widget ui-widget-content ui-corner-all nobg" style="width:390px;height:530px;margin:-15px 5px 0px;background-color: #fff;display: none;position:fixed;z-index:550;">
                                     <div id="availableJobsTabs" class="tabs">
-                                        <span style="cursor:pointer;top:5px;right:5px;" class="closeBtn ui-button-icon-primary ui-icon ui-icon-closethick ui-dialog-titlebar-close"></span>
+                                        <span style="cursor:pointer;top:10px;right:5px;" class="closeBtn ui-button-icon-primary ui-icon ui-icon-closethick ui-dialog-titlebar-close"></span>
+                                        <span style="cursor:pointer;top:10px;right:15px;" title="Pin job list panel" class="pinBtn off ui-button-icon-primary ui-icon  ui-icon-pin-s ui-dialog-titlebar-close"></span>
+                                        <span style="cursor:pointer;top:10px;right:15px;" title="Unpin job list panel" class="pinBtn on ui-button-icon-primary ui-icon  ui-icon-pin-w ui-dialog-titlebar-close"></span>
                                         <ul>
                                             <li>
                                                 <a href="#existingJobs">
                                                     <span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-disk">
-                                                    </span>Available Jobs</a>
-                                                    <span id="loadingJobsList" style="display:none;">
-                                                        <img src="/WebInterface/Resources/images/loading.gif" style="width:16px;height:16px;display:inline-block;z-index:9999;top:5px;left:2px;position:absolute;" />
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <a href="#activeJobs">
-                                                        <span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-calendar">
-                                                        </span>Active Jobs</a>
-                                                        <span id="loadingActiveJobs" style="display:none;">
-                                                            <img src="/WebInterface/Resources/images/loading.gif" style="width:16px;height:16px;display:inline-block;z-index:9999;top:5px;left:2px;position:absolute;" />
-                                                        </span>
-                                                    </li>
-                                                </ul>
-                                                <div id="existingJobs">
-                                                    <div class="jobsData" style="padding:0px;">
-                                                        <span class="jobsPanelButtons">
-                                                            <a href="#" class="button" id="newJobsSchedule">
-                                                                <span style='display: inline-block; margin: -1px 3px 0px -8px;float: left;' class='pointer ui-icon ui-icon-plusthick'></span>
-                                                                <span>New</span>
-                                                            </a>
-                                                            <a href="#" class="button" id="copyJobsSchedule">
-                                                                <span style='display: inline-block; margin: -1px 3px 0px -8px;float: left;' class='pointer ui-icon ui-icon-copy'></span>
-                                                                <span>Copy</span>
-                                                            </a>
-                                                            <a href="#" class="button" id="deleteJobsSchedule">
-                                                                <span style='display: inline-block; margin: -1px 3px 0px -8px; float: left;' class='pointer ui-icon ui-icon-trash'></span>
-                                                                <span class="btnDeleteText">Delete</span>
-                                                            </a>
-                                                            <a id="reloadJobsList" href="javascript:void(0);" class="button">
-                                                                <span style='display: inline-block; margin: -1px -10px 0px -7px; float: left;' class='pointer ui-icon ui-icon-refresh'></span>&nbsp;
-                                                            </a>
-                                                        </span>
-                                                        <div id="jobsScheduleListActions" class="right" style="margin: 8px 0px 8px 2px;right: 10px;position: absolute;top: 47px;">
-                                                            Select :
-                                                            <a href="#" class="selectAll">All</a> |
-                                                            <a href="#" class="deSelect">None</a>
-                                                        </div>
-                                                        <div class="clear"></div>
-                                                        <div style="margin:3px;">
-                                                            <label for="filterSchedules">Filter :</label>
-                                                            <input type="text" class="filterSchedules" style="width:235px;" id="filterSchedules" />&nbsp;
-                                                            <a href="#" class="clearSchedulesFilter" style="top: 0px;margin-left: -5px;position: relative;">Clear</a>
-                                                        </div>
-                                                        <ol class="nobg sideBarList noBorder ui-widget-content" id="jobsScheduleList" style="margin-top:3px;height:430px;overflow-x: hidden;overflow-y: auto;">
-                                                        </ol>
-                                                        <div class="clear"></div>
-                                                    </div>
+                                                    </span>Available Jobs
+                                                </a>
+                                                <span id="loadingJobsList" style="display:none;">
+                                                    <img src="/WebInterface/Resources/images/loading.gif" style="width:16px;height:16px;display:inline-block;z-index:9999;top:5px;left:2px;position:absolute;" />
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <a href="#activeJobs">
+                                                    <span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-calendar"></span>
+                                                    Active Jobs
+                                                </a>
+                                                <span id="loadingActiveJobs" style="display:none;">
+                                                    <img src="/WebInterface/Resources/images/loading.gif" style="width:16px;height:16px;display:inline-block;z-index:9999;top:5px;left:2px;position:absolute;" />
+                                                </span>
+                                            </li>
+                                        </ul>
+                                        <div id="existingJobs">
+                                            <div class="jobsData" style="padding:0px;">
+                                                <span class="jobsPanelButtons">
+                                                    <a href="#" class="button" id="newJobsSchedule">
+                                                        <span style='display: inline-block; margin: -1px 3px 0px -8px;float: left;' class='pointer ui-icon ui-icon-plusthick'></span>
+                                                        <span>New</span>
+                                                    </a>
+                                                    <a href="#" class="button" id="copyJobsSchedule">
+                                                        <span style='display: inline-block; margin: -1px 3px 0px -8px;float: left;' class='pointer ui-icon ui-icon-copy'></span>
+                                                        <span>Copy</span>
+                                                    </a>
+                                                    <a href="#" class="button" id="deleteJobsSchedule">
+                                                        <span style='display: inline-block; margin: -1px 3px 0px -8px; float: left;' class='pointer ui-icon ui-icon-trash'></span>
+                                                        <span class="btnDeleteText">Delete</span>
+                                                    </a>
+                                                    <a id="reloadJobsList" href="javascript:void(0);" class="button">
+                                                        <span style='display: inline-block; margin: -1px -10px 0px -7px; float: left;' class='pointer ui-icon ui-icon-refresh'></span>&nbsp;
+                                                    </a>
+                                                </span>
+                                                <div id="jobsScheduleListActions" class="right">
+                                                    Select :
+                                                    <a href="#" class="selectAll">All</a> |
+                                                    <a href="#" class="deSelect">None</a>
                                                 </div>
-                                                <div id="activeJobs" style="padding:0px 10px 10px 10px;">
-                                                    <div class="clear"></div>
-                                                    <div style="margin:3px;">
-                                                        <label for="filterActiveSchedules">Filter : </label>
-                                                        <input type="text" class="filterActiveSchedules" style="width:250px;" id="filterActiveSchedules" />&nbsp;&nbsp;
-                                                        <a href="#" class="clearActiveSchedulesFilter" style="top: 0px;margin-left: -5px;position: relative;">Clear</a>
-                                                    </div>
-                                                    <div style="margin:3px;">
-                                                        <label for="jobStatusFilter">Show :</label>
-                                                        <select id="jobStatusFilter">
-                                                            <option value="">All</option>
-                                                            <option value="running">Running</option>
-                                                            <option value="paused">Paused</option>
-                                                            <option value="completed">Completed</option>
-                                                            <option value="completed-errors">Completed-Errors</option>
-                                                            <option value="cancelled">Cancelled</option>
-                                                        </select>
-                                                        <span class="spacer"></span>
-                                                        <label for="rangeSelector">Range :</label>
-                                                        <select id="rangeSelector">
-                                                            <option value="10mins">Last 10 Minutes</option>
-                                                            <option value="hour" selected>Last Hour</option>
-                                                            <option value="today">Today</option>
-                                                            <option value="yesterday">Yesterday</option>
-                                                            <option value="last3days">Last 3 Days</option>
-                                                            <option value="week">Last 7 Days</option>
-                                                            <option value="month">Last 30 Days</option>
-                                                            <option value="custom">Custom</option>
-                                                            <option value="all">All</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="clear"></div>
-                                                    <div>
-                                                        <input type="checkbox" checked id="hideUserActiveSchedules" />&nbsp;
-                                                        <label for="hideUserActiveSchedules">Hide user event jobs?</label>
-                                                        <a id="reloadActiveJobs" href="javascript:void(0);" style="float:right;">
-                                                            <span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-refresh'></span>
-                                                            <span>Refresh</span>
-                                                        </a>
-                                                        <div class="clear"></div>
-                                                    </div>
-                                                    <div class="ui-priority-secondary" style="margin:3px 0px 3px -5px;text-align:right;font-size:11px;">
-                                                        <span style="float:left;">Updated at : <span id="lastJobListUpdatedTimestamp"></span></span>
-                                                        <span id="lastJobListUpdatedRange"></span>
-                                                    </div>
-                                                    <div class="clear"></div>
-                                                    <div id="jobsActiveScheduleListActions" style="font-size: 11px;margin: 6px 0px 0px -8px;right: 10px;">
-                                                        <a href="#" class="selectAll">All</a> |
-                                                        <a href="#" class="selectRunning">Running</a> |
-                                                        <a href="#" class="selectPaused">Paused</a> |
-                                                        <a href="#" class="selectCompleted">Completed</a> |
-                                                        <a href="#" class="selectWithError">With Error</a> |
-                                                        <a href="#" class="selectCancelled">Cancelled</a> |
-                                                        <a href="#" class="deSelect">None</a> |
-                                                        <span style="float:right;margin-right:3px;" class="pointer" id="batchActions">
-                                                            <span style="display: inline-block;margin-top: -2px;float: left;" class='pointer ui-icon ui-icon-gear'></span> Action
-                                                        </span>
-                                                    </div>
-                                                    <div class="clear"></div>
-                                                    <ol class="nobg sideBarList noBorder ui-widget-content" id="activeScheduleList" style="margin-top:3px;height:430px;overflow-x: hidden;overflow-y: auto;">
-                                                    </ol>
-                                                    <div class="clear"></div>
+                                                <div class="clear"></div>
+                                                <div style="margin:10px 3px 6px 3px;">
+                                                    <label for="filterSchedules">Filter :</label>
+                                                    <input type="text" class="filterSchedules" style="width:280px;" id="filterSchedules" />&nbsp;
+                                                    <a href="#" class="clearSchedulesFilter" style="top: 0px;margin-left: 0px;position: relative;">Clear</a>
                                                 </div>
+                                                <div>
+                                                    <label for="sortJobs">Sort by:</label>
+                                                    <select name="sort-jobs" id="sortJobs" style="width: 180px">
+                                                        <option default value="name_ascending">Name ascending</option>
+                                                        <option value="name_descending">Name descending</option>
+                                                        <option value="created_ascending">Created ascending</option>
+                                                        <option value="created_descending">Created descending</option>
+                                                        <option value="modified_ascending">Modified ascending</option>
+                                                        <option value="modified_descending">Modified descending</option>
+                                                    </select>
+                                                    <input type="checkbox" checked id="sortFoldersFirst" />
+                                                    <label for="sortFoldersFirst">Folders on top?</label>
+                                                </div>
+                                                <div class="ui-widget path-selector">
+                                                    <select name="path-selector" id="jobFolders" _width="100">
+                                                        <option>/</option>
+                                                    </select>
+                                                </div>
+                                                <div class="back-button">
+                                                </div>
+                                                <ol class="nobg sideBarList noBorder ui-widget-content" id="jobsScheduleList" style="margin-top:3px;height:430px;overflow-x: hidden;overflow-y: auto;">
+                                                </ol>
+                                                <div class="clear"></div>
                                             </div>
-                                            <!--div style="padding:3px;margin:1px;" class="ui-widget-header ui-corner-all">Existing Jobs
-                                                                    <span style="cursor:pointer;top:0px;right:-2px;" class="closeBtn ui-button-icon-primary ui-icon ui-icon-closethick ui-dialog-titlebar-close"></span>
-                                        </div-->
+                                        </div>
+                                        <div id="activeJobs" style="padding:0px;">
+                                            <div class="clear"></div>
+                                            <div style="margin:3px;">
+                                                <label for="filterActiveSchedules">Filter : </label>
+                                                <input type="text" class="filterActiveSchedules" style="width:250px;" id="filterActiveSchedules" />&nbsp;&nbsp;
+                                                <a href="#" class="clearActiveSchedulesFilter" style="top: 0px;margin-left: -5px;position: relative;">Clear</a>
+                                            </div>
+                                            <div style="margin:3px;">
+                                                <label for="jobStatusFilter">Show :</label>
+                                                <select id="jobStatusFilter">
+                                                    <option value="">All</option>
+                                                    <option value="running">Running</option>
+                                                    <option value="paused">Paused</option>
+                                                    <option value="completed">Completed</option>
+                                                    <option value="completed-errors">Completed-Errors</option>
+                                                    <option value="cancelled">Cancelled</option>
+                                                </select>
+                                                <span class="spacer"></span>
+                                                <label for="rangeSelector">Range :</label>
+                                                <select id="rangeSelector">
+                                                    <option value="10mins">Last 10 Minutes</option>
+                                                    <option value="hour" selected>Last Hour</option>
+                                                    <option value="today">Today</option>
+                                                    <option value="yesterday">Yesterday</option>
+                                                    <option value="last3days">Last 3 Days</option>
+                                                    <option value="week">Last 7 Days</option>
+                                                    <option value="month">Last 30 Days</option>
+                                                    <option value="custom">Custom</option>
+                                                    <option value="all">All</option>
+                                                </select>
+                                            </div>
+                                            <div class="clear"></div>
+                                            <div>
+                                                <input type="checkbox" checked id="hideUserActiveSchedules" />&nbsp;
+                                                <label for="hideUserActiveSchedules">Hide user event jobs?</label>
+                                                <a id="reloadActiveJobs" href="javascript:void(0);" style="float:right;">
+                                                    <span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-refresh'></span>
+                                                    <span>Refresh</span>
+                                                </a>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="ui-priority-secondary" style="margin:3px 0px 3px 5px;text-align:right;font-size:11px;">
+                                                <span style="float:left;">Updated at : <span id="lastJobListUpdatedTimestamp"></span></span>
+                                                <span id="lastJobListUpdatedRange"></span>
+                                            </div>
+                                            <div class="clear"></div>
+                                            <div id="jobsActiveScheduleListActions" style="font-size: 11px;margin: 6px 0px 0px 5px;right: 10px;">
+                                                <a href="#" class="selectAll">All</a> |
+                                                <a href="#" class="selectRunning">Running</a> |
+                                                <a href="#" class="selectPaused">Paused</a> |
+                                                <a href="#" class="selectCompleted">Completed</a> |
+                                                <a href="#" class="selectWithError">With Error</a> |
+                                                <a href="#" class="selectCancelled">Cancelled</a> |
+                                                <a href="#" class="deSelect">None</a> |
+                                                <span style="float:right;margin-right:3px;" class="pointer" id="batchActions">
+                                                    <span style="display: inline-block;margin-top: -2px;float: left;" class='pointer ui-icon ui-icon-gear'></span> Action
+                                                </span>
+                                            </div>
+                                            <div class="clear"></div>
+                                            <ol class="nobg sideBarList noBorder" id="activeScheduleList" style="margin-top:3px;height:430px;overflow-x: hidden;overflow-y: auto;">
+                                            </ol>
+                                            <div class="clear"></div>
+                                        </div>
                                     </div>
-                                    <div class="clear"></div>
                                 </div>
-                                <div id="pluginSelector" class="ui-widget-content">
+                                <div class="clear"></div>
+                            </div>
+                            <div id="pluginSelector" class="ui-widget-content">
                                 Choose the plugin to schedule : <select id="plugin"></select>
                             </div>
                             <div id="placeHolder" class="customForm designerPanel" style="margin:34px 0px 0px 0px;">
@@ -761,7 +802,7 @@
                                         <ul>
                                             <li><a href="#TaskConfig">Config</a>
                                         </li>
-                                        <li class="v9-only"><a href="#TaskNotes">Notes</a>
+                                        <li><a href="#TaskNotes">Notes</a>
                                         </li>
                                         <li><a href="#TaskVariables">Variables</a>
                                     </li>
@@ -772,7 +813,7 @@
                         </ul>
                         <div id="TaskConfig">
                         </div>
-                        <div id="TaskNotes" class="v9-only">
+                        <div id="TaskNotes">
                             <textarea id="task_notes" style="width: 100%;height: 350px;margin:20px 0px;" placeholder="Add notes for this tasks here..."></textarea>
                         </div>
                         <div id="TaskVariables">
@@ -909,7 +950,7 @@
         </div>
         <div id="footer" class="ui-widget-content" style="height:34px;">
             <div style="margin: 0px 0px; padding: 5px;">
-                <a href="#" class="button" id="saveChanges2" style="float:right;margin:-2px 2px 2px 0px;">
+                <a href="#" class="button saveJobsButton" id="saveChanges2" style="float:right;margin:-2px 2px 2px 0px;">
                     <span style='display: inline-block;margin: 0px 3px 0px -10px; float: left;' class='pointer ui-icon ui-icon-disk'></span>
                     <span>Save Changes</span>
                 </a>

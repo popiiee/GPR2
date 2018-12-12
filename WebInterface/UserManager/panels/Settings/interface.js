@@ -8,7 +8,6 @@ panelSettings.localization = {};
 
 // Panel details
 var panelName = "Settings";
-panelSettings._panel = $("#pnl" + panelName);
 
 // Localizations
 panelSettings.localization = {
@@ -84,7 +83,9 @@ panelSettings.bindData = function(userInfo, jsonDeep, panel)
 			// 		dir_max_size = 10485760;
 			// 	$("#dir_max_size", panelSettings._panel).val(dir_max_size);
 			// }
-		}catch(ex){}
+		}catch(ex){
+			console.log(ex);
+		}
 	}
 	userManager.UI.panelsPostbindEvent(dataPanel, panel);
 }

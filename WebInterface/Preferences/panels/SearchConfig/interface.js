@@ -37,6 +37,7 @@ panelSearchConfig.init = function(){
 	panelSearchConfig.bindData();
 	panelSearchConfig.bindEvents();
 	$("#browsePopupBtn", _panel).hide();
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelSearchConfig.bindData = function()
@@ -369,6 +370,7 @@ panelSearchConfig.saveContent = function()
 					crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 				}
 			}
+			, panelSearchConfig.saveParams
 		);
 	}
 	else

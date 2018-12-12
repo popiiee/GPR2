@@ -156,6 +156,8 @@
                             {
                                 dir = base.curLoadedPath;
                             }
+                            if(!dir)
+                                return false;
                             if(dir.indexOf("~")==0)
                             {
                                 if(typeof window.runAppletCommand != "undefined")
@@ -464,9 +466,12 @@
                 var ftpsOptions = $(".ftpsOptions", fieldPropertiesDialog).hide();
                 var ftpesOptions = $(".ftpesOptions", fieldPropertiesDialog).hide();
                 var s3Credentials = $(".s3Credentials", fieldPropertiesDialog).hide();
+                var glacierCredentials = $(".glacierCredentials", fieldPropertiesDialog).hide();
                 var s3CrushCredentials = $(".s3CrushCredentials", fieldPropertiesDialog).hide();
                 var noS3Options = $(".noS3Options", fieldPropertiesDialog).show();
+                var noCitrixOption = $(".noCitrixOption", fieldPropertiesDialog).show();
                 var gdriveCredentials = $(".gdriveCredentials", fieldPropertiesDialog).hide();
+                var citrixCredentials = $(".citrixCredentials", fieldPropertiesDialog).hide();
                 var HAOptions = $(".HAOptions", fieldPropertiesDialog).show();
                 var SSLOptions = $(".SSLOptions", fieldPropertiesDialog).hide();
                 var privateOptions = $(".privateOptions", fieldPropertiesDialog).hide();
@@ -503,7 +508,7 @@
                     noFileOption.hide();
                     remoteVFSItem_option_port.val("");
                 }
-                if(remoteVFSItem_option_itemType == "smb" || remoteVFSItem_option_itemType == "smb3" || remoteVFSItem_option_itemType == "rfile")
+                if(remoteVFSItem_option_itemType == "smb" || remoteVFSItem_option_itemType == "smb3" || remoteVFSItem_option_itemType == "rfile" || remoteVFSItem_option_itemType == "glacier")
                 {
                     ftpCredentials.show();
                     HAOptions.hide();
@@ -530,6 +535,9 @@
                     azureOptions.show();
                     noAzureOptions.hide();
                 }
+                if(remoteVFSItem_option_itemType == "glacier"){
+                    glacierCredentials.show();
+                }
                 if(remoteVFSItem_option_itemType == "s3" || remoteVFSItem_option_itemType == "s3crush")
                 {
                     ftpCredentials.hide();
@@ -546,6 +554,12 @@
                     ftpCredentials.hide();
                     gdriveCredentials.show();
                     remoteVFSItem_option_port.val("");
+                }
+                if(remoteVFSItem_option_itemType == "citrix")
+                {
+                    ftpCredentials.hide();
+                    noCitrixOption.hide();
+                    citrixCredentials.show();
                 }
                 if(remoteVFSItem_option_itemType == "sftp")
                 {
@@ -675,10 +689,18 @@
                 {
                     item_option_itemType.val("gdrive").trigger("change");
                 }
+                else if(lowCaseURL.indexOf("citrix") == 0)
+                {
+                    item_option_itemType.val("citrix").trigger("change");
+                }
+                else if(lowCaseURL.indexOf("glacier:") == 0)
+                {
+                    item_option_itemType.val("glacier").trigger("change");
+                }
                 try{
                     var _url = URI(url);
-                    $("#remoteVFSItem_option_user_name, #remoteVFSItem_option_secretKeyID", fieldPropertiesDialog).addClass("notextChange").val(_url.username()).removeClass("notextChange");
-                    $("#remoteVFSItem_option_password, #remoteVFSItem_option_secretKey", fieldPropertiesDialog).addClass("notextChange").val(_url.password()).removeClass("notextChange");
+                    $("#remoteVFSItem_option_user_name, #remoteVFSItem_option_secretKeyID, #remoteVFSItem_option_client_id", fieldPropertiesDialog).addClass("notextChange").val(_url.username()).removeClass("notextChange");
+                    $("#remoteVFSItem_option_password, #remoteVFSItem_option_secretKey, #remoteVFSItem_option_client_secret", fieldPropertiesDialog).addClass("notextChange").val(_url.password()).removeClass("notextChange");
 
                     if(lowCaseURL.indexOf("s3") == 0)
                     {
@@ -703,6 +725,16 @@
                         serverURL.val(hostname);
                         $("#remoteVFSItem_option_s3_bucket", fieldPropertiesDialog).val(_bucket);
                         $("#remoteVFSItem_option_s3_path", fieldPropertiesDialog).val(_path);
+                    }
+                    else if(lowCaseURL.indexOf(glacier) == 0){
+                        var hostname = _url.hostname();
+                        var serverURL = fieldPropertiesDialog.find("#remoteVFSItem_option_glacierServerURL");
+                        if(serverURL.find("option[value='"+hostname+"']").length==0){
+                            serverURL.find("option[custom]").remove();
+                            serverURL.append('<option custom="true" value="'+hostname+'"></option>');
+                            serverURL.attr("lastSelected", hostname);
+                        }
+                        serverURL.val(hostname);
                     }
                 }
                 catch(e){}
@@ -750,10 +782,21 @@
                 var sftpSelected = remoteVFSItem_option_itemType == "sftp";
                 var s3Selected = remoteVFSItem_option_itemType == "s3" || remoteVFSItem_option_itemType == "s3crush";
                 var gdriveSelected = remoteVFSItem_option_itemType == "gdrive";
+                var citrixSelected = remoteVFSItem_option_itemType == "citrix";
+                var glacierSelected = remoteVFSItem_option_itemType == "glacier";
 
-                function addUserPassToURL(url, protocol, addUP)
+                function clearURL(_url, except){
+                    var toReplace = ["s3.amazonaws.com/","google.com/","sf-api.com/","glacier.us-east-1.amazonaws.com/","file.core.windows.net/"];
+                    toReplace = toReplace.removeByVal(except);
+                    for (var i = 0; i < toReplace.length; i++) {
+                        _url = _url.replace(toReplace[i], "");
+                    }
+                    return _url;
+                }
+
+                function addUserPassToURL(url, protocol, addUP, except)
                 {
-                    url = url.replace("s3.amazonaws.com/", "").replace("google.com/", "");
+                    url = clearURL(url, except);
                     if(addUP)
                     {
                         var userName = fixChars(crushFTP.methods.decodeXML(revertFixChars($("#remoteVFSItem_option_user_name", fieldPropertiesDialog).val())));
@@ -768,12 +811,21 @@
 
                 function addUserPassToAzure(url, protocol, addUP)
                 {
-                    return addUserPassToURL(url || "file.core.windows.net/", protocol, addUP);
+                    return addUserPassToURL(url || "file.core.windows.net", protocol, addUP, "file.core.windows.net/");
+                }
+
+                function addUserPassToGlacier(url, protocol, addUP)
+                {
+                    if(url.indexOf("amazonaws.com")<0){
+                        url = "";
+                        $("#remoteVFSItem_option_host", fieldPropertiesDialog).val("glacier.us-east-1.amazonaws.com");
+                    }
+                    return addUserPassToURL(url || "glacier.us-east-1.amazonaws.com", protocol, addUP, "glacier.us-east-1.amazonaws.com/");
                 }
 
                 function addUserPassToURLGDrive(url, protocol)
                 {
-                    url = url.replace("s3.amazonaws.com/", "").replace("google.com/", "");
+                    url = url.replace("s3.amazonaws.com/", "").replace("google.com/", "").replace("sf-api.com/", "");
                     var userName = fixChars(crushFTP.methods.decodeXML(revertFixChars($("#remoteVFSItem_option_gdrive_secretKeyID", fieldPropertiesDialog).val())));
                     var pass = fixChars(crushFTP.methods.decodeXML(revertFixChars($("#remoteVFSItem_option_gdrive_secretKey", fieldPropertiesDialog).val())));
                     if(userName.length>0)
@@ -782,6 +834,21 @@
                     }
                     else
                         url = "www.google.com/" + url;
+                    return protocol + url;
+                }
+
+                function addUserPassToURLCitrix(url, protocol)
+                {
+                    fieldPropertiesDialog.find("#remoteVFSItem_option_port").val("");
+                    url = url.replace("s3.amazonaws.com/", "").replace("google.com/", "").replace("sf-api.com/", "");
+                    var userName = fixChars(crushFTP.methods.decodeXML(revertFixChars($("#remoteVFSItem_option_client_id", fieldPropertiesDialog).val())));
+                    var pass = fixChars(crushFTP.methods.decodeXML(revertFixChars($("#remoteVFSItem_option_client_secret", fieldPropertiesDialog).val())));
+                    if(userName.length>0 || pass.length>0)
+                    {
+                        url = userName + ":" + pass + "@sf-api.com/" + url;
+                    }
+                    else
+                        url = "sf-api.com/" + url;
                     return protocol + url;
                 }
 
@@ -854,7 +921,7 @@
                 else if(azureSelected)
                 {
                     remoteVFSItem_option_url.val(addUserPassToAzure(staticURL, "azure://", true)).trigger("applymask");
-                    $("#remoteVFSItem_option_host", fieldPropertiesDialog).val("file.core.windows.net/");
+                    // $("#remoteVFSItem_option_host", fieldPropertiesDialog).val("file.core.windows.net");
                 }
                 else if(ftpSelected)
                 {
@@ -888,6 +955,26 @@
                 {
                     remoteVFSItem_option_url.val(addUserPassToURL(staticURL, "SFTP://", true));
                 }
+                else if(glacierSelected)
+                {
+                    remoteVFSItem_option_url.val(addUserPassToGlacier(staticURL, "glacier://", true));
+                    var _url;
+                    try{
+                        _url = URI(curUrl);
+                    }catch(ex){
+                        _url = URI(encodeURI(curUrl));
+                    }
+                    var hostname = _url.hostname();
+                    var serverURL = fieldPropertiesDialog.find("#remoteVFSItem_option_glacierServerURL");
+                    if(serverURL.find("option[value='"+hostname+"']").length==0){
+                        serverURL.find("option[custom]").remove();
+                        serverURL.append('<option custom="true" value="'+hostname+'"></option>');
+                        serverURL.attr("lastSelected", hostname);
+                        serverURL.val(hostname);
+                    }
+                    var server = serverURL.attr("lastSelected") || "glacier.us-east-1.amazonaws.com";
+                    $("#remoteVFSItem_option_host", fieldPropertiesDialog).val(server);
+                }
                 else if(s3Selected)
                 {
                     var _url;
@@ -915,6 +1002,11 @@
                 {
                     remoteVFSItem_option_url.val(addUserPassToURLGDrive("", "gdrive://"));
                     $("#remoteVFSItem_option_host", fieldPropertiesDialog).val("www.google.com");
+                }
+                else if(citrixSelected)
+                {
+                    remoteVFSItem_option_url.val(addUserPassToURLCitrix("", "citrix://"));
+                    $("#remoteVFSItem_option_host", fieldPropertiesDialog).val("sf-api.com");
                 }
                 curUrl = remoteVFSItem_option_url.val();
                 var path = $("#remoteVFSItem_option_path", fieldPropertiesDialog).val();
@@ -1087,6 +1179,15 @@
                     {
                         item_option_itemType.val("gdrive");
                     }
+                    else if(lowCaseURL.indexOf("citrix") == 0)
+                    {
+                        item_option_itemType.val("citrix");
+                    }
+                    else if(lowCaseURL.indexOf("glacier:") == 0)
+                    {
+                        item_option_itemType.val("glacier");
+                        $("#remoteVFSItem_option_glacierServerURL", fieldPropertiesDialog).val(matchedElem.host).trigger("change");
+                    }
                     // else{
                     //     if(url.indexOf("//") == 0 || url.indexOf("////") == 0)
                     //         url = "file:" + url;
@@ -1178,11 +1279,11 @@
                                     var cred = url.split(":");
                                     if(cred.length>0)
                                     {
-                                        $("#remoteVFSItem_option_user_name,#remoteVFSItem_option_secretKeyID,#remoteVFSItem_option_gdrive_secretKeyID", fieldPropertiesDialog).val(cred[0]);
+                                        $("#remoteVFSItem_option_user_name,#remoteVFSItem_option_secretKeyID,#remoteVFSItem_option_gdrive_secretKeyID,#remoteVFSItem_option_client_id", fieldPropertiesDialog).val(cred[0]);
                                     }
                                     if(cred.length>1)
                                     {
-                                        $("#remoteVFSItem_option_password,#remoteVFSItem_option_secretKey,#remoteVFSItem_option_gdrive_secretKey", fieldPropertiesDialog).val(cred[1]);
+                                        $("#remoteVFSItem_option_password,#remoteVFSItem_option_secretKey,#remoteVFSItem_option_gdrive_secretKey,#remoteVFSItem_option_client_secret", fieldPropertiesDialog).val(cred[1]);
                                     }
                                 }
                             }
@@ -1231,6 +1332,10 @@
                     if(lowCaseURL && lowCaseURL.indexOf("gdrive") == 0)
                     {
                         $("#remoteVFSItem_option_gdrive_secretKeyID", fieldPropertiesDialog).trigger("textchange");
+                    }
+                    if(lowCaseURL && lowCaseURL.indexOf("citrix") == 0)
+                    {
+                        $("#remoteVFSItem_option_client_id", fieldPropertiesDialog).trigger("textchange");
                     }
                     setTimeout(function() {
                         if(matchedElem.port != "" && matchedElem.port != $("#remoteVFSItem_option_port", fieldPropertiesDialog).val())
@@ -1401,6 +1506,12 @@
                 buildPropertiesURL();
             });
 
+            fieldPropertiesDialog.find("#remoteVFSItem_option_glacierServerURL").unbind().change(function(){
+                var val = $(this).val();
+                $(this).attr('lastSelected', val);
+                buildPropertiesURL();
+            });
+
             fieldPropertiesDialog.find("#remoteVFSItem_option_url").focus(function(){
                 if ($(this).val().indexOf("s3")==0)
                     $(this).closest("td").find("#warningText").show();
@@ -1542,6 +1653,13 @@
                                 fieldPropertiesDialog.find("*[name*='gdrive']").addClass("excludeXML");
                                 fieldPropertiesDialog.find(".privateOptions").find("input").removeClass("excludeXML");
                             }
+                            fieldPropertiesDialog.find("#remoteVFSItem_option_port").removeClass("excludeXML");
+                            var citrixSelected = $("#remoteVFSItem_option_itemType", fieldPropertiesDialog).val() == "citrix";
+                            if(citrixSelected)
+                            {
+                                fieldPropertiesDialog.find("#remoteVFSItem_option_client_id, #remoteVFSItem_option_client_secret").removeClass("excludeXML");
+                                fieldPropertiesDialog.find("#remoteVFSItem_option_port").addClass("excludeXML");
+                            }
                             var hadoopSelected = $("#remoteVFSItem_option_itemType", fieldPropertiesDialog).val() == "hadoop";
                             if(hadoopSelected)
                             {
@@ -1575,6 +1693,7 @@
                                 if(shareName.indexOf("/") !=0 )
                                     shareName = "/" + shareName;
                                 url = url.replace("file.core.windows.net", "file.core.windows.net" + shareName);
+                                url = url.replace("blob.core.windows.net", "blob.core.windows.net" + shareName);
                                 urlField.val(url);
                             }
                             var urlFieldName = urlField.attr("_name");
@@ -1655,6 +1774,10 @@
                 beforeClose : function(){
                     return true;
                 },
+                close: function(){
+                    fieldPropertiesDialog.find("#remoteVFSItem_option_s3serverURL").removeAttr('lastSelected');
+                    fieldPropertiesDialog.find("#remoteVFSItem_option_glacierServerURL").removeAttr('lastSelected');
+                },
                 open: function(){
                     $([document, window]).unbind('.dialog-overlay');
                     bindFTPFormData();
@@ -1685,6 +1808,10 @@
                         base.refreshGoogleToken(fieldPropertiesDialog);
                         return false;
                     });
+                    fieldPropertiesDialog.find(".refreshCitrixToken").unbind().click(function(){
+                        base.refreshCitrixToken(fieldPropertiesDialog);
+                        return false;
+                    });
                     var curItemData = base.options.existingData;
                     fieldPropertiesDialog.find(".sftp-suggested-settings").suggestedSettings({
                         suggestions : configSuggestions.sftp,
@@ -1694,12 +1821,18 @@
             });
 
             $("#remoteVFSItem_option_itemType", fieldPropertiesDialog).unbind().change(function(){
+                if($(this).val() == "azure"){
+                    var curHost = $("#remoteVFSItem_option_host", fieldPropertiesDialog).val();
+                    if(!curHost || curHost.indexOf("windows.net")<0){
+                        $("#remoteVFSItem_option_host", fieldPropertiesDialog).val("file.core.windows.net");
+                    }
+                }
                 showHideItemPropertiesSettings();
                 if(!$(this).hasClass('notextChange'))
                     buildPropertiesURL();
             });
 
-            fieldPropertiesDialog.find("#remoteVFSItem_option_user_name, #remoteVFSItem_option_password, #remoteVFSItem_option_secretKeyID, #remoteVFSItem_option_secretKey, #remoteVFSItem_option_path, #remoteVFSItem_option_port, #remoteVFSItem_option_host, #remoteVFSItem_option_gdrive_secretKeyID, #remoteVFSItem_option_gdrive_secretKey, #remoteVFSItem_option_s3_bucket, #remoteVFSItem_option_s3_path").unbind().bind("textchange", function(){
+            fieldPropertiesDialog.find("#remoteVFSItem_option_user_name, #remoteVFSItem_option_password, #remoteVFSItem_option_secretKeyID, #remoteVFSItem_option_secretKey, #remoteVFSItem_option_path, #remoteVFSItem_option_port, #remoteVFSItem_option_host, #remoteVFSItem_option_gdrive_secretKeyID, #remoteVFSItem_option_gdrive_secretKey, #remoteVFSItem_option_s3_bucket, #remoteVFSItem_option_s3_path, #remoteVFSItem_option_client_secret, #remoteVFSItem_option_client_id").unbind().bind("textchange", function(){
                 if($(this).hasClass('notextChange'))return false;
                 if($(this).is("#remoteVFSItem_option_s3_bucket"))
                 {
@@ -1722,6 +1855,68 @@
             });
 
         };
+
+        base.refreshCitrixToken = function(dialog){
+            var client_id = dialog.find("#remoteVFSItem_option_client_id").val() || "";
+            var citrix_client_info = client_id;
+            client_id = client_id.split("~")[0];
+            var client_secret = client_id.split("~")[1];
+            var baseURL = window.location.protocol + "//" + window.location.host + "/";
+            var curURL = baseURL + "%3Fcommand%3Dregister_citrix_api%26c2f%3D"+crushFTP.getCrushAuth();
+            var url = "https://secure.sharefile.com/oauth/authorize?response_type=code&client_id="+client_id+"&redirect_uri=" + curURL + "&citrix_client_info=" + citrix_client_info;
+            dialog.parent().block({ message: "Waiting... <a href='javascript:void(0);' class='cancel' style='color:#fff;'>Cancel</a> <div style='margin-top:20px;'>(If your browser has not opened a new window, you may need to unblock popups.)</div>", overlayCSS: { opacity: 0.7, cursor: 'normal'},css: {
+                border: 'none',
+                backgroundColor: 'transparent',
+                color: '#fff',
+                'text-align':'center',
+                'font-weight' : 'normal',
+                opacity : 0.8,
+                width : '100%',
+                cursor : 'normal'
+            }});
+            var popup = window.open(url, "citrix", "width=800,height=600");
+            var timer, stopPolling;
+
+            function closePopup(){
+                dialog.parent().unblock();
+                popup.close();
+                clearTimeout(timer);
+                stopPolling = true;
+            }
+
+            dialog.parent().find("a.cancel").click(function(){
+                closePopup();
+            });
+
+            function checkTokenStatus(){
+                if(stopPolling){
+                    stopPolling = false;
+                    return false;
+                }
+                crushFTP.data.serverRequest({
+                    command: 'lookup_citrix_api_code',
+                    client_id: client_id,
+                    serverGroup : $("#userConnectionGroups").val() || "MainUsers",
+                    server_url : url,
+                    citrix_client_info: citrix_client_info
+                },
+                function(data){
+                    var code = data ? $.trim($(data).find("response").text()) : "";
+                    if(data && code && code != "null")
+                    {
+                        dialog.find("#remoteVFSItem_option_client_secret").val(code).trigger("textchange");
+                        closePopup();
+                        crushFTP.UI.growl("Message : ", "Token Refreshed.", false, 3000);
+                    }
+                    else{
+                        timer = setTimeout(function(){
+                            checkTokenStatus();
+                        }, 1000);
+                    }
+                });
+            }
+            checkTokenStatus();
+        }
 
         base.refreshGoogleToken = function(dialog){
             var baseURL = window.location.protocol + "//" + window.location.host + "/";
@@ -1935,13 +2130,13 @@
             opts.isFTPBrowse = isFtpBrowse;
             if (!opts.useApplet && !isFtpBrowse && !opts.syncOpts)
             {
-                defaultDir = window.crushFTP && crushFTP.serverConfig && crushFTP.serverConfig.userRoot ? crushFTP.serverConfig.userRoot.split(";")[0] : "/";
+                defaultDir = crushFTP.serverConfig && crushFTP.serverConfig.userRoot ? crushFTP.serverConfig.userRoot.split(";")[0] : "/";
             }
             if(base.options.file_mode == "server"){
-                defaultDir = window.crushFTP && crushFTP.serverConfig && crushFTP.serverConfig.serverRoot ? crushFTP.serverConfig.serverRoot.split(";")[0] : "/";
+                defaultDir = crushFTP.serverConfig && crushFTP.serverConfig.serverRoot ? crushFTP.serverConfig.serverRoot.split(";")[0] : "/";
             }
             else{
-                defaultDir = window.crushFTP && crushFTP.serverConfig && crushFTP.serverConfig.userRoot ? crushFTP.serverConfig.userRoot.split(";")[0] : "/";
+                defaultDir = crushFTP.serverConfig && crushFTP.serverConfig.userRoot ? crushFTP.serverConfig.userRoot.split(";")[0] : "/";
             }
             pathToLoad = pathToLoad || defaultDir;
             var dropdown = browsePanel.find(".dropdown");
@@ -3070,8 +3265,3 @@ jQuery.expr[':'].Contains = function(a, i, m) {
     else
         return (a.textContent || a.innerText || "").toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
 };
-if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function(search, pos) {
-        return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
-    };
-}

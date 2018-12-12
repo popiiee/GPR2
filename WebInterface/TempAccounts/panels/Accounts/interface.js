@@ -49,7 +49,7 @@ panelAccounts.showHidePanels = function(flag)
 
 panelAccounts.bindActions = function()
 {
-	var expirationAction = $("#temp_accounts_account_expire_task", panelAccounts._panel).empty();
+	var expirationAction = $("#temp_accounts_account_expire_task, #share_expire_notify_task", panelAccounts._panel).empty();
 	expirationAction.append("<option value=\"\">Please select</option>");
 	var crushTaskPlugins = crushFTP.data.getPluginPrefs("CrushTask");
 	var pluginOpts = $('<optgroup label="Plugin"></optgroup>');

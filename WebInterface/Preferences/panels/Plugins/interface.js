@@ -10,6 +10,7 @@ panelPlugins.localization = {};
 var panelName = "Plugins";
 var _panel = $("#pnl" + panelName);
 var _pluginsList = $("#pluginsList", _panel);
+panelPlugins.saveParams = {};
 
 panelPlugins.pluginsToIgnore = ["WebStatistics", "CrushImagePreview", "CrushLDAP", "DotBin", "FilterCommand", "HiddenFTP", "MiniUrlManager", "OSXNetInfo", "DebugOptions"];
 
@@ -26,9 +27,6 @@ localizations.panels[panelName] = $.extend(panelPlugins.localization, localizati
 
 // Interface methods
 panelPlugins.init = function(pluginToLoad, refresh, pluginID, returnXML){
-	if(!crushFTP.V9Beta){
-		panelPlugins.pluginsToIgnore.push("LetsEncrypt");
-	}
 	panelPlugins.isEmbed = pluginToLoad && pluginToLoad.length>0;
 	applyLocalizations(panelName, localizations.panels);
 	crushFTP.methods.setPageTitle(panelPlugins.localization.Header, true);
@@ -375,6 +373,22 @@ panelPlugins.loadPlugin = function(plugin, refresh, pluginID, returnXML, callbac
 		window.pluginPlaceHolder = $("#pluginContainer");
 		function continueLoading()
 		{
+			panelPlugins.saveParams = {};
+			if(!panelPlugins.isEmbed)
+			{
+				if($(".replicationSaveHelper").length>0){
+					$(".replicationSaveHelper").remove();
+					$("#saveContent").show();
+				}
+				crushFTP.Replication.init(common.data.ServerPrefs(), "Preferences:Plugins", _panel, plugin, "#saveContent", function(prefs, _panelname){
+			        panelPlugins.saveParams.ui_save_preferences = prefs;
+			        panelPlugins.saveParams.ui_save_preferences_item = _panelname;
+			        itemsChanged(true);
+			        panelPlugins.itemsChanged(true, window["plugin"+plugin].returnXML, plugin);
+			        _panel.find("#saveContent").click();
+			        crushFTP.Replication.popupVisible(false);
+			    });
+			}
 			var btnPanel = $("#clonningButtons .button").show();
 			if(plugin=="LetsEncrypt"){
 				btnPanel.hide();
@@ -1147,6 +1161,7 @@ panelPlugins.savePluginContentProcess = function(action, formSubItem, pluginInde
 					callback(false);
 				}
 			}
-		}
+		},
+		panelPlugins.saveParams
 	);
 }

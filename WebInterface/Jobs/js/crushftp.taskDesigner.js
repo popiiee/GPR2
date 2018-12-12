@@ -71,13 +71,16 @@ var taskDesigner = {
         },
         changeName : function(name, id){
             var item = taskDesigner.data.get(id);
+            var oldName = item.name + "";
             if(item)
             {
                 item.name = name;
             }
+            audit.addLog("renamed a task from " + oldName + " to " + audit.getName(item));
         },
         remove : function(id)
         {
+            var item = taskDesigner.data.get(id);
             var filteredItems = [];
             for(var i=0;i<taskDesigner.data.items.length;i++)
             {
@@ -87,6 +90,8 @@ var taskDesigner = {
                     toRemove = taskDesigner.data.items[i];
             }
             taskDesigner.data.items = filteredItems;
+            if(item.name != "BreakPoint")
+                audit.addLog("removed a task "+ audit.getName(item));
         },
         get : function(id)
         {
@@ -103,9 +108,12 @@ var taskDesigner = {
             if(type == "task")
             {
                 var item = taskDesigner.data.get(id);
+                var oldPosition = item.position + "";
                 if(item && position)
                 {
                     item.position = position;
+                    if(oldPosition != position)
+                        audit.addLog("repositioned a task " + audit.getName(item) + " from " + oldPosition + " to " + position);
                 }
             }
             else
@@ -163,6 +171,11 @@ var taskDesigner = {
                     }
                     item.connections.connections_subitem = filteredItems;
                 }
+            }
+            var startItem = taskDesigner.data.get(id);
+            var endItem = connectionID != "EndPoint" ? taskDesigner.data.get(connectionID) : {name:"EndPoint", type:""};
+            if(startItem.name != "BreakPoint" && endItem.name != "BreakPoint"){
+                audit.addLog("added connection of type "+ type + " from " + audit.getName(startItem) + " to " + audit.getName(endItem));
             }
             taskDesigner.hasPendingChanges(true);
         },
@@ -236,6 +249,11 @@ var taskDesigner = {
                     }
                     item.connections.connections_subitem = filteredItems;
                 }
+            }
+            var startItem = taskDesigner.data.get(id);
+            var endItem = connectionID != "EndPoint" ? taskDesigner.data.get(connectionID) : {name:"EndPoint", type:""};
+            if(startItem.name != "BreakPoint" && endItem.name != "BreakPoint"){
+                audit.addLog("removed connection of type "+ type + " from " + audit.getName(startItem) + " to " + audit.getName(endItem));
             }
         },
         bindValuesFromJson : function(form, curItem, attrToUse, ignoreUnderscore)
@@ -657,9 +675,9 @@ var taskDesigner = {
     resizeItems : function(){
         var winHeight = $(window).height();
         var winWidth = $(window).innerWidth();
-        var sideMenuHeight = winHeight - 200;
+        var sideMenuHeight = winHeight - 150;
         if(sideMenuHeight<300)sideMenuHeight=300;
-        $("#existingJobsPanel").height(sideMenuHeight);
+        $("#existingJobsPanel").height(sideMenuHeight + 5);
         $("#jobsScheduleList").height(sideMenuHeight - 110);
 
         $("#activeJobs").height(sideMenuHeight - 25);
@@ -739,17 +757,6 @@ var taskDesigner = {
             }
             adminPanel.data.getXMLPrefsDataFromServer("GUIXMLPrefs", function(allPrefs){
                 var plugins = taskDesigner.data.availablePlugins();
-                var v9_beta = $(allPrefs).find("v9_beta").text() == "true";
-                if(!crushFTP.V9Beta && v9_beta){
-                    var sheet = (function() {
-                        var style = document.createElement("style");
-                        style.appendChild(document.createTextNode(""));
-                        document.head.appendChild(style);
-                        return style.sheet;
-                    })();
-                    sheet.insertRule(".v9-only { display: inherit !important; }", 0);
-                }
-                crushFTP.V9Beta = v9_beta;
                 for (var i = 0; i < plugins.length; i++) {
                     var curItem = plugins[i];
                     if(curItem!="CrushTask (User Defined)")
@@ -764,6 +771,18 @@ var taskDesigner = {
                         taskDesigner.hasPendingChanges(true);
                     }
                 });
+                /*Replication stuff*/
+                if(!crushFTP.Replication.initialized){
+                    var replicateHosts = $(document).data("GUIXMLPrefs").replicate_session_host_port;
+                    crushFTP.Replication.init({
+                        replicateHosts:replicateHosts
+                    }, "Jobs", $("#GUIAdmin"), "", ".saveJobsButton", function(prefs, _panelname){
+                        crushFTP.replicationSavePrefs = prefs;
+                        $("#saveChanges").trigger("click");
+                        crushFTP.Replication.popupVisible(false);
+                    });
+                    crushFTP.Replication.initialized = true;
+                }
             });
 
             taskDesigner.showAvailableJobs(function(){
@@ -809,7 +828,8 @@ var taskDesigner = {
                 var serverInfoItems = ["registration_name","rid", "machine_is_linux","machine_is_solaris","machine_is_unix","machine_is_windows","machine_is_x","machine_is_x_10_5_plus","sub_version_info_str","version_info_str"];
                 var arr = {};
                 crushFTP.data.serverRequest({
-                    command: 'getUserManagerItems'
+                    command: 'getServerInfoItems',
+                    keys: serverInfoItems.join(",")
                 }, function(data, XMLHttpRequest, textStatus, errorThrown){
                     var items = $(data);
                     for (var i = 0; i < serverInfoItems.length; i++) {
@@ -1300,6 +1320,28 @@ var taskDesigner = {
             closeOnEscape : false
          });
     },
+    sortJobs: function(data){
+        var orderBy = $('#sortJobs').val();
+        var folderOnTop = $('#sortFoldersFirst').is(":checked");
+        var folderSort = function(obj){
+            if(!folderOnTop) return obj;
+            return _.sortBy(obj, function(o) { return o.children ? 0 : 1; });
+        }
+        var jobs;
+        if(orderBy === "name_ascending")
+         jobs = folderSort(_.sortBy(data, function(o) { return o.name.toLowerCase(); }));
+        else if(orderBy === "name_descending")
+         jobs = folderSort(_.sortBy(data, function(o) { return o.name.toLowerCase(); }).reverse());
+        else if(orderBy === "created_ascending")
+         jobs = folderSort(_.sortBy(data, function(o) { return o.created; }));
+        else if(orderBy === "created_descending")
+         jobs = folderSort(_.sortBy(data, function(o) { return o.created; }).reverse());
+        else if(orderBy === "modified_ascending")
+         jobs = folderSort(_.sortBy(data, function(o) { return o.modified; }));
+        else if(orderBy === "modified_descending")
+         jobs = folderSort(_.sortBy(data, function(o) { return o.modified; }).reverse());
+        return jobs;
+    },
     showAvailableJobs : function(callback){
         $("#loadingJobsList").show();
         taskDesigner.availableJobs = [];
@@ -1320,25 +1362,72 @@ var taskDesigner = {
                         if(type =="false")
                             type = "manually";
                         var itmData = $.xml2json($(this)[0]);
-                        itmData.type = itmData.scheduleType;
+                        itmData.type = itmData.scheduleType || itmData.type;
                         availableJobs.push(itmData);
                     });
-                    var nestedPreview = $.trim(crushFTP.methods.queryString("nested"));
-                    if(nestedPreview)
-                        taskDesigner.availableJobs = _.sortBy(taskDesigner.processJobList(availableJobs), function(o) { return o.name.toLowerCase(); });
-                    else
-                        taskDesigner.availableJobs = availableJobs;
+                    taskDesigner.availableJobs = taskDesigner.sortJobs(taskDesigner.processJobList(availableJobs));
+                    taskDesigner.availableJobsFlat = taskDesigner.sortJobs(availableJobs);
                 }
                 if(callback)
                     callback();
             }
         });
     },
+    loadJobFolder: function(folderData, path, keepFilter){
+        if(!keepFilter)
+            $("#filterSchedules").val("").trigger('keyup');
+        var folderName = folderData.name || '';
+        var folderPath = folderData.path || path || '';
+        taskDesigner.currentJobFolder = folderPath;
+        var levels = folderPath.split("/");
+        var allJobs = taskDesigner.availableJobsFlat;
+        var jobs = taskDesigner.sortJobs(taskDesigner.processJobList(allJobs));
+        if(!folderPath || folderPath === "/"){
+            taskDesigner.availableJobs = jobs;
+            taskDesigner.bindData();
+            var jobFolders = $("#jobFolders").empty();
+            var prevLevel = "";
+            for (var i = 0; i < levels.length; i++) {
+                if(prevLevel)
+                    prevLevel+="/";
+                prevLevel = prevLevel + levels[i];
+                jobFolders.append('<option value="'+prevLevel+'">/'+prevLevel+'</option>');
+            }
+            jobFolders.prepend('<option value="/">/</option>');
+            jobFolders.val(folderPath);
+            return;
+        }
+        var curLevel = 0;
+        function findJob(obj, name){
+            var filterdObj = _.filter(obj, function (item) {
+                return item.name === name;
+            });
+            curLevel++;
+            var nextItem = filterdObj && filterdObj.length>0 ? filterdObj[0].children : filterdObj;
+            if(curLevel >= levels.length){
+                return nextItem;
+            }
+            else
+                return findJob(nextItem, levels[curLevel]);
+        }
+        taskDesigner.availableJobs = taskDesigner.sortJobs(findJob(jobs, levels[curLevel]));
+        taskDesigner.bindData();
+        var jobFolders = $("#jobFolders").empty();
+        var prevLevel = "";
+        for (var i = 0; i < levels.length; i++) {
+            if(prevLevel)
+                prevLevel+="/";
+            prevLevel = prevLevel + levels[i];
+            jobFolders.append('<option value="'+prevLevel+'">/'+prevLevel+'</option>');
+        }
+        jobFolders.prepend('<option value="/">/</option>');
+        jobFolders.val(folderPath);
+    },
     processJobList: function(items){
         var _ref;
         var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
         var folderItems = _.filter(items, function (item) {
-          return item.name.indexOf("/") >= 0;
+            return item.name.indexOf("/") >= 0;
         });
         var folders = {
         };
@@ -1361,8 +1450,8 @@ var taskDesigner = {
         var treeItems = [];
         _.map(folders, function (folder, name) {
           function process(root, name) {
-            var item = _extends({}, folder.meta, {
-                name: name
+            var item = _extends({}, root.meta, {
+                name: name,
             }, {
                 children: []
             });
@@ -1372,13 +1461,22 @@ var taskDesigner = {
                 item.children.push(process(subitem, name));
               });
             }
-            // item.children = _.sortBy(item.children, function(o) { return o.name.toLowerCase(); });
             return item;
           }
           treeItems.push(process(folder, name));
         });
         var filteredArray = (_ref = _).without.apply(_ref, [items].concat(folderItems));
-        return filteredArray.concat(treeItems);
+        var mergedItems = filteredArray.concat(treeItems);
+        function buildPath(obj, parentFolder){
+            for (var j = 0; j < obj.length; j++) {
+                var curItem = obj[j];
+                curItem.path = parentFolder ? parentFolder + "/" + curItem.name : curItem.name;
+                if(curItem.children && curItem.children.length>0)
+                    buildPath(curItem.children, curItem.path);
+            }
+        }
+        buildPath(mergedItems, "");
+        return mergedItems;
     },
     drawJsPlumbLine : function(params){
         try{
@@ -1487,8 +1585,6 @@ var taskDesigner = {
             }
         });
     },
-
-
     setRemoveTimeCall:function(){
         $(".removefromtimelist").unbind("click").bind("click", function(){
             for (var i=0;i<taskDesigner.loadedSchedule.scheduleTimeList.length;i++)
@@ -1565,19 +1661,35 @@ var taskDesigner = {
         }
         return true;
     },
+    getFavorites: function(id){
+        return "";
+        //return "<span class='ui-icon ui-icon-star'></span>";
+    },
     bindData : function(){
         var scheduleList = $("#jobsScheduleList");
         scheduleList.isolatedScroll();
+        var backbutton = $(".back-button", "#existingJobs").hide();
+        var pathSelector = $(".path-selector", "#existingJobs").hide();
+        if(taskDesigner.currentJobFolder && taskDesigner.currentJobFolder !== "/"){
+            var path = "/" + taskDesigner.currentJobFolder.substring(0, taskDesigner.currentJobFolder.lastIndexOf('/'));
+            backbutton.text(path).show();
+            pathSelector.show();
+        }
         adminPanel.UI.multiOptionControlDataBind(taskDesigner.availableJobs
             , false
             , scheduleList
             , function(curItem, index){
-                var name = decodeURIComponent(unescape(curItem.name));
-                var type = decodeURIComponent(unescape(curItem.type)) || "";
-                var id = name || "";
+                var name = curItem.name ? decodeURIComponent(unescape(curItem.name)) : "";
+                var path = curItem.path ? decodeURIComponent(unescape(curItem.path)) : name;
+                var type = curItem.type ? decodeURIComponent(unescape(curItem.type)) : "";
+                var created = curItem.created ? decodeURIComponent(unescape(curItem.created)) : "";
+                var modified = curItem.modified ? decodeURIComponent(unescape(curItem.modified)) : "";
+                created = created && crushFTP.methods.isNumeric(created) ? "<strong>Created:</strong> " + dateFormat(new Date(parseInt(created)), "yyyy-mm-dd HH:MM:ss") : '';
+                modified = modified && crushFTP.methods.isNumeric(modified) ? ", <strong>Modified:</strong> " + dateFormat(new Date(parseInt(modified)), "yyyy-mm-dd HH:MM:ss") : '';
+                var id = path || "";
                 if(name && name != "undefined" && name.indexOf("_")!=0)
                 {
-                    if(!curItem.children || curItem.children.length==0)
+                    if(type.toLowerCase() != "dir" && (!curItem.children || curItem.children.length==0))
                     {
                         var nextRun = curItem.nextRun || "";
                         try{
@@ -1597,27 +1709,48 @@ var taskDesigner = {
                             nextRun = "";
                         var enabled = curItem.enabled == "true" ? "active" : "inactive";
 
-                        return $("<li _id='"+escape(id)+"' _index='"+index+"' _name='"+name+"'><div><span class='listText'>" + name + "</span></div><div class='meta "+enabled+"'><span class='type'><strong>"+type+"</strong>"+nextRun+"</span></div></li>");
+                        return $("<li _id='"+escape(id)+"' _index='"+index+"' _name='"+name+"'><div><span class='listText'>" + name + "</span></div><div class='meta "+enabled+"'><span class='type'><strong>"+type+"</strong>"+ nextRun +"</span><span class='dates'>"+ created + modified +"</span></div><span class='favorite'>"+taskDesigner.getFavorites(id)+"</span></li>");
                     }
                     else{
-                        var subItems = curItem.children;
+                        var subItems = curItem.children || [];
                         var concat = [];
                         var count = subItems.length;
                         if(subItems.length>3){
                             count = 3;
                         }
                         for(var i=0;i<count;i++){
-                            concat.push(subItems[i].name);
+                            if(subItems[i].name)
+                                concat.push(subItems[i].name);
                         }
                         if(subItems.length>3){
                             concat.push(" and " + (subItems.length - count) + " more...")
                         }
-                        return $("<li class='folder' _id='"+escape(id)+"' _index='"+index+"' _name='"+name+"'><div><span class='listText'>" + name + "</span></div><div class='meta'><span class=''><strong>"+concat.join(',')+"</strong></span></div></li>");
+                        return $("<li class='folder' _id='"+escape(id)+"' _index='"+index+"' _name='"+name+"'><div><span class='listText'>" + name + "</span></div><div class='meta'><span class=''><strong>"+concat.join(',')+"</strong></span></div><span class='favorite'>"+taskDesigner.getFavorites(id)+"</span></li>");
                     }
                 }
             }
             ,true
         );
+
+        if(scheduleList.find("li").length == 1 && scheduleList.find("li.folder").length == 1){
+            setTimeout(function(){
+                scheduleList.find("li").trigger('click');
+            });
+        }
+
+        var backbutton = $(".back-button", "#existingJobs").unbind().click(function(){
+            var curFolder = taskDesigner.currentJobFolder;
+            var prevFolder = curFolder.substring(0, curFolder.lastIndexOf("/")) || "/";
+            taskDesigner.loadJobFolder({}, prevFolder);
+        });
+
+        var jobFolders = $("#jobFolders").unbind().change(function(e, keepFilter){
+            taskDesigner.loadJobFolder({}, $(this).val(), keepFilter);
+        });
+
+        $("#sortJobs, #sortFoldersFirst").unbind().change(function(){
+            jobFolders.trigger('change');
+        });
 
         $("li" , scheduleList).unbind().hover(function(){
             $(this).addClass("ui-state-hover");
@@ -1627,6 +1760,8 @@ var taskDesigner = {
             var selected = $(this);
             var trigger = data;
             if(selected.hasClass('folder')){
+                var folderData = selected.data("controlData");
+                taskDesigner.loadJobFolder(folderData);
                 return false;
             }
             if(selected.hasClass("ui-state-focus"))
@@ -1735,7 +1870,7 @@ var taskDesigner = {
             }
         });
 
-        $("a#repeatEveryMinutesOn").click(function(event,value) {
+        $("a#repeatEveryMinutesOn").unbind().click(function(event,value) {
             $('#fromTimeOnEveryMinutes').val("");
             $('#toTimeOnEveryMinutes').val("");
             $('#fromTimeOnEveryMinutesHdn').val("");
@@ -1895,7 +2030,7 @@ var taskDesigner = {
             }).dialog("open");
         });
 
-        $("a#pasteTimeList").click(function(event,value) {
+        $("a#pasteTimeList").unbind().click(function(event,value) {
             var setPromptVal = taskDesigner.loadedSchedule.scheduleTime;
             if(value!=undefined)
                 setPromptVal=value;
@@ -2000,7 +2135,29 @@ var taskDesigner = {
             }
         });
 
-        var jobDetails = $("a.jobDetails").click(function(evt){
+        var jobAuditTrail = $("a#jobAuditTrail").unbind().click(function(){
+            var controlData = taskDesigner.loadedSchedule;
+            if(!controlData){
+                crushFTP.UI.growl("Select Job first", "Load Job for editing", true, 3000);
+                return false;
+            }
+            var audit_trail = controlData.audit_trail || "";
+            var data = audit_trail.split("\n").reverse();
+            $("<div><pre style='padding: 2px;margin: 2px;overflow-y: scroll;background: #f6f6f6;line-height:20px;'>"+data.join("<br>")+"</pre></div>").infoPopup({
+                title: "Job Change Log",
+                elemType: "pre",
+                // maximized: true,
+                width: "90%"
+            });
+            // jAlert("", "Job Change Log", function(){},
+            //     {
+            //         appendAfterInput : "<pre style='width: 690px;height: 500px;padding: 2px;margin: 2px;overflow-y: scroll;margin-left: -60px;z-index: 100;background: #f6f6f6;margin-top: -10px;line-height:20px;'>"+data.join("<br>")+"</pre>"
+            //     }
+            // );
+            return false;
+        });
+
+        var jobDetails = $("a.jobDetails").unbind().click(function(evt){
             taskDesigner.clearRangeSelection();
             var controlData = taskDesigner.loadedSchedule;
             if(!controlData){
@@ -2051,7 +2208,7 @@ var taskDesigner = {
             return false;
         });
 
-        $("#editingJobName, #editingJobName2").closest('div').bind('dblclick', function(event) {
+        $("#editingJobName, #editingJobName2").closest('div').unbind().bind('dblclick', function(event) {
             taskDesigner.clearRangeSelection();
             jobDetails.click();
             return false;
@@ -2074,6 +2231,39 @@ var taskDesigner = {
                 }
             });
         };
+    },
+    getServerTime : function(cb){
+        if(crushFTP.storage("currentServerTime"))
+        {
+            cb(crushFTP.storage("currentServerTime"));
+            return;
+        }
+        crushFTP.data.serverRequest(
+            {
+                command: 'getServerItem',
+                key: "server_info/current_datetime_ddmmyyhhmmss",
+                random: Math.random()
+            },
+            function(msg){
+                var time = $(msg).find("response_status").text() || "";
+                var myDate = new Date();
+                if(time)
+                {
+                    var mm = parseInt(time.substr(0, 2), 0);
+                    var dd = parseInt(time.substr(2, 2), 0);
+                    var yyyy = parseInt(time.substr(4, 4), 0);
+                    var hh = parseInt(time.substr(8, 2), 0);
+                    var mmm = parseInt(time.substr(10, 2), 0);
+                    var ss = parseInt(time.substr(12, 2), 0);
+                    myDate = new Date(yyyy, mm-1, dd, hh, mmm, ss);
+                }
+                crushFTP.storage("currentServerTime", myDate);
+                setTimeout(function(){
+                    crushFTP.removeStorage("currentServerTime");
+                }, 10000);
+                cb(myDate);
+            }
+        );
     },
     runJobByName: function (scheduleName, monitor) {
         if(!scheduleName)
@@ -2709,7 +2899,8 @@ var taskDesigner = {
             taskDesigner.showPasteTasksButton();
             taskDesigner.canvas.removeClass("activeJob");
             $("#GUIAdmin").removeClass('monitoringActiveJob');
-            $("#saveChanges, #saveChanges2").show();
+            if(!$("#saveChanges").hasClass('hidden-by-replication'))
+                $(".saveJobsButton").show();
             $("#runJob, #runJob2").removeClass('ui-state-disabled');
         }
         else
@@ -2720,14 +2911,15 @@ var taskDesigner = {
             $("#GUIAdmin").addClass('monitoringActiveJob');
             if(taskDesigner.monitoringActiveJob)
             {
-                $("#saveChanges, #saveChanges2").hide();
+                $(".saveJobsButton").hide();
                 setTimeout(function(){
                     $("#newTaskDragButton").hide();
                 });
             }
             else
             {
-                $("#saveChanges, #saveChanges2").show();
+                if(!$("#saveChanges").hasClass('hidden-by-replication'))
+                    $(".saveJobsButton").show();
                 setTimeout(function(){
                     $("#newTaskDragButton").show();
                 });
@@ -3269,7 +3461,7 @@ var taskDesigner = {
         {
             taskDesigner.hasChanges = false;
             $("#showChangesNote").hide();
-            $("#saveChanges, #saveChanges2").removeClass("ui-state-hover");
+            $(".saveJobsButton").removeClass("ui-state-hover");
             return false;
         }
         if(flag)
@@ -3282,19 +3474,19 @@ var taskDesigner = {
                 return false;
             }
             taskDesigner.hasChanges = true;
-            $("#saveChanges, #saveChanges2").addClass("ui-state-hover");
+            $(".saveJobsButton").addClass("ui-state-hover");
             $("#showChangesNote").show();
         }
         else
         {
             taskDesigner.hasChanges = false;
             $("#showChangesNote").hide();
-            $("#saveChanges, #saveChanges2").removeClass("ui-state-hover");
+            $(".saveJobsButton").removeClass("ui-state-hover");
         }
     },
     isJobNameInUse : function(scheduleName)
     {
-        var data = taskDesigner.availableJobs;
+        var data = taskDesigner.availableJobsFlat;
         for (var i = 0; i < data.length; i++) {
             if($.trim(data[i].name.toLowerCase()) == $.trim(scheduleName.toLowerCase()))
                 return true;
@@ -3428,7 +3620,8 @@ var taskDesigner = {
                             taskDesigner.rebuildCustomScripts();
                             delete taskDesigner.rebuildCustomScripts;
                         }
-                        controlData = taskDesigner.openFormControlData;
+                        var controlData = taskDesigner.openFormControlData;
+                        var oldData = $.extend(true, {}, controlData);
 
                         if(controlData.type == "Exclude"){
                             var limit_size = pluginDetails.find("#limit_size").val();
@@ -3541,6 +3734,18 @@ var taskDesigner = {
                             taskDesigner.drawLine(taskDesigner.canvas.find("#task_"+ controlData.connectionID).find(".taskJumpTrueActionPoint"), taskDesigner.canvas.find("#task_"+ controlData.jump_task_id), "true");
 
                             taskDesigner.drawLine(taskDesigner.canvas.find("#task_"+ controlData.connectionID).find(".taskJumpFalseActionPoint"), taskDesigner.canvas.find("#task_"+ controlData.jump_false_task_id), "jumpfail");
+
+                            var startItem = taskDesigner.data.get(controlData.connectionID);
+                            if(controlData.jump_task_id){
+                                var endItem = taskDesigner.data.get(controlData.jump_task_id);
+                                if(endItem)
+                                    audit.addLog("set to jump on success for task " + audit.getName(startItem) + " to " + audit.getName(endItem));
+                            }
+                            if(controlData.jump_false_task_id){
+                                var endItem = taskDesigner.data.get(controlData.jump_false_task_id);
+                                if(endItem)
+                                    audit.addLog("set to jump on failure for task " + audit.getName(startItem) + " to " + audit.getName(endItem));
+                            }
                         }
                         else if(controlData.type == "UsersList")
                         {
@@ -3638,6 +3843,17 @@ var taskDesigner = {
                         taskDesigner.previewSnippet(openFormCrushTask.closest(".crushTaskItem"));
 						delete taskDesigner.openFormControlData;
 						delete taskDesigner.openFormCrushTask;
+                        var differences = crushFTP.methods.difference(controlData, oldData);
+                        if(Object.keys(differences).length>0){
+                            var items = [];
+                            for(var item in differences){
+                                var oldVal = oldData[item] || "";
+                                var newVal = differences[item] || "";
+                                if(oldVal != newVal)
+                                    items.push(item + ": changed from '" + oldVal + "' to '" + newVal + "'");
+                            }
+                            audit.addLog("updated task " + audit.getName(controlData) + " " + items.join(", "));
+                        }
 						$(this).dialog("close");
 					}
             	},
@@ -3809,7 +4025,6 @@ var taskDesigner = {
 					$("#existingJobsBtn").trigger("click");
 				return false;
 			}
-			var selected = $("#jobsScheduleList").find("li.loadedSchedule");
 			var elem = $(this);
 			var fromSaveAndContinue = false;
 			if(evtData)
@@ -3824,9 +4039,9 @@ var taskDesigner = {
 			}
 			else
 			{
-				if(selected && selected.length>0)
+				if(taskDesigner.loadedSchedule)
 				{
-                    function continueSaving(reload){
+                    function continueSaving(reload, time){
                         var xml = taskDesigner.generateXML();
                         var controlData = taskDesigner.loadedSchedule;
                         if(controlData && controlData.tasks)
@@ -3836,12 +4051,15 @@ var taskDesigner = {
                         controlData.endPointPosition = taskDesigner.data.endPointPosition;
                         controlData.startPointZIndex = taskDesigner.canvas.find("#StartPointPanel").css("zIndex");
                         controlData.endPointZIndex = taskDesigner.canvas.find("#EndPoint").css("zIndex");
+                        var created = controlData.created || time;
                         var canWidth = taskDesigner.canvas.width();
                         var canHeight = taskDesigner.canvas.height();
                         controlData.canvasSize = canWidth.toString() + "," + canHeight.toString();
+                        var log = controlData.audit_trail || "";
+                        log += audit.getLog(taskDesigner.loadedSchedule.id);
+                        controlData.audit_trail = log;
                         var dataXML = $.json2xml(controlData, {rootTagName: 'schedules_subitem'});
-                        dataXML = dataXML.replace(/\<schedules_subitem>/g, "<schedules_subitem type=\"properties\">")
-                                    .replace(/\<type>properties<\/type>/g, "").replace(/\<\/schedules_subitem>/g, "");
+                        dataXML = dataXML.replace(/\<schedules_subitem>/g, "<schedules_subitem type=\"properties\"><created>"+created+"</created><modified>"+time+"</modified>").replace(/\<type>properties<\/type>/g, "").replace(/\<\/schedules_subitem>/g, "");
                         var rootConnections = [];
                         var _connections = taskDesigner.data.startConnections;
                         if(_connections && _connections.length>0)
@@ -3865,15 +4083,20 @@ var taskDesigner = {
                         {
                             var schName = unescape(taskDesigner.loadedSchedule.scheduleName);
                             taskDesigner.showLoading();
-                            crushFTP.data.serverRequest({
+                            var obj = {
                                 command: "addJob",
                                 name : taskDesigner.loadedSchedule.scheduleName,
                                 data : xml
-                            }, function(data){
+                            };
+                            if(crushFTP.replicationSavePrefs){
+                                obj.ui_save_preferences_item = crushFTP.replicationSavePrefs;
+                            }
+                            crushFTP.data.serverRequest(obj, function(data){
                                 var status = $.trim($(data).find("response_status").text());
                                 if(status.toLowerCase().indexOf("failure")!=0)
                                 {
                                     taskDesigner.bindData();
+                                    $("#jobFolders").trigger('change');
                                     taskDesigner.hasPendingChanges(false);
                                     if(!evtData || !evtData.doNotClear)
                                         taskDesigner.clearLoadedTaskData();
@@ -3891,6 +4114,7 @@ var taskDesigner = {
                                     {
                                         taskDesigner.showAvailableJobs(function(){
                                             taskDesigner.bindData();
+                                            $("#jobFolders").trigger('change');
                                             if(!fromSaveAndContinue)
                                                 $("#jobsScheduleList").find("li[_id='"+escape(schName)+"']").addClass("loadedSchedule ui-state-focus");
                                             if(fromSaveAndContinue)
@@ -3960,11 +4184,15 @@ var taskDesigner = {
                             });
                             return false;
                         }
-                        crushFTP.data.serverRequest({
+                        var obj = {
                             command: "renameJob",
                             priorName: taskDesigner.renameJobData.priorName,
                             name : taskDesigner.renameJobData.name
-                        },
+                        };
+                        if(crushFTP.replicationSavePrefs){
+                            obj.ui_save_preferences_item = crushFTP.replicationSavePrefs;
+                        }
+                        crushFTP.data.serverRequest(obj,
                         function(data){
                             crushFTP.UI.hideIndicator();
                             var jobName = taskDesigner.renameJobData.name;
@@ -3976,7 +4204,10 @@ var taskDesigner = {
                                 if(status.toLowerCase().indexOf("success")>=0)
                                 {
                                     taskDesigner.loadedSchedule.scheduleName = jobName;
-                                    continueSaving(true);
+                                    taskDesigner.getServerTime(function(time){
+                                        var curTime = time.getTime();
+                                        continueSaving(true, curTime);
+                                    });
                                 }
                                 else
                                 {
@@ -3986,8 +4217,12 @@ var taskDesigner = {
                         });
                         return false;
                     }
-                    else
-                        continueSaving();
+                    else{
+                        taskDesigner.getServerTime(function(time){
+                            var curTime = time.getTime();
+                            continueSaving(false, curTime);
+                        });
+                    }
 				}
 			}
 			return false;
@@ -4047,6 +4282,7 @@ var taskDesigner = {
                             $(this).find(".closeBtn").trigger('click');
                         }
                     });
+                    audit.addLog("removed all breakpoints");
                 }
                 else
                 {
@@ -4063,6 +4299,7 @@ var taskDesigner = {
                             }
                         }
                     }
+                    audit.addLog("added breakpoint to each step");
                 }
             }
             return false;
@@ -4210,10 +4447,11 @@ var taskDesigner = {
 		/*Existing jobs panel*/
 		var existingJobsPanel = $("#existingJobsPanel");
 		$("#existingJobsBtn").click(function(){
-			if(existingJobsPanel.is(":visible"))
-			{
-				existingJobsPanel.slideUp("fast");
-				//$("#filterSchedules", existingJobsPanel).val("").trigger("keyup");
+            if(existingJobsPanel.is(":visible"))
+            {
+                if(taskDesigner.panel.hasClass('pinned-sidebar'))
+                    return false;
+                existingJobsPanel.slideUp("fast");
 			}
 			else
 				existingJobsPanel.slideDown("fast", function(){
@@ -4226,9 +4464,16 @@ var taskDesigner = {
 		});
 
 		existingJobsPanel.find(".closeBtn").click(function(){
+            if(taskDesigner.panel.hasClass('pinned-sidebar'))
+                return false;
 			existingJobsPanel.slideUp();
 			return false;
 		});
+
+        existingJobsPanel.find(".pinBtn").click(function(){
+            taskDesigner.panel.toggleClass("pinned-sidebar");
+            return false;
+        });
 
 		$("#jobsScheduleListActions").find("a").unbind().click(function(){
 			if($(this).hasClass("selectAll"))
@@ -4325,7 +4570,8 @@ var taskDesigner = {
 						weekDays += "("+$(this).attr("_day")+")";
 					});
 					xmlString += "\n<weekDays>"+weekDays+"</weekDays>";
-
+                    var nextRunDate = taskDesigner.jobDetailsDialog.find("#nextRun").datetimepicker("getDate");
+                    var nextRun = nextRunDate ? nextRunDate.getTime() : '-1';
 					var monthDays = "";
 					$(".monthdays", taskDesigner.jobDetailsDialog).find(".ui-state-active").each(function(){
 						monthDays += "("+$(this).attr("_day")+")";
@@ -4343,7 +4589,9 @@ var taskDesigner = {
 					var controlData = taskDesigner.loadedSchedule;
                     var oldName = controlData.scheduleName;
 					controlData = $.extend(controlData, items);
-                    if(hasChanges)
+                    if(controlData.nextRun != nextRun)
+                        controlData.nextRun = nextRun;
+                    else if(hasChanges)
                         controlData.nextRun = "-1";
                     if(controlData.max_runtime_hours == ""){
                         controlData.max_runtime_hours = "00";
@@ -4407,6 +4655,18 @@ var taskDesigner = {
                         });
                     }
                 });
+                var nextRun = $("#nextRun").datetimepicker({
+                    showOn: "both",
+                    buttonImage: "/WebInterface/Resources/images/calendar.png",
+                    buttonImageOnly: true,
+                    minDate: new Date()
+                });
+                if(taskDesigner.loadedSchedule.nextRun && taskDesigner.loadedSchedule.nextRun != "-1"){
+                    try{
+                        var date = new Date(parseInt(taskDesigner.loadedSchedule.nextRun));
+                        nextRun.datetimepicker("setDate", date);
+                    }catch(ex){}
+                }
                 $('#addinTimeList').click(function(){
                     var timevalue = $.trim($("#timeValueadd").val());
                     if(!timevalue)
@@ -4460,7 +4720,7 @@ var taskDesigner = {
                 {
                     if(taskDesigner.loadedSchedule.scheduleTime[i]!='')
                     {
-                    taskDesigner.loadedSchedule.scheduleTime[i]=taskDesigner.formatTime(taskDesigner.loadedSchedule.scheduleTime[i])
+                        taskDesigner.loadedSchedule.scheduleTime[i]=taskDesigner.formatTime(taskDesigner.loadedSchedule.scheduleTime[i])
                     }
                 }
 
@@ -4539,10 +4799,23 @@ var taskDesigner = {
 					jAlert('<div style="text-align:center">To use this feature, an Enterprise license is required.<br><br> To get more information on features and pricing, see the following links : <br><br><a href="http://crushftp.com/pricing.html#enterprise" tabIndex="-1" target="_blank">Plans &amp; Pricing</a> | <a href="http://www.crushftp.com/crush6wiki/Wiki.jsp?page=Enterprise%20License%20Enhancements" tabIndex="-1" target="_blank">Enterprise License Enhancements</a></div>', "This is an Enterprise License feature");
 					return false;
 				}
-				jPrompt("Job Name", "", "Input", function(scheduleName){
+                var folderName = "", folderNameDisplay = "";
+                if(taskDesigner.currentJobFolder && taskDesigner.currentJobFolder !== "/")
+                {
+                    folderName = taskDesigner.currentJobFolder + "";
+                    if(!folderName.endsWith("/")){
+                        folderName = folderName + "/";
+                    }
+                    folderNameDisplay = folderName + "";
+                    if(!folderNameDisplay.startsWith("/")){
+                        folderNameDisplay = "/" + folderNameDisplay;
+                    }
+                }
+				jPrompt("Job Name: ", "", "Input", function(scheduleName){
                     if(scheduleName != null && scheduleName.length>0)
                     {
                         scheduleName = $.trim(scheduleName);
+                        scheduleName = folderName + scheduleName;
                         if(scheduleName.indexOf("__") == 0){
                             jAlert("Job name starting with '__' is reserved for temporary jobs, please use another name", "Error", function(){
                                 $("#newJobsSchedule").trigger('click');
@@ -4578,51 +4851,62 @@ var taskDesigner = {
                         {
                             xml = dataXML + xml + rootConnections.join("") + "</schedules_subitem>";
                         }
-                        if(xml && xml.length>0)
-                        {
-                            taskDesigner.showLoading();
-                            crushFTP.data.serverRequest({
-                                command: "addJob",
-                                name : scheduleName,
-                                data : xml
-                            }, function(data){
-                                var status = $.trim($(data).find("response_status").text());
-                                if(status.toLowerCase().indexOf("failure")!=0)
-                                {
-                                    crushFTP.UI.growl("Data saved", "Your changes are saved", false, 5000);
-                                    taskDesigner.showLoading(true);
-                                    var selected = $("#jobsScheduleList").find("li.loadedSchedule");
-                                    var _sch = false;
-                                    if(selected.length>0)
-                                        _sch = unescape(selected.attr("_id"));
-                                    taskDesigner.showAvailableJobs(function(){
-                                        taskDesigner.bindData();
-                                        if(_sch)
-                                        {
-                                            $("#jobsScheduleList").find("li[_id='"+escape(_sch)+"']").addClass('loadedSchedule');
-                                        }
-                                        $("#jobsScheduleList").find("li[_id='"+escape(scheduleName)+"']").trigger("click");
-                                        filterSchedules.removeData("last_searched").trigger('keyup', [true]);
-                                        setTimeout(function(){
+                        function continueAdding(){
+                            if(xml && xml.length>0)
+                            {
+                                taskDesigner.showLoading();
+                                var obj = {
+                                    command: "addJob",
+                                    name : scheduleName,
+                                    data : xml
+                                };
+                                if(crushFTP.replicationSavePrefs){
+                                    obj.ui_save_preferences_item = crushFTP.replicationSavePrefs;
+                                }
+                                crushFTP.data.serverRequest(obj, function(data){
+                                    var status = $.trim($(data).find("response_status").text());
+                                    if(status.toLowerCase().indexOf("failure")!=0)
+                                    {
+                                        crushFTP.UI.growl("Data saved", "Your changes are saved", false, 5000);
+                                        taskDesigner.showLoading(true);
+                                        var selected = $("#jobsScheduleList").find("li.loadedSchedule");
+                                        var _sch = false;
+                                        if(selected.length>0)
+                                            _sch = unescape(selected.attr("_id"));
+                                        taskDesigner.showAvailableJobs(function(){
+                                            taskDesigner.bindData();
+                                            var jobFolders = $("#jobFolders").trigger('change');
+                                            if(_sch)
+                                            {
+                                                $("#jobsScheduleList").find("li[_id='"+escape(_sch)+"']").addClass('loadedSchedule');
+                                            }
+                                            $("#jobsScheduleList").find("li[_id='"+escape(scheduleName)+"']").trigger("click");
                                             filterSchedules.removeData("last_searched").trigger('keyup', [true]);
-                                        },100);
-                                    });
-                                }
-                                else
-                                {
-                                    crushFTP.UI.growl("Error while saving", "Your changes are not saved. " + status, true);
-                                    taskDesigner.showLoading(true);
-                                }
-                            });
+                                            setTimeout(function(){
+                                                filterSchedules.removeData("last_searched").trigger('keyup', [true]);
+                                            },100);
+                                        });
+                                    }
+                                    else
+                                    {
+                                        crushFTP.UI.growl("Error while saving", "Your changes are not saved. " + status, true);
+                                        taskDesigner.showLoading(true);
+                                    }
+                                });
+                            }
                         }
+                        crushFTP.Replication.showOptionsOrContinue(continueAdding);
                     }
-				});
+				}, false, false, {
+                    prependBeforeInput: $("<strong>"+folderNameDisplay+"</strong>")
+                });
 				return false;
 			}
             else if($(this).attr("id") == "reloadJobsList")
             {
                 var selected = $("#jobsScheduleList").find("li.loadedSchedule");
                 var _sch = false;
+                var curSearch = filterSchedules.val();
                 if(selected.length>0)
                     _sch = unescape(selected.attr("_id"));
                 taskDesigner.showAvailableJobs(function(){
@@ -4635,10 +4919,8 @@ var taskDesigner = {
                             crushFTP.UI.checkUnchekInput(itm.find("input"), true);
                         }
                     }
-                    filterSchedules.removeData("last_searched").trigger('keyup', [true]);
-                    setTimeout(function(){
-                        filterSchedules.removeData("last_searched").trigger('keyup', [true]);
-                    },100);
+                    var jobFolders = $("#jobFolders").trigger('change', {keepFilter: true});
+                    filterSchedules.removeData("last_searched").val(curSearch).trigger('keyup', [true]);
                 });
             }
 			else if($(this).attr("id") == "deleteJobsSchedule")
@@ -4654,9 +4936,9 @@ var taskDesigner = {
 					jConfirm("Are you sure you wish to remove selected "+ total +" schedule(s)?", "Confirm", function(value){
 						if(value)
 						{
-							crushFTP.UI.showIndicator(false, false, "Please wait..");
-							function removeSchedule()
-							{
+                            function removeSchedule()
+                            {
+							    crushFTP.UI.showIndicator(false, false, "Please wait..");
 								if(items.length>0)
 								{
 									var curItem = items.pop();
@@ -4671,6 +4953,7 @@ var taskDesigner = {
                                     }
                                     taskDesigner.showAvailableJobs(function(){
                                         taskDesigner.bindData();
+                                        var jobFolders = $("#jobFolders").trigger('change');
 										if(loadedID && jobsScheduleList.find("li[_id='"+escape(loadedID)+"']").addClass("loadedSchedule ui-state-focus").length == 0)
 										{
 											taskDesigner.hasPendingChanges(false);
@@ -4692,7 +4975,7 @@ var taskDesigner = {
 									taskDesigner.showLoading(true);
 								}
 							}
-							removeSchedule();
+                            crushFTP.Replication.showOptionsOrContinue(removeSchedule);
 						}
 					});
 				}
@@ -4728,50 +5011,57 @@ var taskDesigner = {
                                             });
                                             return false;
                                         }
-        								var uid = crushFTP.methods.generateRandomPassword(8);
-                                        $(xml).find("connectionID").each(function(){
-                                            var _uid = crushFTP.methods.generateRandomPassword(8);
-                                            var curUID = $(this).text();
-                                            $(this).text(_uid);
-                                            $(xml).find("jump_false_task_id:contains('"+curUID+"'), connectionID:contains('"+curUID+"'), jump_task_id:contains('"+curUID+"')").each(function(){
+        								function continueAddingJob(){
+                                            var uid = crushFTP.methods.generateRandomPassword(8);
+                                            $(xml).find("connectionID").each(function(){
+                                                var _uid = crushFTP.methods.generateRandomPassword(8);
+                                                var curUID = $(this).text();
                                                 $(this).text(_uid);
-                                            });
-                                        });
-                                        xml = getTextFromXML(xml);
-                                        _id = controlData.id;
-                                        xml = xml.replace(/\+/g, "%2B");
-        								xml = xml.replace("<id>"+_id+"</id>", "<id>"+uid+"</id>")
-                                        .replace("<scheduleName>"+controlData.scheduleName+"</scheduleName>", "<scheduleName>"+scheduleName+"</scheduleName><nextRun>-1</nextRun>");
-        								taskDesigner.showLoading();
-        								crushFTP.data.serverRequest({
-                                            command: "addJob",
-                                            name : scheduleName,
-                                            data : xml
-                                        }, function(data){
-                                            var status = $.trim($(data).find("response_status").text());
-                                            if(status.toLowerCase().indexOf("failure")!=0)
-                                            {
-                                                taskDesigner.showAvailableJobs(function(){
-                                                    taskDesigner.bindData();
-                                                    if(_id)
-                                                    {
-                                                        $("#jobsScheduleList").find("li[_id='"+escape(_id)+"']").addClass('loadedSchedule');
-                                                    }
-                                                    taskDesigner.hasPendingChanges(false);
-                                                    taskDesigner.clearLoadedTaskData();
-                                                    crushFTP.UI.growl("Schedule Added", "Your changes are saved", false, 5000);
-                                                    taskDesigner.showLoading(true);
-                                                    setTimeout(function(){
-                                                        $("#jobsScheduleList").find("li[_name='"+scheduleName+"']").trigger("click");
-                                                    }, 100);
+                                                $(xml).find("jump_false_task_id:contains('"+curUID+"'), connectionID:contains('"+curUID+"'), jump_task_id:contains('"+curUID+"')").each(function(){
+                                                    $(this).text(_uid);
                                                 });
+                                            });
+                                            xml = getTextFromXML(xml);
+                                            _id = controlData.id;
+                                            xml = xml.replace(/\+/g, "%2B");
+            								xml = xml.replace("<id>"+_id+"</id>", "<id>"+uid+"</id>")
+                                            .replace("<scheduleName>"+controlData.scheduleName+"</scheduleName>", "<scheduleName>"+scheduleName+"</scheduleName><nextRun>-1</nextRun>");
+            								taskDesigner.showLoading();
+                                            var obj = {
+                                                command: "addJob",
+                                                name : scheduleName,
+                                                data : xml
+                                            };
+                                            if(crushFTP.replicationSavePrefs){
+                                                obj.ui_save_preferences_item = crushFTP.replicationSavePrefs;
                                             }
-                                            else
-                                            {
-                                                crushFTP.UI.growl("Error while saving", "Your changes are not saved. " + status, true);
-                                                taskDesigner.showLoading(true);
-                                            }
-                                        });
+            								crushFTP.data.serverRequest(obj, function(data){
+                                                var status = $.trim($(data).find("response_status").text());
+                                                if(status.toLowerCase().indexOf("failure")!=0)
+                                                {
+                                                    taskDesigner.showAvailableJobs(function(){
+                                                        taskDesigner.bindData();
+                                                        if(_id)
+                                                        {
+                                                            $("#jobsScheduleList").find("li[_id='"+escape(_id)+"']").addClass('loadedSchedule');
+                                                        }
+                                                        taskDesigner.hasPendingChanges(false);
+                                                        taskDesigner.clearLoadedTaskData();
+                                                        crushFTP.UI.growl("Schedule Added", "Your changes are saved", false, 5000);
+                                                        taskDesigner.showLoading(true);
+                                                        setTimeout(function(){
+                                                            $("#jobsScheduleList").find("li[_name='"+scheduleName+"']").trigger("click");
+                                                        }, 100);
+                                                    });
+                                                }
+                                                else
+                                                {
+                                                    crushFTP.UI.growl("Error while saving", "Your changes are not saved. " + status, true);
+                                                    taskDesigner.showLoading(true);
+                                                }
+                                            });
+                                        }
+                                        crushFTP.Replication.showOptionsOrContinue(continueAddingJob);
         							}
         						});
                             }
@@ -4938,7 +5228,7 @@ var taskDesigner = {
             if(($(this).is("#rdbLog") || $(this).is("#rdbUserLog")) && $(this).is(":checked"))
             {
                 $("#jobsCanvas,#newTaskDragButton,.zoomSlider").hide();
-                $("#saveChanges, #saveChanges2").addClass("ui-state-disabled");
+                $(".saveJobsButton").addClass("ui-state-disabled");
                 var logFile = $(this).is("#rdbLog") ? taskDesigner.activeJobLogFile : taskDesigner.activeJobUserLogFile;
                 if(!logFile)
                     return false;
@@ -4986,7 +5276,7 @@ var taskDesigner = {
 			}
 			else
 			{
-                $("#saveChanges, #saveChanges2").removeClass("ui-state-disabled");
+                $(".saveJobsButton").removeClass("ui-state-disabled");
 				logPlaceHolder.hide();
 				$("#jobsCanvas,#newTaskDragButton,.zoomSlider").show();
 			}
@@ -5333,10 +5623,14 @@ var taskDesigner = {
 	removeSchedule : function(name, callback)
 	{
 		if(typeof name == "undefined")return;
-        crushFTP.data.serverRequest({
+        var obj = {
             command: "removeJob",
             name : name
-        },
+        };
+        if(crushFTP.replicationSavePrefs){
+            obj.ui_save_preferences_item = crushFTP.replicationSavePrefs;
+        }
+        crushFTP.data.serverRequest(obj,
         function(data){
             if(data && typeof data.getElementsByTagName != "undefined")
             {
@@ -5408,6 +5702,7 @@ var taskDesigner = {
                     }, 500);
                     return false;
                 }
+                delete crushFTP.replicationSavePrefs;
                 taskDesigner.processJobData(controlData , xml, callback);
             });
 		}
@@ -5442,6 +5737,8 @@ var taskDesigner = {
                 controlData.single = "false";
             if(typeof controlData.singleServer == "undefined")
                 controlData.singleServer = "false";
+            if(typeof controlData.job_log_name == "undefined")
+                controlData.job_log_name = "{scheduleName}_{id}.log";
             if(controlData.tasks)
             {
                 function getRandomInt (min, max) {
@@ -6590,6 +6887,7 @@ var taskDesigner = {
 						taskItem.find(".crushTaskDetailsLink").trigger("click");
 						vtip(taskItem);
 					}, 600);
+                    audit.addLog("added new task " + audit.getName(data) + " at position " + data.position);
                     if(callback)
                         callback(_uid);
 				}
@@ -6783,7 +7081,7 @@ var taskDesigner = {
 
             var taskDetails = taskElem.find(".taskDetails").empty();
             var taskHeader = taskElem.find(".crushTask-header");
-            if(crushFTP.V9Beta && data.task_notes){
+            if(data.task_notes){
                 taskHeader.find(".task-notes-icon").attr("title", "<div class='custom-vtip'>" + crushFTP.methods.htmlEncode(data.task_notes).replace(/\n/g, "<br>") + "</div>");
             }
             else{
@@ -6832,6 +7130,11 @@ var taskDesigner = {
                 {
                     lbl = "Mode : ";
                     value = data["cache_mode"] || "";
+                }
+                if(type == "uservariable" && id == "varValue"){
+                    var varType = data["varName"] || "";
+                    if(varType.toLowerCase().indexOf("password")>=0)
+                        value = value.replace(/./g, '*');
                 }
 				taskDetails.append("<div class='taskDetailsItem'><label>"+lbl+"</label><div>"+value+"</div></div><div class='clear'></div>");
 			});
@@ -7090,6 +7393,7 @@ var taskDesigner = {
                         }
                         if(prevTaskId && nextTaskId && type)
                         {
+                            audit.skipEntry = true;
                             if(type == "true" || type == "jumpfail")
                             {
                                 if(type == "true")
@@ -7121,6 +7425,10 @@ var taskDesigner = {
                                 else
                                     taskDesigner.drawLine($("#task_" + prevTaskId).find("span.taskFailureActionPoint"), $("#task_" + nextTaskId), type);
                             }
+                            audit.skipEntry = false;
+                            var startItem = prevTaskId !="StartPoint" ? taskDesigner.data.get(prevTaskId) : {name:"StartPoint", type:""};
+                            var endItem = nextTaskId != "EndPoint" ? taskDesigner.data.get(nextTaskId) : {name:"EndPoint", type:""};
+                            audit.addLog("removed breakpoint between " + audit.getName(startItem) + " and " + audit.getName(endItem));
                         }
                         setTimeout(function(){
                             taskDesigner.data.remove(uid);
@@ -7466,16 +7774,53 @@ var taskDesigner = {
                                     linkClass : "addItemFileParser2",
                                     removeLinkText : "",
                                     removeLinkClass : "removeItemFileParser2",
+                                    showAddButtonOnAllElements: true,
                                     addEventCallback : function(newElem, clonnedFrom){
                                         newElem.form();
                                         newElem.addClass("added-item").find("input:first").focus();
                                         newElem.find("input,textarea").each(function(index, el) {
                                             $(this).removeAttr('id');
                                         });
+                                        newElem.find(".varname").bind("textchange", function(){
+                                            if($(this).val().toLowerCase().indexOf("password")>=0){
+                                                newElem.find("textarea").hide();
+                                                newElem.find(".password").show();
+                                            }
+                                            else{
+                                                newElem.find("textarea").show();
+                                                newElem.find(".password").hide();
+                                            }
+                                        });
+                                        newElem.find(".password").bind("textchange", function(){
+                                            newElem.find("textarea").val($(this).val());
+                                        });
+                                        newElem.find("textarea").bind("textchange", function(){
+                                            newElem.find(".password").val($(this).val());
+                                        });
+                                    },
+                                    beforeAddEventCallback: function(elem){
+                                        elem.find(".varname").bind("textchange", function(){
+                                            if($(this).val().toLowerCase().indexOf("password")>=0){
+                                                elem.find("textarea").hide();
+                                                elem.find(".password").show();
+                                            }
+                                            else{
+                                                elem.find("textarea").show();
+                                                elem.find(".password").hide();
+                                            }
+                                        });
+                                        elem.find(".password").bind("textchange", function(){
+                                            elem.find("textarea").val($(this).val());
+                                        });
+                                        elem.find("textarea").bind("textchange", function(){
+                                            elem.find(".password").val($(this).val());
+                                        });
+                                        return true;
                                     },
                                     removeEventCallback : function(prev, self, uid){
                                     }
                                 });
+                                taskForm.find(".varname").trigger('textchange');
                             }
     						else if(controlData.type == "Wait")
     						{
@@ -7508,7 +7853,7 @@ var taskDesigner = {
                                 items += '</optgroup>';
 
                                 var loadedJob = taskDesigner.loadedSchedule.scheduleName;
-                                var jobs = taskDesigner.availableJobs;
+                                var jobs = taskDesigner.availableJobsFlat;
                                 items += '<optgroup label="Job">';
                                 for (var i = 0; i < jobs.length; i++) {
                                     var curItem = jobs[i].name;
@@ -7581,7 +7926,7 @@ var taskDesigner = {
 	                                {
 	                                    for (var i = 0; i < headers.length; i++) {
 	                                        var curItem = headers[i].value;
-	                                        if(curItem.split(":").length>0)
+	                                        if(curItem && curItem.split(":").length>0)
 	                                        {
 	                                            if(data.length==0)
 	                                                data.push({key : "", value : ""});
@@ -7730,6 +8075,12 @@ var taskDesigner = {
                             {
                                 if(typeof controlData.skip_link_on_empty == "undefined")
                                     controlData.skip_link_on_empty = "false";
+                                if(typeof controlData.run_job == "undefined")
+                                	controlData.run_job = "false";
+                                if(typeof controlData.run_job_items == "undefined")
+                                	controlData.run_job_items = "false";
+                                if(typeof controlData.run_job_async == "undefined")
+                                	controlData.run_job_async = "false";
                             }
                             if(typeof controlData.acceptAnyCert == "undefined" && taskDesigner.formDialog.find('input[_name="acceptAnyCert"]').length>0)
                             {
@@ -9141,6 +9492,8 @@ var taskDesigner = {
 					type : curElem.attr("PickType") || 'dir',
                     existingVal : $.trim($("#" + curElem.attr("rel"), form).val()),
 					callback : function(selectedPath, ftpServerInfo){
+                        var type = taskDesigner.openFormControlData.type.toLowerCase();
+                        var toAppend = type !== 'find' ? '{name}' : '';
                         var rel = curElem.attr("rel");
 						if(ftpServerInfo)
 						{
@@ -9159,7 +9512,7 @@ var taskDesigner = {
                                         path = "FILE://" + ftpServerInfo.url;
                                 }
                             }
-							ftpServerInfo[rel] = path;
+							ftpServerInfo[rel] = path + toAppend;
 							var taskForm = taskDesigner.formDialog;
 							var ignored = taskForm.find(".ignoreBind").removeClass("ignoreBind");
                             var tempControlData = $.extend(true, {}, taskDesigner.openFormControlData);
@@ -9203,7 +9556,7 @@ var taskDesigner = {
                                         selectedPath += "/response.txt";
                                 }
                             }
-							$("#" + rel, form).val(selectedPath).trigger("change");
+							$("#" + rel, form).val(selectedPath + toAppend).trigger("change");
                         }
 					}
 				};
@@ -9987,6 +10340,9 @@ var taskDesigner = {
             taskDesigner.drawLine(prevTaskItem.find(".taskJumpFalseActionPoint"), breakpointItem, type);
             taskDesigner.drawLine(breakpointItem.find(".taskSuccessActionPoint"), nextTaskItem, type);
         }
+        var startItem = srcID !="StartPoint" ? taskDesigner.data.get(srcID) : {name:"StartPoint", type:""};
+        var endItem = targetID != "EndPoint" ? taskDesigner.data.get(targetID) : {name:"EndPoint", type:""};
+        audit.addLog("added breakpoint between " + audit.getName(startItem) + " and " + audit.getName(endItem));
 	},
 	showContextMenu : function(conn, e, menu)
 	{

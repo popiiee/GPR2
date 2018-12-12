@@ -369,6 +369,17 @@
 							$.alerts._reposition();
 							$.alerts._maintainPosition(true);
 						}
+						if(displayOptions && displayOptions.prependBeforeInput)
+						{
+							var parent = promptInput.parent();
+							parent.prepend(displayOptions.prependBeforeInput);
+							$("#popup_container").css({
+								minWidth: "350px",
+								maxWidth: "720px"
+							});
+							$.alerts._reposition();
+							$.alerts._maintainPosition(true);
+						}
 						if(displayOptions && displayOptions.okButtonText)
 						{
 							$(".submitActionOk", popup_container).text(displayOptions.okButtonText);

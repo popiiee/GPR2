@@ -18,12 +18,17 @@ panelGraphs.maxRecordsToShow = 300;
 panelGraphs.hasReopened = false;
 
 panelGraphs.Connections = [0];
+panelGraphs.ConnectionsUnique = [0];
 panelGraphs.OutSpeed = [0];
 panelGraphs.InSpeed = [0];
 
 panelGraphs.connectionsGraph = $("#connectionsGraph", panelGraphs._panel);
 panelGraphs.connectionCurrent = $("#connectionCurrent", panelGraphs._panel);
 panelGraphs.connectionMax = $("#connectionMax", panelGraphs._panel);
+panelGraphs.connectionUnique = $("#connectionUnique", panelGraphs._panel);
+panelGraphs.connectionUniqueMax = $("#connectionUniqueMax", panelGraphs._panel);
+panelGraphs.connectionsUniqueCB = $("#connectionsUniqueCB", panelGraphs._panel);
+panelGraphs.connectionsAllCB = $("#connectionsAllCB", panelGraphs._panel);
 
 panelGraphs.outSpeedGraph = $("#outSpeedGraph", panelGraphs._panel);
 panelGraphs.outSpeedCurrent = $("#outSpeedCurrent", panelGraphs._panel);
@@ -37,6 +42,12 @@ panelGraphs.memoryGraph = $("#memoryGraph", panelGraphs._panel);
 panelGraphs.ram_max = $("#ram_max", panelGraphs._panel);
 panelGraphs.ram_free = $("#ram_free", panelGraphs._panel);
 
+panelGraphs.serverCPUMax = $("#serverCPUMax", panelGraphs._panel);
+panelGraphs.osCPUMax = $("#osCPUMax", panelGraphs._panel);
+
+panelGraphs.serverCPUGraph = $("#serverCPUGraph", panelGraphs._panel);
+panelGraphs.serverOSGraph = $("#osCPUGraph", panelGraphs._panel);
+
 panelGraphs.graphInfo = $("#graphinfo");
 panelGraphs.graphInfo.draggable();
 panelGraphs.graphTip = $("#graphtip");
@@ -45,6 +56,7 @@ $.fn.sparkline.defaults.common.width = "99%";
 $.fn.sparkline.defaults.common.height = "100px";
 
 panelGraphs.maxConnection = 0;
+panelGraphs.maxUniqueConnection = 0;
 panelGraphs.maxOutSpeed = 0;
 panelGraphs.maxInSpeed = 0;
 
@@ -120,59 +132,65 @@ panelGraphs.init = function() {
         }
     });
 
-    if(panelDashboard && panelDashboard._panel){
-        panelDashboard._panel.find("fieldset#speedInformation").find(".downSpeed").bind("mouseenter", function(ev) {
-            var left = ev.pageX;
-            if (left > $(window).width() - 370) {
-                left = $(window).width() - 370;
-            }
-            panelGraphs.graphTip.css({
-                top: ev.pageY - 100,
-                left: left - 150
-            });
-            panelGraphs.graphTip.attr("monitoring.down", true);
-
-            function refreshSpeedInfo() {
-                panelGraphs.showSpeedInfo(ev, "out", 299);
-                setTimeout(function() {
-                    if (panelGraphs.graphTip.attr("monitoring.down"))
-                        refreshSpeedInfo();
-                }, 2000);
-            }
-            refreshSpeedInfo();
-        }).bind("mouseleave", function() {
-            panelGraphs.graphTip.hide();
-            panelGraphs.graphTip.removeAttr("monitoring.down");
+    panelDashboard._panel.find("fieldset#speedInformation").find(".downSpeed").bind("mouseenter", function(ev) {
+        var left = ev.pageX;
+        if (left > $(window).width() - 370) {
+            left = $(window).width() - 370;
+        }
+        panelGraphs.graphTip.css({
+            top: ev.pageY - 100,
+            left: left - 150
         });
+        panelGraphs.graphTip.attr("monitoring.down", true);
 
-        panelDashboard._panel.find("fieldset#speedInformation").find(".upSpeed").bind("mouseenter", function(ev) {
-            var left = ev.pageX;
-            if (left > $(window).width() - 370) {
-                left = $(window).width() - 370;
-            }
-            panelGraphs.graphTip.css({
-                top: ev.pageY - 100,
-                left: left - 150
-            });
-            panelGraphs.graphTip.attr("monitoring.up", true);
+        function refreshSpeedInfo() {
+            panelGraphs.showSpeedInfo(ev, "out", 299);
+            setTimeout(function() {
+                if (panelGraphs.graphTip.attr("monitoring.down"))
+                    refreshSpeedInfo();
+            }, 2000);
+        }
+        refreshSpeedInfo();
+    }).bind("mouseleave", function() {
+        panelGraphs.graphTip.hide();
+        panelGraphs.graphTip.removeAttr("monitoring.down");
+    });
 
-            function refreshSpeedInfo() {
-                panelGraphs.showSpeedInfo(ev, "in", 299);
-                setTimeout(function() {
-                    if (panelGraphs.graphTip.attr("monitoring.up"))
-                        refreshSpeedInfo();
-                }, 2000);
-            }
-            refreshSpeedInfo();
-        }).bind("mouseleave", function() {
-            panelGraphs.graphTip.hide();
-            panelGraphs.graphTip.removeAttr("monitoring.up");
+    panelDashboard._panel.find("fieldset#speedInformation").find(".upSpeed").bind("mouseenter", function(ev) {
+        var left = ev.pageX;
+        if (left > $(window).width() - 370) {
+            left = $(window).width() - 370;
+        }
+        panelGraphs.graphTip.css({
+            top: ev.pageY - 100,
+            left: left - 150
         });
-    }
+        panelGraphs.graphTip.attr("monitoring.up", true);
+
+        function refreshSpeedInfo() {
+            panelGraphs.showSpeedInfo(ev, "in", 299);
+            setTimeout(function() {
+                if (panelGraphs.graphTip.attr("monitoring.up"))
+                    refreshSpeedInfo();
+            }, 2000);
+        }
+        refreshSpeedInfo();
+    }).bind("mouseleave", function() {
+        panelGraphs.graphTip.hide();
+        panelGraphs.graphTip.removeAttr("monitoring.up");
+    });
 
     panelGraphs.graphInfo.find(".close").click(function() {
         panelGraphs.graphInfo.hide();
         return false;
+    });
+
+    panelGraphs.connectionsUniqueCB.unbind().change(function(){
+        panelGraphs.renderGraphs();
+    });
+
+    panelGraphs.connectionsAllCB.unbind().change(function(){
+        panelGraphs.renderGraphs();
     });
 
     $("#memoryGraphPanel").contextMenu({
@@ -326,18 +344,7 @@ panelGraphs.showSpeedInfo = function(ev, type, region, info) {
     });
 };
 
-panelGraphs.refreshDataFromServer = function(isInit) {
-    panelGraphs.graphThreadRunning = true;
-    var priorIntervals = panelGraphs.intervalsInPoll;
-    if (isInit) {
-        priorIntervals = panelGraphs.initGraphInterval;
-        panelGraphs.Connections = [];
-        panelGraphs.OutSpeed = [];
-        panelGraphs.InSpeed = [];
-        panelGraphs.RamFree = [];
-        panelGraphs.RamUsed = [];
-    }
-
+panelGraphs.bindGraphsData = function(items, init){
     function getDataFromResponse(items, key) {
         if (items && items[key]) {
             var val = items[key];
@@ -347,21 +354,56 @@ panelGraphs.refreshDataFromServer = function(isInit) {
         } else
             return "";
     }
+    if(init){
+        priorIntervals = panelGraphs.initGraphInterval;
+        panelGraphs.Connections = [];
+        panelGraphs.ConnectionsUnique = [];
+        panelGraphs.OutSpeed = [];
+        panelGraphs.InSpeed = [];
+        panelGraphs.RamFree = [];
+        panelGraphs.RamUsed = [];
+        panelGraphs.ServerCPU = [];
+        panelGraphs.OSCPU = [];
+        panelGraphs.intervalsInPoll = panelGraphs.initGraphInterval;
+    }
+
+    panelGraphs.bindData.graphs({
+        logged_in_users: getDataFromResponse(items.response_data, "logged_in_users"),
+        connected_unique_ips: getDataFromResponse(items.response_data, "connected_unique_ips"),
+        current_download_speed: getDataFromResponse(items.response_data, "current_download_speed"),
+        current_upload_speed: getDataFromResponse(items.response_data, "current_upload_speed"),
+        ram_free: getDataFromResponse(items.response_data, "ram_free"),
+        ram_max: getDataFromResponse(items.response_data, "ram_max"),
+        server_cpu: getDataFromResponse(items.response_data, "server_cpu"),
+        os_cpu: getDataFromResponse(items.response_data, "os_cpu")
+    });
+}
+
+panelGraphs.refreshDataFromServer = function(isInit) {
+    if(!window.panelDashboard.isLive) return;
+    panelGraphs.graphThreadRunning = true;
+    var priorIntervals = panelGraphs.intervalsInPoll;
+    if (isInit) {
+        priorIntervals = panelGraphs.initGraphInterval;
+        panelGraphs.Connections = [];
+        panelGraphs.ConnectionsUnique = [];
+        panelGraphs.OutSpeed = [];
+        panelGraphs.InSpeed = [];
+        panelGraphs.RamFree = [];
+        panelGraphs.RamUsed = [];
+        panelGraphs.ServerCPU = [];
+        panelGraphs.OSCPU = [];
+    }
+
     if (priorIntervals > panelGraphs.maxRecordsToShow) priorIntervals = panelGraphs.maxRecordsToShow;
+    var params = "current_download_speed,current_upload_speed,logged_in_users,ram_free,ram_max,server_cpu,os_cpu,connected_unique_ips";
     crushFTP.data.serverRequest({
         command: "getStatHistory",
-        params: "current_download_speed,current_upload_speed,logged_in_users,ram_free,ram_max",
+        params: params,
         priorIntervals: priorIntervals
     }, function(data) {
         panelGraphs.graphThreadRunning = false;
-        var items = $.xml2json(data);
-        panelGraphs.bindData.graphs({
-            logged_in_users: getDataFromResponse(items.response_data, "logged_in_users"),
-            current_download_speed: getDataFromResponse(items.response_data, "current_download_speed"),
-            current_upload_speed: getDataFromResponse(items.response_data, "current_upload_speed"),
-            ram_free: getDataFromResponse(items.response_data, "ram_free"),
-            ram_max: getDataFromResponse(items.response_data, "ram_max")
-        });
+        panelGraphs.bindGraphsData($.xml2json(data));
     });
 };
 
@@ -385,6 +427,22 @@ panelGraphs.bindData = {
         }
         panelGraphs.connectionCurrent.text(currentConnections);
         panelGraphs.connectionMax.text(panelGraphs.maxConnection);
+
+        //Connections Unique
+        panelGraphs.ConnectionsUnique = panelGraphs.ConnectionsUnique.concat(data.connected_unique_ips);
+        if (panelGraphs.ConnectionsUnique.length > panelGraphs.maxRecordsToShow) {
+            var itemsToRemove = panelGraphs.ConnectionsUnique.length - panelGraphs.maxRecordsToShow;
+            panelGraphs.ConnectionsUnique.remove(1, itemsToRemove);
+            panelGraphs.ConnectionsUnique[0] = 0;
+        }
+
+        var currentUniqueConnections = parseInt(data.connected_unique_ips[data.connected_unique_ips.length - 1]);
+        var maxUniqueVal = parseInt(data.connected_unique_ips.max());
+        if (maxUniqueVal > panelGraphs.maxUniqueConnection) {
+            panelGraphs.maxUniqueConnection = maxUniqueVal;
+        }
+        panelGraphs.connectionUnique.text(currentUniqueConnections);
+        panelGraphs.connectionUniqueMax.text(panelGraphs.maxUniqueConnection);
 
         //Out speed
         panelGraphs.OutSpeed = panelGraphs.OutSpeed.concat(data.current_download_speed);
@@ -433,13 +491,47 @@ panelGraphs.bindData = {
             if (panelGraphs.RamFree[i] > 0)
                 panelGraphs.RamUsed.push(maxRam - panelGraphs.RamFree[i]);
         }
+        //Server CPU
+        panelGraphs.ServerCPU = panelGraphs.ServerCPU.concat(data.server_cpu);
+        if (panelGraphs.ServerCPU.length > panelGraphs.maxRecordsToShow) {
+            var itemsToRemove = panelGraphs.ServerCPU.length - panelGraphs.maxRecordsToShow;
+            panelGraphs.ServerCPU.remove(1, itemsToRemove);
+            panelGraphs.ServerCPU[0] = 0;
+        }
+        var maxServerCPU = 0;
+        for (var i = panelGraphs.ServerCPU.length - 1; i >= 0; i--) {
+            if(parseInt(panelGraphs.ServerCPU[i])>maxServerCPU)
+                maxServerCPU = panelGraphs.ServerCPU[i];
+        };
+        panelGraphs.serverCPUMax.text(maxServerCPU);
+
+        //OS CPU
+        panelGraphs.OSCPU = panelGraphs.OSCPU.concat(data.os_cpu);
+        if (panelGraphs.OSCPU.length > panelGraphs.maxRecordsToShow) {
+            var itemsToRemove = panelGraphs.OSCPU.length - panelGraphs.maxRecordsToShow;
+            panelGraphs.OSCPU.remove(1, itemsToRemove);
+            panelGraphs.OSCPU[0] = 0;
+        }
+        var maxCPU = 0;
+        for (var i = panelGraphs.OSCPU.length - 1; i >= 0; i--) {
+            if(parseInt(panelGraphs.OSCPU[i])>maxCPU)
+                maxCPU = panelGraphs.OSCPU[i];
+        };
+        panelGraphs.osCPUMax.text(maxCPU);
         // Now render graphs
         panelGraphs.renderGraphs(maxRam);
     }
 };
 
 panelGraphs.renderGraphs = function(maxRam) {
-    panelGraphs.connectionsGraph.sparkline(panelGraphs.Connections, {
+    if(!maxRam && panelGraphs.curMaxRam)
+        maxRam = panelGraphs.curMaxRam;
+    panelGraphs.curMaxRam = maxRam;
+    var connections = panelGraphs.Connections;
+    if(panelGraphs.connectionsUniqueCB.is(":checked")){
+        connections = panelGraphs.ConnectionsUnique;
+    }
+    panelGraphs.connectionsGraph.sparkline(connections, {
         type: "line",
         lineColor: "#36363a",
         fillColor: "#A3A3C2"
@@ -473,5 +565,22 @@ panelGraphs.renderGraphs = function(maxRam) {
         lineColor: "#83B8D8",
         fillColor: "#549FCC",
         chartRangeMax: maxRam
+    });
+
+    panelGraphs.serverCPUGraph.sparkline(panelGraphs.ServerCPU, {
+        type: "line",
+        lineColor: "#83B8D8",
+        fillColor: "#549FCC",
+        chartRangeMin: 0,
+        chartRangeMax: 100,
+        chartRangeClip: true
+    });
+
+    panelGraphs.serverOSGraph.sparkline(panelGraphs.OSCPU, {
+        type: "line",
+        lineColor: "#83B8D8",
+        fillColor: "#549FCC",
+        chartRangeMin: 0,
+        chartRangeMax: 100
     });
 };

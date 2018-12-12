@@ -692,17 +692,6 @@ function initGUI()
 {
 	window.onbeforeunload = confirmExit;
 	var prefs = common.data.ServerPrefs();
-	var v9_beta = prefs && prefs.v9_beta && prefs.v9_beta.length>0 ? prefs.v9_beta[0].text == "true" : false;
-    if(!crushFTP.V9Beta && v9_beta){
-        var sheet = (function() {
-            var style = document.createElement("style");
-            style.appendChild(document.createTextNode(""));
-            document.head.appendChild(style);
-            return style.sheet;
-        })();
-        sheet.insertRule(".v9-only { display: inherit !important; }", 0);
-    }
-	crushFTP.V9Beta = v9_beta;
 	if(prefs && prefs.CustomForms)
 	{
 		$(document).data("pageTitle", document.title);
@@ -1324,10 +1313,6 @@ function showPanelPersonalizations()
 						sup = 0;
 					if(curItem && curItem.type == "Plugin")
 					{
-						if(curItem.panel === "LetsEncrypt" && !crushFTP.V9Beta)
-						{
-							continue;
-						}
 						links.push('<li class="ui-state-default ui-corner-all" _index="'+sup+'"><a panel="Plugins" loadPlugin="'+curItem.panel+'" href="#">'+menu.find('a[panel="Plugins"]').text()+' &raquo; '+ curItem.panel +'</a> <sup>alt+'+sup+'</sup></li>');
 					}
 					else
@@ -1727,3 +1712,14 @@ var common = {
 		}
 	}
 };
+
+function setupPrefsReplicationSave(_panel, panelName){
+	crushFTP.Replication.init(common.data.ServerPrefs(), "Preferences", _panel, panelName, "#saveContent", function(prefs, _panelname){
+		window["panel" + panelName].saveParams = {};
+        window["panel" + panelName].saveParams.ui_save_preferences = prefs;
+        window["panel" + panelName].saveParams.ui_save_preferences_item = _panelname;
+        itemsChanged(true);
+        _panel.find("#saveContent").click();
+        crushFTP.Replication.popupVisible(false);
+    });
+}

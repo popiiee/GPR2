@@ -42,6 +42,7 @@ panelUserConfig.init = function(){
 	panelUserConfig.bindData();
 	panelUserConfig.bindEvents();
 	$("#browsePopupBtn", _panel).hide();
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelUserConfig.bindData = function()
@@ -422,7 +423,7 @@ panelUserConfig.saveContent = function()
 						crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 					}
 				}
-			});
+			}, panelUserConfig.saveParams);
 		}
 		function saveSQLOptions(callback)
 		{
@@ -464,6 +465,7 @@ panelUserConfig.saveContent = function()
 						callback(false);
 					}
 				}
+				, panelUserConfig.saveParams
 			);
 		}
 

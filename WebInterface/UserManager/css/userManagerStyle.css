@@ -1316,6 +1316,68 @@ ul#context-menu li {
 #testResultDialog table td {
     padding: 6px;
 }
-.v9-only{
-    display: none;
+td.customForm{
+    display: table-cell;
+}
+
+#user-roles h3 {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+#user-roles div {
+    padding: 0px;
+    border: none;
+    border-radius: 0px;
+}
+
+#user-roles div div.option {
+    display: inline-block;
+    padding: 5px;
+    width: 48%;
+    white-space: nowrap;
+}
+
+span.select-items {
+    float: right;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+#user-roles .filters input{
+    padding: 4px;
+    width: 300px;
+}
+
+#user-roles .filters{
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#user-roles .filters .select-items{
+    margin-top: 5px;
+}
+
+#user-roles .panel{
+    max-height: 650px;
+    overflow-y: auto;
+}
+
+#user-roles .field-label{
+    cursor: pointer;
+    top: -4px;
+    position: relative;
+}
+
+#user-roles .nothing-found{
+    text-align: center;
+    padding: 20px;
+}
+
+.not-allowed{
+    border: 1px solid red;
+    display: none !important;
+}
+div.jHtmlArea .ToolBar{
+    width: 100% !important;
 }

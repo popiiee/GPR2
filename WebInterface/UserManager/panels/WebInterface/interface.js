@@ -8,7 +8,6 @@ panelWebInterface.localization = {};
 
 // Panel details
 var panelName = "WebInterface";
-panelWebInterface._panel = $("#pnl" + panelName);
 
 // Localizations
 panelWebInterface.localization = {};
@@ -199,7 +198,7 @@ panelWebInterface.bindFormsDropdown = function(list) {
 panelWebInterface.buttons = [
   '(delete)::::javascript:performAction("delete");|Delete',
   '(rename)::::javascript:performAction("rename");|Rename',
-  // '(write)::::javascript:performAction("edit");|Edit',
+  '(write)::::javascript:performAction("edit");|Edit file (for context menu only)',
   '(download)::::javascript:performAction("download");|Download',
   '(download)::::javascript:performAction("quickAdvancedDownload");|Advanced Download',
   '(download)::::javascript:performAction("downloadAll");|Download All',
@@ -310,9 +309,9 @@ panelWebInterface.bindEvents = function() {
             if (selected.attr("key") == "maxImageSizeForThumbnail") {
                 options = ["1|Small", "2|Medium", "3|Large"];
             }
-            // if (selected.attr("defaultVal") == "true" || selected.attr("defaultVal") == "false") {
-            //     options = ["true|True", "false|False"];
-            // }
+            if (selected.attr("defaultVal") == "true" || selected.attr("defaultVal") == "false") {
+                options = ["true|True", "false|False"];
+            }
             var note = selected.attr("notes") || false;
             if(note)
                 note = "<div style='margin-top:10px'>"+note+"</div>";
@@ -466,9 +465,9 @@ panelWebInterface.bindEvents = function() {
             if (selected.attr("key") == "maxImageSizeForThumbnail") {
                 options = ["1|Small", "2|Medium", "3|Large"];
             }
-            // if (selected.attr("defaultVal") == "true" || selected.attr("defaultVal") == "false") {
-            //     options = ["true|True", "false|False"];
-            // }
+            if (selected.attr("defaultVal") == "true" || selected.attr("defaultVal") == "false") {
+               options = ["true|True", "false|False"];
+            }
             var note = selected.attr("notes") || false;
             if(note)
                 note = "<div style='margin-top:10px'>"+note+"</div>";

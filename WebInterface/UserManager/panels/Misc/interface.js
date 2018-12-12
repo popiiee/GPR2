@@ -8,7 +8,6 @@ panelMisc.localization = {};
 
 // Panel details
 var panelName = "Misc";
-panelMisc._panel = $("#pnl" + panelName);
 
 // Localizations
 panelMisc.localization = {
@@ -312,18 +311,27 @@ panelMisc.generateXML = function()
 		var username = panelMisc.user.created_by_username;
 		var email = panelMisc.user.created_by_email || "";
 		var time = panelMisc.user.created_time || getServerTime();
-		xml +="\r\n<created_by_username>"+username+"</created_by_username>";
-		xml +="\r\n<created_by_email>"+email+"</created_by_email>";
-		xml +="\r\n<created_time>"+time+"</created_time>";
+		var password_history = panelMisc.user.password_history || "";
+		if(!userManager.methods.seperateValueAndInheritValue(username).inherit)
+			xml +="\r\n<created_by_username>"+username+"</created_by_username>";
+		if(!userManager.methods.seperateValueAndInheritValue(email).inherit)
+			xml +="\r\n<created_by_email>"+email+"</created_by_email>";
+		if(!userManager.methods.seperateValueAndInheritValue(time).inherit)
+			xml +="\r\n<created_time>"+time+"</created_time>";
+		if(!userManager.methods.seperateValueAndInheritValue(password_history).inherit)
+			xml +="\r\n<password_history>"+password_history+"</password_history>";
 	}
 	else
 	{
 		var username = $(document).data("username");
 		var email = userManager.currentUserEmail || "";
 		var time = getServerTime();
+		var password_history = panelMisc.user && panelMisc.user.password_history || "";
 		xml +="\r\n<created_by_username>"+username+"</created_by_username>";
 		xml +="\r\n<created_by_email>"+email+"</created_by_email>";
 		xml +="\r\n<created_time>"+time+"</created_time>";
+		if(!userManager.methods.seperateValueAndInheritValue(password_history).inherit)
+			xml +="\r\n<password_history>"+password_history+"</password_history>";
 	}
 	return xml;
 }

@@ -105,6 +105,7 @@ panelWebInterface.init = function() {
         resizable: false,
         closeOnEscape: true
     });
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelWebInterface.bindData = function() {
@@ -2086,7 +2087,7 @@ panelWebInterface.saveContent = function() {
                         crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
                     }
                 }
-            });
+            }, panelWebInterface.saveParams);
         }
 
         function saveCustomForms(callback) {
@@ -2179,7 +2180,7 @@ panelWebInterface.saveContent = function() {
                         crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
                     }
                 }
-            });
+            }, panelWebInterface.saveParams);
         }
 
         function saveMiniURLs(callback) {
@@ -2220,7 +2221,7 @@ panelWebInterface.saveContent = function() {
                         crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
                     }
                 }
-            });
+            }, panelWebInterface.saveParams);
         }
 
         function saveLoginPages(callback) {
@@ -2259,7 +2260,7 @@ panelWebInterface.saveContent = function() {
                         crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
                     }
                 }
-            });
+            }, panelWebInterface.saveParams);
         }
 
         function saveProxyRules(callback) {
@@ -2298,7 +2299,7 @@ panelWebInterface.saveContent = function() {
                         crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
                     }
                 }
-            });
+            }, panelWebInterface.saveParams);
         }
 
         crushFTP.UI.showIndicator(false, false, "Please wait..");

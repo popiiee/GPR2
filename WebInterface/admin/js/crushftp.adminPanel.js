@@ -96,7 +96,7 @@ var adminPanel = {
 		},
 		dataRefreshCall : function (onlySessionInfo) {
 			crushFTP.UI.showIndicator(true, $("#statusPanelTabs"));
-			if((panelServerInfo && panelServerInfo._panel.is(":visible")) || (window.panelDashboard && window.panelDashboard._panel.is(":visible")) || (window.panelAbout && window.panelAbout._panel.is(":visible")))
+			if((panelServerInfo && panelServerInfo._panel.is(":visible")) || (window.panelDashboard && window.panelDashboard._panel.is(":visible") && window.panelDashboard.isLive) || (window.panelAbout && window.panelAbout._panel.is(":visible")))
 			{
 				adminPanel.dataRepo.refreshServerInfo(function(items, xml){
 					if(panelServerInfo.bindData)
@@ -107,7 +107,7 @@ var adminPanel = {
 							panelServerInfo.bindData.serverInfo(items);
 					}
 					window.currentServerInfo = items;
-					if(window.panelDashboard._panel.is(":visible") && window.panelDashboard && window.panelDashboard.bindData)
+					if(window.panelDashboard._panel.is(":visible") && window.panelDashboard && window.panelDashboard.bindData && window.panelDashboard.isLive)
 					{
 						panelDashboard.bindData(items, xml);
 					}
@@ -176,17 +176,6 @@ var adminPanel = {
 		{
 			var items = [];
 			crushFTP.data.loadAllPrefs(function(data){
-				var v9_beta = $(data).find("v9_beta").text() == "true";
-                if(!crushFTP.V9Beta && v9_beta){
-                    var sheet = (function() {
-                        var style = document.createElement("style");
-                        style.appendChild(document.createTextNode(""));
-                        document.head.appendChild(style);
-                        return style.sheet;
-                    })();
-                    sheet.insertRule(".v9-only { display: inherit !important; }", 0);
-                }
-                crushFTP.V9Beta = v9_beta;
 				if(data && typeof data.getElementsByTagName !="undefined" && data.getElementsByTagName("result_value") && data.getElementsByTagName("result_value").length > 0)
 				{
 					data = data.getElementsByTagName("result_value")[0];

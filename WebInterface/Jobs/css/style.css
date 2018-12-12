@@ -30,6 +30,7 @@ div#footer {
     position: relative;
     margin: 0px 10px 0px 0px;
     overflow: hidden;
+    cursor: crosshair;
 }
 #linkedPopupPlaceholder
 {
@@ -169,12 +170,14 @@ div#footer {
     box-shadow: -3px 3px 10px #665C5C;
     -moz-box-shadow: -3px 3px 10px #665C5C;
     -webkit-box-shadow: -3px 3px 10px #665C5C;
+    cursor: default;
 }
 .crushTaskItem {
     margin: 0 1em 1em 0;
     max-width: 330px;
     min-width: 200px;
     position: absolute;
+    cursor: default;
     /*height: 160px;*/
 }
 .highlighted {
@@ -727,6 +730,14 @@ mark {
     background: #F0EBEB;
 }
 
+#jobsScheduleList{
+    border-radius: 0px;
+    border-right: 0px;
+    border-left: 0px;
+    border-bottom: 0px;
+    background: transparent;
+}
+
 #jobsScheduleList li, #activeScheduleList li
 {
     border-bottom-width: 1px;
@@ -735,6 +746,14 @@ mark {
     padding-bottom: 5px;
     background-image: none;
     min-height: 50px;
+    position: relative;
+}
+
+#jobsScheduleList li span.favorite, #activeScheduleList li span.favorite {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
 }
 
 #jobsScheduleList li.folder, #activeScheduleList li.folder{
@@ -762,6 +781,13 @@ mark {
     position: relative;
     padding-top: 2px;
     margin-bottom: 6px;
+}
+
+#jobsScheduleList li div.meta .dates
+{
+    text-align: right;
+    display: block;
+    padding-right: 5px;
 }
 
 #jobsScheduleList li div.meta.active, #jobsScheduleList li div.meta.inactive
@@ -1059,12 +1085,125 @@ span.browse-button a.button span.ui-button-text{
     max-width: 500px;
 }
 
-.v9-only{
-    display: none;
-}
 .task-notes-icon{
     position: absolute;
     right: 115px;
     top: 4px;
     cursor: help;
+}
+#existingJobs
+{
+    padding: 0px;
+}
+.jobsPanelButtons{
+    top: 5px;
+    position: relative;
+    margin: 5px;
+}
+#jobsScheduleListActions{
+    margin: 8px 0px 8px 2px;
+    right: 10px;
+    position: absolute;
+    top: 40px;
+}
+#existingJobsPanel{
+    border-radius: 0px;
+    box-shadow: none;
+    border: none;
+    display: block;
+}
+#availableJobsTabs{
+    border-radius: 0px;
+}
+#availableJobsTabs .availableJobsTabs{
+    border-radius: 0px;
+}
+
+.back-button{
+    background: url(/WebInterface/jQuery/images/arrow_turn_up.png) left top no-repeat;
+    background-position: 10px 8px;
+    padding-left: 35px;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    background-color: #eee;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}
+
+.path-selector
+{
+    width:100%;
+    position: relative;
+    padding:3px 0px 0px 0px;
+    height:25px;
+    margin-bottom:5px;
+    text-align: center;
+}
+
+.path-selector select
+{
+    width:95%;
+    height:25px;
+}
+
+.ui-autocomplete {
+    width : 365px !important;
+}
+.autocompleteListBox
+{
+    z-index: 99999 !important;
+}
+
+.pinned-sidebar .taskDesignerButtons{
+    margin-left: 420px !important;
+}
+
+.pinned-sidebar #existingJobsPanel{
+    margin-left: -420px !important;
+    margin-top: -10px !important;
+}
+
+.pinned-sidebar #placeHolder{
+    padding-left: 388px;
+}
+
+.pinned-sidebar .zoomSlider {
+    left: 20px;
+    bottom: 40px;
+    position: relative;
+}
+
+.pinned-sidebar #existingJobsPanel #availableJobsTabs .closeBtn{
+    display: none;
+}
+
+.pinBtn
+{
+    float: right;
+    top: -3px;
+    right: -5px;
+    position: relative;
+}
+
+.pinBtn.on{
+    display: none;
+}
+
+.pinned-sidebar .pinBtn.off{
+    display: none;
+}
+
+.pinned-sidebar .pinBtn.on{
+    display: inline-block;
+    right: 5px !important;
+}
+.sideBarList.noBorder li{
+    margin: 0px;
+}
+img.ui-datepicker-trigger {
+    top: 3px;
+    position: relative;
+    cursor: pointer;
+    left: 2px;
 }

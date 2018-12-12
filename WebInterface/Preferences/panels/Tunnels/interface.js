@@ -58,6 +58,7 @@ panelTunnels.init = function(){
 	crushFTP.methods.setPageTitle(panelTunnels.localization.Header, true);
 	panelTunnels.bindData();
 	panelTunnels.bindEvents();
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelTunnels.bindData = function()
@@ -418,6 +419,7 @@ panelTunnels.saveContent = function()
 								crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 							}
 						}
+						, panelTunnels.saveParams
 					);
 				}
 				else
@@ -425,6 +427,7 @@ panelTunnels.saveContent = function()
 					crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 				}
 			}
+			, panelTunnels.saveParams
 		);
 	}
 	else

@@ -53,6 +53,7 @@ panelGeneralSettings.init = function() {
     applyLocalizations(panelName, localizations.panels);
     crushFTP.methods.setPageTitle(panelGeneralSettings.localization.Header, true);
     panelGeneralSettings.bindData();
+    setupPrefsReplicationSave(_panel, panelName);
 };
 
 panelGeneralSettings.bindData = function() {
@@ -530,7 +531,7 @@ panelGeneralSettings.saveContent = function() {
             } else {
                 crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
             }
-        });
+        }, panelGeneralSettings.saveParams);
     } else {
         crushFTP.UI.growl("No changes made", "", false, 3000);
     }

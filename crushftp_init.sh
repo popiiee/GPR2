@@ -18,7 +18,7 @@
 # Description:       Starts Crush on boot  
 ### END INIT INFO  
 # THESE NEED TO BE SET
-CRUSH_DIR="/var/opt/CrushFTP8_PC/" #crushftp directory
+CRUSH_DIR="/var/opt/CrushFTP9_PC/" #crushftp directory
 CRUSH_INIT_SCRIPT="$CRUSH_DIR"crushftp_init.sh
 USER="root" # only work for this user
 JAVA="java"
@@ -284,7 +284,7 @@ case "$1" in
 				touch /etc/systemd/system/crushftp.service
 				cat <<-EOT >/etc/systemd/system/crushftp.service
 				[Unit]
-					Description=CrushFTP 8 Server
+					Description=CrushFTP 9 Server
 					Documentation=http://www.crushftp.com/
 					After=network.target auditd.service named.service
 				[Service]

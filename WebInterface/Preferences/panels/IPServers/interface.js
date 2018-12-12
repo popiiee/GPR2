@@ -492,6 +492,8 @@ panelIPServers.bindEvents = function()
 		}
 	});
 
+	$(".ssl-guide", _panel).sslGuideButton();
+
 	$("input[name='serverType']", _panel).change(function(){
 		panelIPServers.showHideItemsForServerType();
 	});
@@ -803,6 +805,22 @@ panelIPServers.bindEvents = function()
 		{
 			$("#serverlist").closest("td").unblock();
 			$("#saveContent").show();
+		}
+	});
+
+	settingsPanel.find("#proxy_header, #proxy_header_v2").bind("change", function(){
+		var isv1 = $(this).is("#proxy_header");
+		var v1 = settingsPanel.find("#proxy_header");
+		var v2 = settingsPanel.find("#proxy_header_v2");
+		if($(this).is(":checked")){
+			if(isv1){
+				crushFTP.UI.checkUnchekInput(v2);
+				v2.trigger('change');
+			}
+			else{
+				crushFTP.UI.checkUnchekInput(v1);
+				v1.trigger('change');
+			}
 		}
 	});
 

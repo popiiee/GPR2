@@ -752,7 +752,7 @@ li.ui-draggable
 
 .dashboardGraphPanel
 {
-    width: 158px;
+    width: 175px;
     height: 170px;
     float: left;
     margin: 5px 0px 10px 5px;
@@ -799,6 +799,16 @@ li.ui-draggable
     left:0px;
 }
 
+.dashboardGraphPanelGroup .secondary-legend{
+    white-space: nowrap;
+    position: absolute;
+    top: 19px;
+    font-size: 10px;
+    text-align: right;
+    width: 100%;
+    right: 20px;
+}
+
 .dashboardLegends div.label
 {
     float: left;
@@ -842,6 +852,8 @@ li.ui-draggable
     padding: 5px !important;
     margin-bottom: 2px;
     max-height:55px;
+    background: transparent;
+    border-radius: 0px;
 }
 
 .lastLogins .listItem:hover
@@ -1109,10 +1121,45 @@ li.ui-draggable
     cursor: pointer;
 }
 
-.v9-only{
-    display: none;
+#configOptionTabs fieldset, #pnlGraphs{
+    background: transparent;
+    border-radius: 0px;
+    position: relative;
 }
 
+#serverGraphsTabDashboard{
+    padding-bottom: 10px;
+}
+
+#pnlGraphs{
+    border: 0px;
+}
+
+#configOptionTabs fieldset legend{
+    background-image: none;
+    border: 0px;
+    border-radius: 0px;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+#pnlGraphs fieldset{
+    float:left;
+    width: 46%;
+    margin-right: 15px;
+    overflow:hidden;
+    height: 150px;
+}
+@media (max-width: 1300px) {
+    #pnlGraphs fieldset{
+        float:none;
+        width: auto;
+        margin: 0px;
+    }
+}
+#placeHolder{
+    margin: 0px;
+}
 .splitter .ui-resizable-e
 {
     background: #cacaca;
@@ -1129,4 +1176,104 @@ li.ui-draggable
 
 .splitter .ui-resizable-e:hover{
     opacity: 1;
+}
+
+.live
+{
+    background-image: url("/WebInterface/Resources/images/bullet_green.png");
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 11px;
+    padding-left: 16px;
+    background-repeat: no-repeat;
+    line-height: 16px;
+}
+
+label.date-time-picker{
+    top:0px;
+    margin: 0px 5px;
+    cursor: pointer;
+}
+.date-time-picker img{
+    top: 7px;
+    position: relative;
+}
+#changeSnapshotTime{
+    display: inline-block;
+    width: 1px;
+    height: 1px;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    outline: none;
+    outline-offset: 0px;
+}
+
+#dashboardStatus.online .date, #dashboardStatus.online .cancel{
+    display: none;
+}
+
+#dashboardStatus .live{
+    filter: grayscale(100);
+    opacity: 0.6;
+}
+
+#dashboardStatus.online .live{
+    filter: grayscale(0);
+    opacity: 1;
+}
+
+
+#dashboardStatus .prev, #dashboardStatus .next{
+    cursor: pointer;
+    text-decoration: none;
+}
+
+#dashboardStatus .cancel{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#lastSnapshotTime{
+    border-bottom: 1px dashed #999;
+    cursor: pointer;
+}
+
+#dashboardStatus .prev.disabled, #dashboardStatus .next.disabled{
+    opacity: 0.5;
+    cursor: text;
+}
+
+#osCPUGraph canvas, #serverCPUGraph canvas {
+    border-left: 1px solid #999;
+    border-bottom: 1px solid #999;
+}
+
+#osCPUGraph, #serverCPUGraph{
+    position: relative;
+}
+
+#osCPUGraph::before, #serverCPUGraph::before {
+    content: "100";
+    position: absolute;
+    left: -22px;
+    top: -4px;
+}
+
+#osCPUGraph::after, #serverCPUGraph::after {
+    content: "0";
+    position: absolute;
+    left: -10px;
+    top: 90px;
+}
+#pnlGraphs span.options{
+    float: right;
+    position: relative;
+    top:-3px;
+}
+
+#pnlGraphs span.options label{
+    cursor: pointer;
+    margin-right: 5px;
 }

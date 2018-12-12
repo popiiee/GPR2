@@ -76,6 +76,7 @@ panelPreview.init = function(isRefresh){
 	panelPreview.bindData();
 	panelPreview.bindPrefsData();
 	panelPreview.bindEvents();
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelPreview.initLayout = function(isRefresh)
@@ -910,7 +911,7 @@ panelPreview.saveContent = function()
 						{
 							crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 						}
-					});
+					}, panelPreview.saveParams);
 				}
 				/*else
 				{
@@ -927,7 +928,7 @@ panelPreview.saveContent = function()
 				crushFTP.UI.hideIndicator();
 				crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 			}
-		});
+		}, panelPreview.saveParams);
 	}
 	else
 	{

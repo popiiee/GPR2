@@ -35,6 +35,7 @@ panelEmailTemplates.init = function(isRefresh){
 	panelEmailTemplates.bindData();
 	panelEmailTemplates.bindEvents();
 	$("#emailTemplatesList", _panel).val("").trigger("change");
+    setupPrefsReplicationSave(_panel, panelName);
 }
 
 panelEmailTemplates.initLayout = function(isRefresh)
@@ -328,7 +329,7 @@ panelEmailTemplates.saveContent = function()
 				crushFTP.UI.hideIndicator();
 				crushFTP.UI.growl("Error while saving", "Your changes are not saved", true);
 			}
-		});
+		}, panelEmailTemplates.saveParams);
 	}
 	else
 	{

@@ -10,6 +10,7 @@
     <link type="text/css" href="/WebInterface/Resources/css/themes/ui-lightness.zip/jquery-ui.css" rel="stylesheet" />
     <link type="text/css" href="/WebInterface/Resources/css/style.css" rel="stylesheet" />
     <link type="text/css" href="/WebInterface/Resources/css/vtip.css" rel="stylesheet" />
+    <link type="text/css" href="/WebInterface/Resources/css/jHtmlArea/jHtmlArea.css" rel="stylesheet" />
     <link type="text/css" href="/WebInterface/Resources/js/ColorPicker/colorPicker.css" rel="stylesheet" />
     <link type="text/css" href="/WebInterface/Resources/js/ContextMenu/context.css" rel="stylesheet" />
     <link type="text/css" href="css/userManagerStyle.css" rel="stylesheet" />
@@ -22,7 +23,7 @@
     </style>
     <![endif]-->
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.4.1.min.js"></script>
     <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.json-2.2.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery-ui-1.8.23.min.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery.ui.selectableAdvanced.js"></script>
@@ -37,6 +38,7 @@
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery.multiFieldExtender-2.0.min.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery.notify.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/vtip.js"></script>
+    <script type="text/javascript" src = "/WebInterface/Resources/js/jHtmlArea-0.7.0.min.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/browserSelector.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jQuery.cookie.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/ColorPicker/jquery.colorPicker.js"></script>
@@ -55,8 +57,10 @@
     <script type="text/javascript" src="/WebInterface/Resources/js/seekAttention.jquery.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery.highlight.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/moment.min.js"></script>
+    <script type="text/javascript" src="/WebInterface/Resources/js/crushftp.replicationSave.js"></script>
     <script type="text/javascript" src="js/crushftp.localizations.js"></script>
     <script type="text/javascript" src="js/crushftp.userManager.js"></script>
+    <script type="text/javascript" src="js/userManagerRoles.js"></script>
     <script type="text/javascript" src="js/crushftp.init.js"></script>
     <script type="text/javascript" src="team-setup/js/interface.js"></script>
     <script type="text/javascript" src="/WebInterface/admin/js/crushftp.telnet.inject.js"></script>
@@ -93,7 +97,7 @@
     </script>
 </head>
 
-<body id="GUIInterface">
+<body id="GUIInterface" class="user-management">
     <div id="autocompleteFix" style="position:absolute;top:-200px;">
         <input type="text" name="email" value="" style="display: none" />
         <input type="text" name="email" value="Alice"/>
@@ -414,7 +418,7 @@
                     <li>
                         <div id="switcher" style="position:relative;top:2px;left:10px;"></div>
                     </li>
-                    <li class="adminOnly" style="top: 3px;">
+                    <li style="top: 3px;">
                         <div class="connectionSwitch" style="margin-top:8px;margin-left:5px;left:15px;display:block;">
                             <span style='display: inline-block; margin: 1px 3px 0px -5px;float: left;top:-3px;position: relative;' class='ui-icon ui-icon-link'></span>
                             <label for="userConnectionGroups">User connection group :</label>
@@ -596,7 +600,7 @@
                                 This is preview of user <span class="user"></span>'s version : <span class="version"></span>
                             </div>
                             <div>
-                                Just hit <a href="#" id="savePreviewVersion">Save All Changes</a> to rollback user to shown version or <a href="#" id="cancelRollback">Cancel</a> rollback.
+                                Just hit <a href="#" id="savePreviewVersion">Save</a> to rollback user to shown version or <a href="#" id="cancelRollback">Cancel</a> rollback.
                             </div>
                         </div>
                          <div class="rollback-preview-warning" id="undeleteMessage" style="display: none;">
@@ -604,7 +608,7 @@
                                 This is preview of deleted user <span class="user"></span> as on <span class="version"></span>
                             </div>
                             <div>
-                                Just hit <a href="#" id="savePreviewVersion">Save All Changes</a> to restore this user or <a href="#" id="cancelRollback">Cancel</a>.
+                                Just hit <a href="#" id="savePreviewVersion">Save</a> to restore this user or <a href="#" id="cancelRollback">Cancel</a>.
                             </div>
                         </div>
                         <div id="loadingIndicator"></div>
@@ -722,7 +726,7 @@
                     <a href="#" class="button" id="saveUserData">
                         <span style='display: inline-block; margin: 0px 3px 0px -7px;
                         float: left;' class='pointer ui-icon ui-icon-check'></span>
-                        <span class="">Save All Changes</span>
+                        <span class="">Save</span>
                     </a>
                     <a href="#" class="button" id="cancelChanges">
                         <span style='display: inline-block; margin: 0px 3px 0px -7px;
@@ -731,9 +735,9 @@
                     </a>
                 </span>
                 <a href="#" class="button backToTop" id="">
-                    <span style='display: inline-block;margin: 0px 3px 0px 0px; float: left;position:relative;left:15px;' class='pointer ui-icon ui-icon-arrowreturnthick-1-n'>
+                    <span style='display: inline-block;margin: 0px 3px 0px 0px; float: left;position:relative;left:5px;' class='pointer ui-icon ui-icon-arrowreturnthick-1-n'>
                     </span>
-                    <span style="margin-left:7px;">Back to top</span>
+                    <span>Back to top</span>
                 </a>
             </div>
             <div style="float:left;margin-top:10px;">
@@ -758,12 +762,20 @@
         </li>
     </ul>
     <div id="emailTemplatesDialog" class="customForm" title="Email Templates" style="display:none;">
-        Template :
-        <select id="emailTemplatesList" style="width:350px;margin-top:5px;">
-        </select>
+        <div>
+            <span>Template : <select id="emailTemplatesList" style="width:350px;margin-top:5px;position: relative;top: 4px;"></select></span>
+        </div>
         <table id="templateDetails" width="100%" cellpadding="0" cellspacing="0" border="0" style="display:none;margin:5px;">
-            <tr>
-                <td class="customForm">
+            <tr class="template-viewmode">
+                <td style="text-align: right;">
+                    <a id="editEmailTemplate" href="#" class="button" style="top: 0px;">
+                        <span style='display: inline-block;margin: 0px 3px 0px -7px; float: left;' class='pointer ui-icon ui-icon-pencil'></span>
+                        <span class="">Edit</span>
+                    </a>
+                </td>
+            </tr>
+            <tr class="template-viewmode">
+                <td class="customForm view">
                     <div class="ui-priority-primary" style="margin-top:10px;">
                         <label>From :</label>
                     </div>
@@ -783,6 +795,12 @@
                         <div id="emailTemplateEmailBCC" class="ui-widget" style="padding:3px 10px;"></div>
                     </div>
                     <div class="ui-priority-primary" style="margin-top:10px;">
+                        <label>Reply To :</label>
+                    </div>
+                    <div>
+                        <div id="emailTemplateEmailReplyTo" class="ui-widget" style="padding:3px 10px;"></div>
+                    </div>
+                    <div class="ui-priority-primary" style="margin-top:10px;">
                         <label>Subject :</label>
                     </div>
                     <div>
@@ -793,6 +811,40 @@
                     </div>
                     <div>
                         <div id="emailTemplateBody" class="ui-widget" style="padding:3px 10px;max-height:300px;overflow-y: auto;"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="template-editmode">
+                <td class="customForm edit">
+                    <div class="ui-priority-primary" style="margin-top:10px;">
+                        <label>From :</label>
+                    </div>
+                    <div>
+                        <input type="text" class="bigInputBox" id="emailTemplateEmailFromEdit" />
+                    </div>
+                    <div class="ui-priority-primary" style="margin-top:10px;">
+                        <label>CC :</label>
+                    </div>
+                    <div>
+                        <input type="text" class="bigInputBox" id="emailTemplateEmailCCEdit" />
+                    </div>
+                    <div class="ui-priority-primary" style="margin-top:10px;">
+                        <label>BCC :</label>
+                    </div>
+                    <div>
+                        <input type="text" class="bigInputBox" id="emailTemplateEmailBCCEdit" />
+                    </div>
+                    <div class="ui-priority-primary" style="margin-top:10px;">
+                        <label>Subject :</label>
+                    </div>
+                    <div>
+                        <input type="text" class="bigInputBox" id="emailTemplateSubjectEdit" />
+                    </div>
+                    <div class="ui-priority-primary" style="margin-top:10px;">
+                        <label>Body :</label>
+                    </div>
+                    <div>
+                        <textarea id="emailTemplateBodyEdit" style="width: 99%;height:250px;"></textarea>
                     </div>
                 </td>
             </tr>

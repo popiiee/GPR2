@@ -288,12 +288,12 @@
                     <input type="checkbox" _name="segmented" name="segmented" class="ignoreBind" id="segmented" />
                     <label for="segmented">Store files split into segments.</label>
                 </p>
-                <p class="gdriveCredentials v9-only">
+                <p class="gdriveCredentials">
                     <input type="checkbox" _name="team_drive" name="team_drive" class="ignoreBind" id="team_drive" />
                     <label for="team_drive">Enable Team Drive</label>
                 </p>
                 <div class="sftpOptions">
-                    <div class="v9-only">
+                    <div>
                         <div class="sftp-suggested-settings compact"></div>
                     </div>
                 </div>
@@ -1582,10 +1582,11 @@
                                         <div class="clear" style="position:relative;top:-15px;">
                                             <div class="user-variables">
                                                 <div class="quarter-panel" title="You can reference this variable in all future tasks as {myVariable}">
-                                                    <input placeholder="Name" recName="name" type="text" id="varName" name="varName" class="ignoreBind showInSnippet" style="width:100%" />
+                                                    <input placeholder="Name" recName="name" type="text" id="varName" name="varName" class="ignoreBind showInSnippet varname" style="width:100%" />
                                                 </div>
                                                 <div class="third-half-panel">
-                                                <textarea placeholder="Value" recName="value" type="text" id="varValue" name="varValue" class="ignoreBind showInSnippet" style="width:100%;" rows="2"></textarea>
+                                                <textarea placeholder="Value" recName="value" type="text" id="varValue" name="varValue" class="ignoreBind showInSnippet varvalue" style="width:100%;" rows="2"></textarea>
+                                                <input placeholder="Value" recName="value" type="password" name="varValue" class="ignoreBind varvalue password" style="width:100%;display: none;" />
                                                 </div>
                                                 <div class="clear"></div>
                                             </div>
@@ -2039,6 +2040,18 @@
                                             <input type="checkbox" id="skip_link_on_empty" name="skip_link_on_empty" class="ignoreBind" />
                                             <label for="skip_link_on_empty" class="CrushTask">Continue on and skip linked job when there are no items.</label>
                                         </div>
+                                        <div>
+                                            <input type="checkbox" id="run_job" name="run_job" class="ignoreBind" />
+                                            <label for="run_job" class="CrushTask">Run as external job (same as clicking test and run on that job).</label>
+                                        </div>
+                                        <p class="subPanel ui-widget-content leftborder nobg">
+                                            <input type="checkbox" id="run_job_items" name="run_job_items" class="ignoreBind" />
+                                            <label for="run_job_items" class="CrushTask">Pass current filtered items to linked job.</label>
+                                        </p>
+                                        <p class="subPanel ui-widget-content leftborder nobg">
+                                            <input type="checkbox" id="run_job_async" name="run_job_async" class="ignoreBind" />
+                                            <label for="run_job_async" class="CrushTask">Run job async and don't wait for it.</label>
+                                        </p>
                                         <div style="margin:10px 0px;" class="dmzOption">
                                             <label for="use_dmz">Route connection through DMZ when possible : </label>
                                             <select rel="link_item" _name="use_dmz" style="width:140px;"  id="use_dmz"></select>

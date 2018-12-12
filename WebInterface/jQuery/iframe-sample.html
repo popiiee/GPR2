@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>CrushFTP iframe communication sample page</title>
+    <script type="text/javascript">
+        /*
+            This is how the host page will have to listen to messages from CrushFTP iframe
+        */
+        function formatBytes(bytes) {
+            if ((bytes / 1024).toFixed(0) == 0) return bytes + " bytes";
+            else if ((bytes / 1024 / 1024).toFixed(0) == 0) return (bytes / 1024).toFixed(1) + " KB";
+            else if ((bytes / 1024 / 1024 / 1024).toFixed(0) == 0) return (bytes / 1024 / 1024).toFixed(1) + " MB";
+            else if ((bytes / 1024 / 1024 / 1024 / 1024).toFixed(0) == 0) return (bytes / 1024 / 1024 / 1024).toFixed(1) + " GB";
+            else if ((bytes / 1024 / 1024 / 1024 / 1024 / 1024).toFixed(0) == 0) return (bytes / 1024 / 1024 / 1024 / 1024).toFixed(1) + " TB";
+        };
+
+        window.addEventListener('message', function(e){
+            var data = e.data; /*This object will contain message from CrushFTP UI*/
+            /*
+                Sample message object:
+                1) When upload starts
+                {
+                    "type":"uploadStarted",
+                    "mode":"all-files",
+                    "files":[
+                        {
+                            "name":"KB2.txt"
+                            ,"uploading_to":"/test MBOX/KB2.txt"
+                            ,"size":2048
+                            ,"status":""
+                        },
+                        {
+                            "name":"KB4.txt",
+                            "uploading_to":"/test MBOX/KB4.txt",
+                            "size":4096,
+                            "status":""
+                        }
+                    ]
+                }
+
+                2) When upload completes
+                {
+                    "type":"uploadCompleted",
+                    "files":[
+                        {
+                            "name":"KB2.txt",
+                            "uploading_to":"/test MBOX/KB2.txt",
+                            "size":2048,
+                            "status":"done"
+                        },
+                        {
+                            "name":"KB4.txt",
+                            "uploading_to":"/test MBOX/KB4.txt",
+                            "size":4096,
+                            "status":"done"
+                        }
+                    ]
+                }
+            */
+            if(!data)return;
+            var result = document.getElementById("result");
+            data.mode = data.mode || "-";
+
+            var files = "";
+            if(data.files){
+                files = "<br><strong>List of files:</strong><ul>";
+                for(var i =0; i < data.files.length;i++){
+                    var curFile = data.files[i];
+                    files += "<li>Name: "+curFile.name+", Uploading To: "+curFile.uploading_to+", Size: "+formatBytes(curFile.size)+", Status: "+curFile.status+"</li>"
+                }
+                files += "</ul>";
+            }
+
+            result.innerHTML += "<br> <strong>Event: </strong>" + data.type + " <strong>Mode:</strong>" + data.mode + " <strong>Total files:</strong>" + data.files.length + files;
+        });
+    </script>
+    <style>
+        #result{
+                position: absolute;
+                right: 10px;
+                border: 1px solid #eee;
+                background: #fff;
+                padding: 10px;
+                line-height: 27px;
+                min-width: 800px;
+                min-height: 120px;
+                box-shadow: 0px 0px 6px 0px #eee;
+                border-radius: 3px;
+                font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="result">
+        <strong>Events log</strong>
+    </div>
+    <!-- Change the src below to your server -->
+    <iframe src="https://mbox-it.be.jnj.com/?u=WISE_Upload_Only_iframe&p=Test%231234&wi_onlyAllowedExtensionsToUpload=.doc,.ppt,.xls&path=/ITS_WISE_test004/" width="1000px" height="900px" frameborder="0"></iframe>
+</body>
+</html>

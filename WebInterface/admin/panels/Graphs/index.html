@@ -1,12 +1,25 @@
 <!-- Panel HTML -->
-<div id="pnlGraphs" class="adminPanel">
+<div id="pnlGraphs" class="adminPanel ui-widget-content">
 	<fieldset>
 		<legend>Connections : </legend>
 		<div class="graphNotes">
-			<span>Current : </span><span id="connectionCurrent" class="ui-priority-primary"></span>, <span>Max : </span><span id="connectionMax" class="ui-priority-primary"></span>
+			<span>Current : </span><span id="connectionCurrent" class="ui-priority-primary"></span>, <span>Max : </span><span id="connectionMax" class="ui-priority-primary"></span>, <span>Unique Current : </span><span id="connectionUnique" class="ui-priority-primary"></span>, <span>Unique Max : </span><span id="connectionUniqueMax" class="ui-priority-primary"></span>
+			<span class="options">
+				<input checked="checked" type="radio" name="connection_type" val="all" id="connectionsAllCB" /><label for="connectionsAll">All</label>
+				<input type="radio" name="connection_type" val="unique" id="connectionsUniqueCB" /><label for="connectionsUnique">Unique</label>
+			</span>
 		</div>
-		<div style="margin:1px px">
+		<div style="margin:1px">
 			<span id="connectionsGraph">Loading...</span>
+		</div>
+	</fieldset>
+	<fieldset id="memoryGraphPanel">
+		<legend id="memoryRelease" style="cursor:pointer;">Memory Use : </legend>
+		<div class="graphNotes">
+			<span>Max : </span><span id="ram_max" class="ui-priority-primary"></span>, <span>Free : </span><span id="ram_free" class="ui-priority-primary"></span>
+		</div>
+		<div style="margin:1px">
+			<span id="memoryGraph">Loading...</span>
 		</div>
 	</fieldset>
 	<fieldset>
@@ -14,7 +27,7 @@
 		<div class="graphNotes">
 			<span>Current : </span><span id="outSpeedCurrent" class="ui-priority-primary"></span>, <span>Max : </span><span id="outSpeedMax" class="ui-priority-primary"></span>
 		</div>
-		<div style="margin:1px px">
+		<div style="margin:1px">
 			<span id="outSpeedGraph">Loading...</span>
 		</div>
 	</fieldset>
@@ -23,21 +36,30 @@
 		<div class="graphNotes">
 			<span>Current : </span><span id="inSpeedCurrent" class="ui-priority-primary"></span>, <span>Max : </span><span id="inSpeedMax" class="ui-priority-primary"></span>
 		</div>
-		<div style="margin:1px px">
+		<div style="margin:1px">
 			<span id="inSpeedGraph">Loading...</span>
 		</div>
 	</fieldset>
-	<fieldset id="memoryGraphPanel">
-		<legend id="memoryRelease" style="cursor:pointer;">Memory Use : </legend>
+	<fieldset>
+		<legend>Server CPU : </legend>
 		<div class="graphNotes">
-			<span>Max : </span><span id="ram_max" class="ui-priority-primary"></span>, <span>Free : </span><span id="ram_free" class="ui-priority-primary"></span>
+			<span>Max : </span><span id="serverCPUMax" class="ui-priority-primary"></span>
 		</div>
-		<div style="margin:1px px">
-			<span id="memoryGraph">Loading...</span>
+		<div style="margin:15px">
+			<span id="serverCPUGraph">Loading...</span>
+		</div>
+	</fieldset>
+	<fieldset>
+		<legend>OS CPU : </legend>
+		<div class="graphNotes">
+			<span>Max : </span><span id="osCPUMax" class="ui-priority-primary"></span>
+		</div>
+		<div style="margin:15px">
+			<span id="osCPUGraph">Loading...</span>
 		</div>
 	</fieldset>
 </div>
-<div class="graphinfo" id="graphinfo">
+<div class="graphinfo" id="graphinfo ui-widget-content">
 	<span class="close">x</span>
 	<div class="title"></div>
 	<div class="nodata">No information available</div>

@@ -20,7 +20,7 @@
 	<![endif]-->
 
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="/WebInterface/Resources/js/jquery-migrate-1.4.1.min.js"></script>
     <script type="text/javascript" src = "/WebInterface/Resources/js/jquery.json-2.2.js"></script>
     <script type="text/javascript" src="/WebInterface/Resources/js/jquery-ui-1.8.23.min.js"></script>
 	<script type="text/javascript" src = "/WebInterface/Resources/js/jquery.ui.selectableAdvanced.js"></script>
@@ -38,6 +38,8 @@
     <script type="text/javascript" src = "/WebInterface/Resources/js/vtip.js"></script>
     <script type="text/javascript" src = "/WebInterface/Resources/js/browserSelector.js"></script>
 	<script type="text/javascript" src = "/WebInterface/Resources/js/jQuery.cookie.js"></script>
+    <!-- Moment js -->
+    <script type="text/javascript" src="/WebInterface/Resources/js/moment.min.js"></script>
 	<script type="text/javascript" src = "/WebInterface/Resources/js/jquery.contextMenu.js"></script>
 	<script type="text/javascript" src = "/WebInterface/Resources/js/jquery.UI.ComboBox.js"></script>
 	<script type="text/javascript" src = "/WebInterface/Resources/js/crushftp.browseVFSPopup.js"></script>
@@ -129,85 +131,81 @@
 	</div>
 	<div class="clear content" style="margin-left:0px;">
 		<div class="mainContentPanel" id="adminPanel">
-			<div id="loadingIndicator"></div>
-			<div class="ui-widget">
-				<div class="ui-widget-content">
-					<div id="notification" style="display:none;" class="ui-corner-all ui-state-error"></div>
-					<div id="placeHolder" class="customForm">
-						<div class="settings_panel">
-							<div id="configOptionTabs" class="tabs">
-							   <ul class="mainTabs">
-									<li privs="connect,server_edit,server_view" id="dashboardPanelTabLink" class="enterpriseFeature crush7Feature"><a rel="dashboardPanel" href="#dashboardPanel"><span style="display: inline-block;margin: -2px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-home">
-									</span>Dashboard</a></li>
-									<li privs="connect,server_edit,server_view"><a rel="statusPanel" href="#statusPanel"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-check">
-									</span>Status</a></li>
-									<li privs="connect,report_view,report_edit"><a rel="reportsPanel" href="#reportsPanel"><span style="display: inline-block;margin: -2px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-clipboard">
-									</span>Reports</a></li>
-									<li privs="connect,update_run"><a rel="aboutPanel" href="#aboutPanel"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-info">
-									</span>About</a></li>
-                                    <!-- tour tab -->
-                                    <li style="float:right">
-										<a href="javascript:void(0);" id="startMainTour" style="text-decoration: none"><span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-help'></span><span>Tour</span></a>
-                            		</li>
-							   </ul>
-							   <div id="dashboardPanel" class="smalltabs tabs subTabsPanel enterpriseFeature crush7Feature">
-							   </div>
-							   <div class="subTabsPanel" id="statusPanel">
-									<div id="statusPanelTabs" style="border:none;margin:0px 2px;" class="smalltabs tabs">
-									   <ul>
-										  <li><a href="#serverInfoPlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-link">
-						</span>Server Info</a></li>
-										  <li><a href="#userInfoPlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-person">
-						</span>User Info</a></li>
-									   </ul>
-									   <div class="panelHolder" id="serverInfoPlaceHolder"></div>
-									   <div class="panelHolder" id="userInfoPlaceHolder"></div>
-									 </div>
-									 <div class="clear"></div>
-							   </div>
-							   <div class="subTabsPanel" id="reportsPanel">
-									<div id="reportsPanelTabs" style="border:none;margin:0px 2px;" class="smalltabs tabs">
-									   <ul>
-										  <li><a href="#reportsSetupPlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-gear">
-						</span>Setup</a></li>
-										<li><a href="#reportsSchedulePlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-clock">
-						</span>Schedule</a></li>
-									   </ul>
-									   <div class="panelHolder" id="reportsSetupPlaceHolder"></div>
-									   <div class="panelHolder" id="reportsSchedulePlaceHolder"></div>
-									 </div>
-									 <div class="clear"></div>
-							   </div>
-							   <div class="subTabsPanel" id="aboutPanel">
-							   </div>
-							</div>
-							<div class="clear"></div>
-						</div>
-						<div class="clear"></div>
-					</div>
-				</div>
-			</div>
-			<div id="growlContainer" style="display: none;">
-				<div id="growl">
-					<a class="ui-notify-close" href="#"><span class="ui-icon ui-icon-close" style="float: right">
-					</span></a><span style="float: left; margin: 2px 5px 0 0;" class="ui-icon ui-icon-alert">
-					</span>
-					<h2>
-						#{title}</h2>
-					<p>
-						#{text}</p>
-				</div>
-			</div>
-		</div>
-	</div>
+    		<div id="loadingIndicator"></div>
+    		<div id="notification" style="display:none;" class="ui-corner-all ui-state-error"></div>
+    		<div id="placeHolder" class="customForm">
+    			<div class="settings_panel">
+    				<div id="configOptionTabs" class="tabs">
+    				   <ul class="mainTabs">
+    						<li privs="connect,server_edit,server_view" id="dashboardPanelTabLink" class="enterpriseFeature crush7Feature"><a rel="dashboardPanel" href="#dashboardPanel"><span style="display: inline-block;margin: -2px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-home">
+    						</span>Dashboard</a></li>
+    						<li privs="connect,server_edit,server_view"><a rel="statusPanel" href="#statusPanel"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-check">
+    						</span>Status</a></li>
+    						<li privs="connect,report_view,report_edit"><a rel="reportsPanel" href="#reportsPanel"><span style="display: inline-block;margin: -2px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-clipboard">
+    						</span>Reports</a></li>
+    						<li privs="connect,update_run"><a rel="aboutPanel" href="#aboutPanel"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-info">
+    						</span>About</a></li>
+                            <!-- tour tab -->
+                            <li style="float:right">
+    							<a href="javascript:void(0);" id="startMainTour" style="text-decoration: none"><span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-help'></span><span>Tour</span></a>
+                    		</li>
+    				   </ul>
+    				   <div id="dashboardPanel" class="smalltabs tabs subTabsPanel enterpriseFeature crush7Feature">
+    				   </div>
+    				   <div class="subTabsPanel" id="statusPanel">
+    						<div id="statusPanelTabs" style="border:none;margin:0px 2px;" class="smalltabs tabs">
+    						   <ul>
+    							  <li><a href="#serverInfoPlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-link">
+    			</span>Server Info</a></li>
+    							  <li><a href="#userInfoPlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-person">
+    			</span>User Info</a></li>
+    						   </ul>
+    						   <div class="panelHolder" id="serverInfoPlaceHolder"></div>
+    						   <div class="panelHolder" id="userInfoPlaceHolder"></div>
+    						 </div>
+    						 <div class="clear"></div>
+    				   </div>
+    				   <div class="subTabsPanel" id="reportsPanel">
+    						<div id="reportsPanelTabs" style="border:none;margin:0px 2px;" class="smalltabs tabs">
+    						   <ul>
+    							  <li><a href="#reportsSetupPlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-gear">
+    			</span>Setup</a></li>
+    							<li><a href="#reportsSchedulePlaceHolder" class="tablink"><span style="display: inline-block;margin: -1px 3px 0px -10px; float: left;" class="pointer ui-icon ui-icon-clock">
+    			</span>Schedule</a></li>
+    						   </ul>
+    						   <div class="panelHolder" id="reportsSetupPlaceHolder"></div>
+    						   <div class="panelHolder" id="reportsSchedulePlaceHolder"></div>
+    						 </div>
+    						 <div class="clear"></div>
+    				   </div>
+    				   <div class="subTabsPanel" id="aboutPanel">
+    				   </div>
+    				</div>
+    				<div class="clear"></div>
+    			</div>
+    			<div class="clear"></div>
+    		</div>
+	   </div>
+    </div>
+    <div id="growlContainer" style="display: none;">
+    	<div id="growl">
+    		<a class="ui-notify-close" href="#"><span class="ui-icon ui-icon-close" style="float: right">
+    		</span></a><span style="float: left; margin: 2px 5px 0 0;" class="ui-icon ui-icon-alert">
+    		</span>
+    		<h2>
+    			#{title}</h2>
+    		<p>
+    			#{text}</p>
+    	</div>
+    </div>
 	<div id="footer" class="ui-widget-content">
 		<div style="margin: 5px 0px; padding: 5px; height: 25px">
 			<div class="fields" style="float:right">
 				<a href="#" class="button backToTop" id=""><span style='display: inline-block;
-					margin: 0px 3px 0px -10px; float: left;' class='pointer ui-icon ui-icon-arrowreturnthick-1-n'>
+					margin: 0px 3px 0px -15px; float: left;' class='pointer ui-icon ui-icon-arrowreturnthick-1-n'>
 				</span><span class="">Back to top</span> </a>
 			</div>
-			<div style="float:left;margin-top:10px;">
+			<div style="float:left;margin-top:5px;">
 				<span id="PoweredByText" class="poweredby">Powered by
 					<a href="http://www.crushftp.com/" target="_blank">CrushFTP</a>
 				</span>

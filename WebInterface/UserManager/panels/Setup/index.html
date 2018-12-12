@@ -89,6 +89,8 @@
 						<option value="rfile">RFile</option>
 						<option value="hadoop">HADOOP</option>
 						<option value="azure">Azure</option>
+						<option value="citrix">Citrix</option>
+						<option value="glacier">Glacier</option>
 					</select>
 					<span class="spacer"></span>
 					<input type="checkbox" _name="encrypted" id="itemProperty_option_encrypturl"  />
@@ -153,7 +155,31 @@
 	                </select>
 	            </td>
 	        </tr>
-			<tr>
+	        <tr class="glacierCredentials">
+	            <td class="itemPropertyLabel">
+	                <label for="itemProperty_option_glacierServerURL">Server : </label>
+	            </td>
+	            <td>
+	                <select id="itemProperty_option_glacierServerURL">
+	                    <option value="glacier.us-east-1.amazonaws.com">glacier.us-east-1.amazonaws.com</option>
+	                    <option value="glacier.us-east-2.amazonaws.com">glacier.us-east-2.amazonaws.com</option>
+	                    <option value="glacier.us-west-1.amazonaws.com">glacier.us-west-1.amazonaws.com</option>
+	                    <option value="glacier.us-west-2.amazonaws.com">glacier.us-west-2.amazonaws.com</option>
+	                    <option value="glacier.external-1.amazonaws.com">glacier.external-1.amazonaws.com</option>
+	                    <option value="glacier.ca-central-1.amazonaws.com">glacier.ca-central-1.amazonaws.com</option>
+	                    <option value="glacier.ap-south-1.amazonaws.com">glacier.ap-south-1.amazonaws.com</option>
+	                    <option value="glacier.ap-northeast-2.amazonaws.com">glacier.ap-northeast-2.amazonaws.com</option>
+	                    <option value="glacier.ap-southeast-1.amazonaws.com">glacier.ap-southeast-1.amazonaws.com</option>
+	                    <option value="glacier.ap-southeast-2.amazonaws.com">glacier.ap-southeast-2.amazonaws.com</option>
+	                    <option value="glacier.ap-northeast-1.amazonaws.com">glacier.ap-northeast-1.amazonaws.com</option>
+	                    <option value="glacier.eu-central-1.amazonaws.com">glacier.eu-central-1.amazonaws.com</option>
+	                    <option value="glacier.eu-west-1.amazonaws.com">glacier.eu-west-1.amazonaws.com</option>
+	                    <option value="glacier.eu-west-2.amazonaws.com">glacier.eu-west-2.amazonaws.com</option>
+	                    <option value="glacier.sa-east-1.amazonaws.com">glacier.sa-east-1.amazonaws.com</option>
+	                </select>
+	            </td>
+	        </tr>
+			<tr class="itemURLOption">
 				<td class="itemPropertyLabel">
 					<label for="itemProperty_option_url">URL : </label>
 				</td>
@@ -500,7 +526,7 @@
 			<tr class="gdriveCredentials">
 				<td></td>
 	            <td>
-	            	<div class="v9-only ">
+	            	<div>
 	                	<input type="checkbox" _name="team_drive" name="team_drive_gdrive" class="excludeXML" id="itemProperty_option_gdrive_team_drive" />
 	                	<label for="itemProperty_option_gdrive_team_drive">Enable Team Drive</label>
 	                </div>
@@ -516,6 +542,27 @@
 					</a>
 					<span class="spacer"></span>
 					<a target="_blank" href="http://www.crushftp.com/crush8wiki/Wiki.jsp?page=GDriveSetup">Learn more</a>
+				</td>
+			</tr>
+			<tr class="citrixCredentials">
+				<td class="itemPropertyLabel" >
+					<label class="username" for="itemProperty_option_client_id">Client ID : </label>
+				</td>
+				<td>
+					<input type="text" _name="client_id" name="client_id" class="excludeXML username" id="itemProperty_option_client_id" />
+					<span class="username">&nbsp;</span>
+					<label for="itemProperty_option_client_secret">Password : </label>
+					<input type="password" _name="client_secret" name="client_secret" class="excludeXML" id="itemProperty_option_client_secret" />
+				</td>
+			</tr>
+			<tr class="citrixCredentials" style="margin-top:10px;">
+				<td class="itemPropertyLabel">
+				</td>
+				<td>
+					<a href="#" class="button refreshCitrixToken" style="top:5px;margin-left:0px;margin-top:7px;">
+						<span style='display:inline-block;margin:0px 3px 0px -7px;float:left;' class='pointer ui-icon ui-icon-refresh'></span>
+						Get Refresh Token
+					</a>
 				</td>
 			</tr>
 			<tr class="hadoopOption">
@@ -815,7 +862,7 @@
 			<tr class="sftpOptions">
 				<td colspan="2">
 					<div>
-						<div class="v9-only">
+						<div>
 							<div class="sftp-suggested-settings"></div>
 						</div>
 					</div>
@@ -829,7 +876,20 @@
 				<li><a href="#itemProperty_Encryption">Encryption</a></li>
 				<li><a href="#itemProperty_Sync">Sync</a></li>
 				<li><a href="#itemProperty_Posix">POSIX</a></li>
+				<li><a href="#itemProperty_Advanced">Extra Permissions</a></li>
 			</ul>
+			<div id="itemProperty_Advanced" class="extra customForm">
+				<div style="clear: both;">
+					<input type="checkbox" class="ignoreBind" _name="ratio" id="itemSync_option_setup_ratio"/>
+					<label for="itemSync_option_setup_ratio">Free Ratio</label>
+				</div>
+				<div class="vtip" title="If enabled, web downloads will not tell he browser how big the file is so that the file's size can be bigger or smaller when finally downloaded.">
+					<input type="checkbox" _name="dynamic_size" id="itemSync_option_dynamic_size" />
+					<label for="itemSync_option_dynamic_size">
+						Dynamic Size
+					</label>
+				</div>
+			</div>
 			<div id="itemProperty_Encryption" class="customForm sideScroll" style="height:420px;">
 				<table width="100%">
 					<tr>
@@ -1214,7 +1274,7 @@
         </tr>
         <tr>
             <td class="customForm nobg">
-                <fieldset class="ui-widget-content nobg">
+                <fieldset class="ui-widget-content nobg" config="account_info">
                     <legend class="collapseHandle pointer"></legend>
                     <div class="dataDiv">
                         <fieldset id="accountDetailsAndOptions" class="noForm nobg notInheritable" filterKeywords="password use_name random account enabled disabled setup">
@@ -1227,14 +1287,14 @@
                                     <td class="settingsArea">
                                         <div>
                                             <table style="padding-left: 20px;">
-                                                <tr>
+                                                <tr config="account_enabled">
                                                     <td colspan="2">
                                                         <input type="checkbox" id="account_enabled" class="excludeXML" />
                                                         <label for="account_enabled">
                                                             Account Enabled</label>
                                                             <label id="expiredLabel" style="color:red;margin-left:10px;">
                                                             	(Account is expired)
-                                                            	<a class="v9-only" style="top:-4px" href="javascript:void(0);" id="extendExpiration">
+                                                            	<a style="top:-4px" href="javascript:void(0);" id="extendExpiration">
                                                             		<span class="ui-icon ui-icon-clock" style="display: inline-block;top: 3px;position: relative;"></span>
                                                             		Extend Expiration
                                                             	</a>
@@ -1245,7 +1305,7 @@
                                                     <td colspan="2">
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                <tr config="user_name">
                                                     <td style="width: 100px;">
                                                         <label for="user_name">
                                                             User name :
@@ -1255,7 +1315,7 @@
                                                         <input class="validate" valtype="userName" type="text" id="crush_value1"  style="width:230px;" />
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                <tr config="password">
                                                     <td style="width: 100px;">
                                                         <label for="password" id="revealPassword">
                                                             Password :
@@ -1266,7 +1326,7 @@
                                                     </td>
                                                 </tr>
 											</table>
-											<table style="padding-left: 20px;">
+											<table style="padding-left: 20px;" config="generate_password">
                                                 <tr>
                                                     <td id="randomPasswordPanel">
                                                         <a id="generateRandomPass" href="#" class="button" style="top: 0px;">
@@ -1287,7 +1347,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-corner-all nobg saltPanel" filterKeywords="salt" pnlId="setup5">
+                        <fieldset class="ui-corner-all nobg saltPanel" filterKeywords="salt" pnlId="setup5" config="salt">
                             <table quickLocate="Salt setup">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -1310,7 +1370,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-corner-all nobg" filterKeywords="auto password" pnlId="setup1">
+                        <fieldset class="ui-corner-all nobg" filterKeywords="auto password" pnlId="setup1" config="auto_set_pass">
                             <table quickLocate="Auto Set Password on next login">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -1326,7 +1386,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-corner-all nobg" filterKeywords="phone" pnlId="setup5">
+                        <fieldset class="ui-corner-all nobg" filterKeywords="phone" pnlId="setup5" config="phone">
                             <table quickLocate="User Phone">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -1343,7 +1403,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-corner-all nobg" filterKeywords="two factor sms authentication otp twilio" pnlId="setup6">
+                        <fieldset class="ui-corner-all nobg" filterKeywords="two factor sms authentication otp twilio" pnlId="setup6" config="otp_auth">
                             <table quickLocate="Use two factor sms authentication (OTP)">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -1354,7 +1414,7 @@
                                             <input type="checkbox" id="otp_auth" />
                                             <label for="otp_auth">
                                                 Two factor OTP/SMS authentication.</label>
-                                            <div class="v9-only">
+                                            <div>
 	                                            <table id="two-factor-protocols" style="width: 850px;margin-left: -3px;display: none;">
 													<tr>
 														<td>
@@ -1400,7 +1460,28 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-corner-all nobg" filterKeywords="email first last name" pnlId="setup2">
+                        <fieldset class="ui-corner-all nobg" filterKeywords="two factor authentication google secret" pnlId="setup7" config="twofactor_secret">
+                            <table quickLocate="Use two factor sms authentication (OTP)">
+                                <tr>
+                                    <td class="checkboxArea ui-widget-content rightborder nobg">
+                                        <input type="checkbox" />
+                                    </td>
+                                    <td class="settingsArea">
+                                        <div class="fields">
+                                            <label for="twofactor_secret">
+                                                Two factor authentication secret.
+                                            </label>
+                                            <input type="password" id="twofactor_secret" class="bigInputBox" readonly="readonly" />
+                                            <a href="#" id="clear2FASecret" class="button">
+                                            	<span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-trash'></span>
+                                            	<span class="">Clear Secret</span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                        <fieldset class="ui-corner-all nobg" filterKeywords="email first last name" pnlId="setup2" config="user_info">
                             <table quickLocate="User Email">
                                 <tr>
                                     <td class="checkboxArea ui-widget-content rightborder nobg">
@@ -1409,7 +1490,7 @@
                                     <td class="settingsArea">
                                         <div>
                                             <table style="padding-left: 20px;">
-                                                <tr>
+                                                <tr config="email">
                                                     <td style="width: 100px;">
                                                         <label for="email">
                                                             Email :
@@ -1419,7 +1500,7 @@
                                                         <input type="text" valtype="email" id="email" class="bigInputBox validate" />
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                <tr config="first_name">
                                                     <td>
                                                         <label for="first_name">
                                                             First Name :
@@ -1429,7 +1510,7 @@
                                                         <input type="text" id="first_name" />
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                <tr config="last_name">
                                                     <td>
                                                         <label for="last_name">
                                                             Last Name :
@@ -1441,12 +1522,12 @@
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2" style="padding-top: 10px;">
-                                                        <a href="#" id="sendPassEmail" class="button">
+                                                        <a href="#" id="sendPassEmail" class="button" config="sendUserPassInfoMail">
                                                         	<span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-mail-closed'></span>
-                                                        	<span class="">Send email with user/pass information </span>
+                                                        	<span class="">Send e-mail to this user</span>
                                                         </a>
 														<span class="spacer"></span>
-														<a href="javascript:void(0);" id="runJobForUser" class="button adminOnly" style="padding-right: 15px;">
+														<a href="javascript:void(0);" id="runJobForUser" class="button adminOnly" style="padding-right: 15px;" config="runUserJob">
                                                         	<span style='display: inline-block; margin: 0px 3px 0px -7px;float: left;' class='pointer ui-icon ui-icon-copy'></span>
                                                         	<span class="">Run Job </span>
                                                         	<span class="ui-icon ui-icon-triangle-1-s" style="position: absolute;right: 5px;top: 5px;"></span>
@@ -1459,7 +1540,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset id="vfsItemsListingAndOptions" class="ui-corner-all nobg" filterKeywords="vfs virtual file system folder quota comment rename delete upload download home ratio" pnlId="setup3">
+                        <fieldset id="vfsItemsListingAndOptions" class="ui-corner-all nobg" filterKeywords="vfs virtual file system folder quota comment rename delete upload download home ratio" pnlId="setup3" config="VFS">
                         	<div id="vfsSetupHelp" class="ui-widget ui-widget-content">
 								<div class="" style="padding:3px;display:block;margin:0px 3px;">
 									<span style="float:right;cursor: pointer;position: absolute;right: 6px;margin-top: -8px;" class="close">x</span>
@@ -1639,7 +1720,7 @@
                                                         	</span>
                                                         	<span style="float: right;margin-top: 10px;">
 	                                                        	<label for="sortVFSItems">Sort :</label>
-	                                                        	<select id="sortVFSItems" class="ignoreChange">
+	                                                        	<select id="sortVFSItems" class="ignoreChange ignoreBind">
 	                                                        		<option value="" selected>Default</option>
 												                	<option value="name">Name Ascending</option>
 												                	<option value="name-d">Name Descending</option>
@@ -1693,9 +1774,6 @@
 																	<input type="checkbox" class="ignoreBind" id="setup_invisible"/><label for="setup_invisible">Make Invisible</label>
 																</div>
 																<div style="clear: both;">
-																	<input type="checkbox" class="ignoreBind" id="setup_ratio"/><label for="setup_ratio">Free Ratio</label>
-																</div>
-																<div style="clear: both;">
 																	<span title="Replicate" class="vtip replicate-checkbox">
 																		<input type="checkbox" class="ignoreBind" id="setup_replicate"/><label for="setup_replicate">Replicate</label>
 																	</span>
@@ -1735,7 +1813,7 @@
                                 </tr>
                             </table>
                         </fieldset>
-                        <fieldset class="ui-corner-all nobg" filterKeywords="linking linked vfs"  pnlId="setup4">
+                        <fieldset class="ui-corner-all nobg" filterKeywords="linking linked vfs"  pnlId="setup4" config="VFS_LINKING">
                             <table quickLocate="VFS Linking">
                                 <tr>
                                     <td id="linkedVFSCheck" propertyType="panelSetup:LinkedVFS" class="checkboxArea ui-widget-content rightborder nobg specialProperty">

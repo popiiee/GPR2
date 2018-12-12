@@ -8,7 +8,6 @@ panelRestrictions.localization = {};
 
 // Panel details
 var panelName = "Restrictions";
-panelRestrictions._panel = $("#pnl" + panelName);
 
 // Localizations
 panelRestrictions.localization = {
@@ -106,7 +105,7 @@ panelRestrictions.bindData = function(userInfo, jsonDeep, panel)
 		var tasks = panelRestrictions.availablePlugins();
 		if(tasks && tasks.length>0)
 		{
-			var crushTaskDrps = $("#account_expire_task, #disabled_account_task", panelRestrictions._panel).empty();
+			var crushTaskDrps = $("#account_expire_task, #disabled_account_task, #account_expire_notify_task, #password_expire_notify_task", panel).empty();
 			var pluginOpts = $('<optgroup label="Plugin"></optgroup>');
 			for(var i=0;i<tasks.length;i++)
 			{
@@ -125,6 +124,10 @@ panelRestrictions.bindData = function(userInfo, jsonDeep, panel)
 			crushTaskDrps.prepend("<option value=''>Please Select</option>");
 		}
 
+		if(typeof userInfo.user.password_expire_advance_days_notify == "undefined")
+			userInfo.user.password_expire_advance_days_notify = "10";
+		if(typeof userInfo.user.account_expire_advance_days_notify == "undefined")
+			userInfo.user.account_expire_advance_days_notify = "10";
 		userManager.data.bindValuesFromJson(dataPanel, userInfo.user, false, panel);
 
 		if($("#fileEncryptionKey", dataPanel).val() != "")
