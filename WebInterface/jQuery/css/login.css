@@ -27,7 +27,7 @@ div#signup #panelSignup
 div#panelbody, div#changepasswordPanel {
     background-color:#fff;
     padding:0px 10px 10px 10px;
-    border: 1px solid #eee;
+    border: 1px solid #03C5F0;
     -moz-border-radius: 10px 10px 10px 10px;
     border-radius: 10px 10px 10px 10px;
     -webkit-border-radius: 10px 10px 10px 10px;
